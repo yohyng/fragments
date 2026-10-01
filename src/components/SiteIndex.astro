@@ -1,6 +1,7 @@
 ---
 import { categories } from '../content.config';
 import { formatDate, type Post } from '../lib/posts';
+import { site } from '../lib/site';
 
 interface Props {
   posts: Post[];
@@ -12,10 +13,10 @@ const LIMIT = 20;
 ---
 
 <nav class="index" data-scroll data-noscrollbar data-index aria-label="記事索引">
-  <a class="site" href="/">fragments</a>
+  <a class="site" href="/">{site.name}</a>
   <div class="intro">
-    <span class="intro-ja">建築・空間・デザインをめぐる思索、試論 /</span>
-    <span class="intro-en">Explorations and Abductive Speculations on Architecture, Space, and Design.</span>
+    <span class="intro-ja">{site.catchJa}</span>
+    <span class="intro-en">{site.catchEn}</span>
     <div class="cats">
       {
         ['all', ...categories].map((c) => (

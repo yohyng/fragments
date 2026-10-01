@@ -1,0 +1,144 @@
+---
+// Article end: subscribe → 前の記事 / 次の記事 → 関連する記事
+import Subscribe from './Subscribe.astro';
+import { formatDate, type Post } from '../lib/posts';
+
+interface Props {
+  post: Post;
+  /** all posts, newest first */
+  posts: Post[];
+}
+const { post, posts } = Astro.props;
+
+// 「前の記事」 is the next older post, 「次の記事」 the next newer one
+const i = posts.findIndex((p) => p.slug === post.slug);
+const prev = posts[i + 1];
+const next = posts[i - 1];
+// 関連する記事: same category, newest first
+const related = posts.filter((p) => p.category === post.category && p.slug !== post.slug).slice(0, 3);
+---
+
+<aside class="sub" aria-label="購読">
+  <Subscribe />
+</aside>
+<nav class="pager" aria-label="前後の記事">
+  {
+    prev && (
+      <a class="prev" href={`/posts/${prev.slug}/`} rel="prev">
+        <span class="label">前の記事</span>
+        <span>{prev.title}</span>
+      </a>
+    )
+  }
+  {
+    next && (
+      <a class="next" href={`/posts/${next.slug}/`} rel="next">
+        <span class="label">次の記事</span>
+        <span>{next.title}</span>
+      </a>
+    )
+  }
+</nav>
+{
+  related.length > 0 && (
+    <nav class="related" aria-label="関連する記事">
+      <div class="related-label">関連する記事</div>
+      {related.map((r) => (
+        <a href={`/posts/${r.slug}/`}>
+          <span class="related-title">
+            {r.title}
+            {r.subtitle && <span class="related-sub">{r.subtitle}</span>}
+          </span>
+          <span class="related-date">{formatDate(r.date)}</span>
+        </a>
+      ))}
+    </nav>
+  )
+}
+
+<style>
+  /* Article end: subscribe → prev / next → related (widths follow the body's 34em) */
+  .sub,
+  .pager,
+  .related {
+    max-width: calc(34 * clamp(15px, 0.8rem + 0.2vw, 16px));
+  }
+  .sub {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 96px;
+    padding: 48px 0 12px;
+    border-top: 1px solid var(--color-text);
+    font-family: var(--font-mincho);
+    font-size: 14px;
+  }
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 24px;
+    margin-top: 40px;
+    font-family: var(--font-mincho);
+    font-size: 13px;
+    line-height: 1.75;
+  }
+  .pager a {
+    display: flex;
+    flex-direction: column;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .pager a:hover {
+    color: var(--color-accent-700);
+  }
+  .pager .next {
+    grid-column: 2;
+    align-items: flex-end;
+    text-align: right;
+  }
+  .pager .label {
+    font-family: var(--font-body);
+    font-size: 11.5px;
+    color: var(--color-neutral-700);
+  }
+  .related {
+    display: flex;
+    flex-direction: column;
+    margin-top: 48px;
+  }
+  .related-label {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--color-neutral-700);
+    padding-bottom: 6px;
+  }
+  .related a {
+    display: block;
+    padding: 6px 0;
+    font-family: var(--font-mincho);
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .related a:hover {
+    color: var(--color-accent-700);
+  }
+  .related-title {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .related-sub {
+    margin-left: 8px;
+    color: var(--color-neutral-700);
+  }
+  .related-date {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--color-neutral-700);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

@@ -1,0 +1,49 @@
+---
+// Image at the body's full width, 3:2, with a caption.
+// <Figure src="/img/x.jpg" alt="…" caption="図1　…" />
+// Without `src` it draws the grey placeholder from the design.
+interface Props {
+  src?: string;
+  alt?: string;
+  caption?: string;
+}
+const { src, alt = '', caption } = Astro.props;
+---
+
+<figure>
+  {src ? <img src={src} alt={alt} loading="lazy" decoding="async" /> : <div class="placeholder">image（3:2）</div>}
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  figure {
+    margin: 2.2em 0;
+  }
+  img,
+  .placeholder {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    border: 6px solid var(--color-surface);
+    outline: 1px solid var(--color-divider);
+  }
+  img {
+    object-fit: cover;
+  }
+  .placeholder {
+    background: var(--color-neutral-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--color-neutral-600);
+  }
+  figcaption {
+    margin-top: 10px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--color-neutral-700);
+    text-align: left;
+  }
+</style>

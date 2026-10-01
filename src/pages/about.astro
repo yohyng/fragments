@@ -1,0 +1,133 @@
+---
+// p3: catch and description where the body goes, contact where the notes go.
+// The bottom rule is always shown.
+import Page from '../layouts/Page.astro';
+import { site } from '../lib/site';
+---
+
+<Page title="about — fragments">
+  <main class="column" data-scroll data-noscrollbar>
+    <div class="rule" aria-hidden="true"></div>
+    <header class="head">
+      <h1>about</h1>
+    </header>
+    <div class="grid">
+      <div class="text">
+        <p class="catch-ja">{site.catchJa}</p>
+        <p class="catch-en">{site.catchEn}</p>
+        <p class="desc">{site.about}</p>
+      </div>
+      <div class="side">
+        <div class="contact">
+          <span class="label">Contact</span>
+          {site.contact.map((c) => <a href={c.href}>{c.label}</a>)}
+        </div>
+      </div>
+    </div>
+    <div class="end-space"></div>
+    <div class="endrule" data-endrule></div>
+  </main>
+</Page>
+
+<style>
+  .column {
+    height: 100%;
+    overflow-y: auto;
+    padding-bottom: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .rule {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--color-bg);
+    height: 36px;
+    padding-bottom: 6px;
+    box-sizing: content-box;
+    border-bottom: 1px solid var(--color-neutral-700);
+  }
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 56px;
+    min-height: 220px;
+    box-sizing: border-box;
+  }
+  h1 {
+    font-family: var(--font-mincho-heading);
+    font-weight: 500;
+    font-size: 30px;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 34em) 300px;
+    column-gap: 88px;
+  }
+  .text {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    font-size: clamp(15px, 0.8rem + 0.2vw, 16px);
+    line-height: 1.9;
+  }
+  .catch-ja {
+    margin: 0;
+    font-family: var(--font-mincho-heading);
+    font-size: 18px;
+    line-height: 1.7;
+  }
+  .catch-en {
+    margin: 0;
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-neutral-800);
+  }
+  .desc {
+    margin: 0;
+    font-family: var(--font-mincho);
+    text-align: justify;
+    color: var(--color-neutral-800);
+    padding-top: 20px;
+    border-top: 1px solid var(--color-divider);
+  }
+  .side {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    font-family: var(--font-mincho);
+    font-size: 12px;
+    line-height: 1.75;
+    color: var(--color-neutral-800);
+  }
+  .contact {
+    display: flex;
+    flex-direction: column;
+  }
+  .label {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--color-neutral-700);
+  }
+  .end-space {
+    min-height: 96px;
+    flex: 1 0 96px;
+  }
+  .endrule {
+    flex: none;
+    position: sticky;
+    bottom: 0;
+    height: 0;
+    border-top: 1px solid var(--color-neutral-700);
+  }
+  /* always shown on this page */
+  .endrule[data-endrule] {
+    opacity: 1;
+  }
+</style>

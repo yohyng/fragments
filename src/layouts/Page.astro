@@ -1,0 +1,33 @@
+---
+// PC page: index column (360px) | 56px | right column. 100vh, no page scroll;
+// each column scrolls on its own.
+import Base from './Base.astro';
+import SiteIndex from '../components/SiteIndex.astro';
+import { getPosts } from '../lib/posts';
+
+interface Props {
+  title: string;
+  /** slug of the article being read */
+  current?: string;
+}
+const { title, current } = Astro.props;
+const posts = await getPosts();
+---
+
+<Base title={title}>
+  <div class="page">
+    <SiteIndex posts={posts} current={current} />
+    <slot />
+  </div>
+</Base>
+
+<style>
+  .page {
+    height: 100vh;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 360px minmax(0, 1fr);
+    column-gap: 56px;
+    padding: 48px 32px 32px;
+  }
+</style>

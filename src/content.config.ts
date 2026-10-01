@@ -18,7 +18,7 @@ const note = z.object({
 
 const posts = defineCollection({
   // slug = file name (e.g. src/content/posts/2026-10-01.md → "2026-10-01")
-  loader: glob({ pattern: '**/*.md', base: './src/content/posts' }),
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/posts' }),
   schema: z.object({
     /** Display format "2026.10.01" is derived from this */
     date: z.coerce.date(),

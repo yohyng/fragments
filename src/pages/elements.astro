@@ -1,0 +1,12 @@
+---
+// p8: sample of every element an article can use. Not listed in the index.
+import Page from '../layouts/Page.astro';
+import Article from '../layouts/Article.astro';
+import { Content, frontmatter } from '../samples/elements.mdx';
+---
+
+<Page title={`${frontmatter.title} — fragments`}>
+  <Article title={frontmatter.title} subtitle={frontmatter.subtitle} date={new Date(frontmatter.date)}>
+    <Content />
+  </Article>
+</Page>

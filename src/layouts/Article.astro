@@ -1,0 +1,280 @@
+---
+// Right column of an article page: header rule, title block, body (with
+// sidenotes), then the `end` slot, a 96px space and the bottom rule.
+import { formatDate } from '../lib/posts';
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  date: Date;
+}
+const { title, subtitle, date } = Astro.props;
+---
+
+<main class="column" data-scroll data-noscrollbar>
+  <div class="rule" aria-hidden="true"></div>
+  <article>
+    <header class="head">
+      <h1>{title}</h1>
+      {subtitle && <div class="subtitle">{subtitle}</div>}
+      <time class="date" datetime={date.toISOString().slice(0, 10)}>{formatDate(date)}</time>
+    </header>
+    <div class="body">
+      <slot />
+    </div>
+  </article>
+  <slot name="end" />
+  <div class="end-space"></div>
+  <div class="endrule" data-endrule></div>
+</main>
+
+<style>
+
+  .column {
+    height: 100%;
+    overflow-y: auto;
+    padding-bottom: 0;
+  }
+  .end-space {
+    height: 96px;
+  }
+  .endrule {
+    position: sticky;
+    bottom: 0;
+    height: 0;
+    border-top: 1px solid var(--color-neutral-700);
+  }
+  .rule {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--color-bg);
+    height: 36px;
+    padding-bottom: 6px;
+    box-sizing: content-box;
+    border-bottom: 1px solid var(--color-neutral-700);
+  }
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 56px;
+    min-height: 220px;
+    box-sizing: border-box;
+  }
+  h1 {
+    font-family: var(--font-mincho-heading);
+    font-weight: 500;
+    font-size: clamp(26px, 1.4rem + 0.6vw, 32px);
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+  .subtitle {
+    font-family: var(--font-mincho-heading);
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--color-neutral-800);
+  }
+  .date {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--color-neutral-700);
+    font-variant-numeric: tabular-nums;
+    margin-top: 10px;
+  }
+  .body {
+    max-width: 34em;
+    font-family: var(--font-mincho);
+    font-size: clamp(15px, 0.8rem + 0.2vw, 16px);
+    line-height: 1.9;
+    text-align: justify;
+    letter-spacing: 0.02em;
+  }
+  .body :global(p),
+  .body :global(.p) {
+    margin: 0;
+    text-indent: 1em;
+  }
+
+  /* Note number square — in the text */
+  .body :global(.note-ref) {
+    font-family: var(--font-body);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-indent: 0;
+    min-width: 15px;
+    height: 15px;
+    padding: 0 3px;
+    box-sizing: border-box;
+    font-size: 10px;
+    line-height: 1;
+    color: #fff;
+    cursor: pointer;
+    font-variant-numeric: tabular-nums;
+    border-radius: 1px;
+    margin: 0 2px;
+    vertical-align: 4px;
+    background: var(--color-accent);
+  }
+  .body :global(.note-ref a),
+  .body :global(.note-num) {
+    color: #fff;
+    text-decoration: none;
+  }
+
+  /* Sidenote */
+  .body :global(.sidenote) {
+    display: inline;
+    float: right;
+    clear: right;
+    width: 300px;
+    margin-right: -388px;
+    margin-bottom: 16px;
+    text-indent: 0;
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--color-neutral-800);
+    background: transparent;
+  }
+  .body :global(.sidenote-head) {
+    display: block;
+    color: var(--color-text);
+  }
+  .body :global(.note-num) {
+    font-family: var(--font-body);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-indent: 0;
+    min-width: 15px;
+    height: 15px;
+    padding: 0 3px;
+    box-sizing: border-box;
+    font-size: 10px;
+    line-height: 1;
+    cursor: pointer;
+    font-variant-numeric: tabular-nums;
+    border-radius: 1px;
+    margin-right: 8px;
+    vertical-align: 2px;
+    background: var(--color-accent);
+  }
+  .body :global(.sidenote-cite) {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--color-neutral-700);
+    margin: 2px 0 4px;
+  }
+  .body :global(.sidenote-body) {
+    display: block;
+    text-align: justify;
+  }
+
+  /* Hover / jump highlight */
+  .body :global(.note-ref.is-hl),
+  .body :global(.sidenote.is-hl .note-num) {
+    background: var(--color-accent-900);
+  }
+  .body :global(.sidenote.is-hl) {
+    background: var(--color-accent-100);
+  }
+
+  /* Elements inside the body (p8) */
+  .body :global(h2) {
+    font-family: var(--font-mincho-heading);
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    margin: 2.2em 0 0.8em;
+  }
+  .body :global(h3) {
+    font-family: var(--font-mincho-heading);
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 1.6;
+    margin: 1.8em 0 0.4em;
+  }
+  .body :global(blockquote) {
+    margin: 2em 0;
+    padding: 2px 0 2px 1.5em;
+    border-left: 1px solid var(--color-accent);
+    color: var(--color-neutral-800);
+  }
+  .body :global(blockquote cite) {
+    display: block;
+    margin-top: 8px;
+    font-style: normal;
+    font-size: 12px;
+    color: var(--color-neutral-700);
+  }
+  .body :global(ul),
+  .body :global(ol) {
+    margin: 1.6em 0;
+    padding-left: 1.4em;
+    text-indent: 0;
+  }
+  .body :global(li) {
+    margin: 0;
+  }
+</style>
+
+<script>
+  // Hover a number or note → highlight both. Click a number → smooth-scroll to
+  // its counterpart inside the column, then keep it highlighted for 1.6s.
+  // (The scroll moves the number out from under the cursor, which fires
+  // mouseleave; that must not end the 1.6s highlight.)
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let jumping = false;
+  const pair = (id: string) => document.querySelectorAll(`[data-note="${CSS.escape(id)}"]`);
+  const setHl = (id: string | null) => {
+    document.querySelectorAll('[data-note].is-hl').forEach((n) => n.classList.remove('is-hl'));
+    if (id) pair(id).forEach((n) => n.classList.add('is-hl'));
+  };
+  const go = (targetId: string, id: string) => {
+    const el = document.getElementById(targetId);
+    if (el) {
+      const r = el.getBoundingClientRect();
+      const sc = el.closest<HTMLElement>('[data-scroll]');
+      if (sc) {
+        const sr = sc.getBoundingClientRect();
+        sc.scrollTo({ top: sc.scrollTop + r.top - sr.top - sr.height / 3, behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: window.scrollY + r.top - window.innerHeight / 3, behavior: 'smooth' });
+      }
+    }
+    setHl(id);
+    jumping = true;
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      jumping = false;
+      setHl(null);
+    }, 1600);
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-note]').forEach((node) => {
+    const id = node.dataset.note!;
+    node.addEventListener('mouseenter', () => {
+      clearTimeout(timer);
+      jumping = false;
+      setHl(id);
+    });
+    node.addEventListener('mouseleave', () => {
+      if (!jumping) setHl(null);
+    });
+  });
+  document.querySelectorAll<HTMLAnchorElement>('.note-ref a, .note-num').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const target = a.getAttribute('href')!.slice(1);
+      go(target, target.replace(/^(note|ref)-/, ''));
+    });
+  });
+</script>
