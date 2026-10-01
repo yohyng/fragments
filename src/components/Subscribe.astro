@@ -1,0 +1,137 @@
+---
+// Subscribe box: one 1px accent frame holding the email field and the button.
+// After sending it is replaced by the 「✓ Subscribed」 band and a note.
+---
+
+<div class="subscribe" data-subscribe>
+  <form class="field" novalidate>
+    <input
+      type="email"
+      name="email"
+      autocomplete="email"
+      aria-label="メールアドレス"
+      placeholder="email@example.com　新着記事をメールで受け取る"
+    />
+    <button type="submit">Subscribe</button>
+  </form>
+  <div class="done" hidden>
+    <div class="band"><span class="check" aria-hidden="true">✓</span><span>Subscribed</span></div>
+    <div class="msg" role="status"></div>
+  </div>
+</div>
+
+<style>
+  .field {
+    display: flex;
+    height: 34px;
+    border: 1px solid var(--color-accent);
+    border-radius: 0;
+    margin: 0;
+  }
+  .field[hidden] {
+    display: none;
+  }
+  input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0 12px;
+    font-family: var(--font-body), 'Zen Old Mincho', serif;
+    font-size: 14px;
+    color: var(--color-text);
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    outline: none;
+  }
+  input:focus,
+  input:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 0.5px var(--color-accent);
+  }
+  input::placeholder {
+    font-size: 12px;
+    color: var(--color-neutral-500);
+  }
+  button {
+    flex: none;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: #fff;
+    background: var(--color-accent);
+    text-decoration: none;
+    border: 0;
+    border-radius: 0;
+    cursor: pointer;
+  }
+  button:hover {
+    background: var(--color-accent-600);
+  }
+  .done:not([hidden]) {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .band {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 34px;
+    padding: 0 12px;
+    border: 1px solid var(--color-accent);
+    background: var(--color-accent-100);
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--color-accent-700);
+  }
+  .check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    background: var(--color-accent);
+    color: #fff;
+    font-size: 11px;
+    line-height: 1;
+  }
+  .msg {
+    font-size: 11.5px;
+    line-height: 1.7;
+    color: var(--color-neutral-700);
+  }
+</style>
+
+<script>
+  import { subscribe } from '../lib/subscribe';
+
+  document.querySelectorAll<HTMLElement>('[data-subscribe]').forEach((box) => {
+    const form = box.querySelector('form')!;
+    const input = form.querySelector('input')!;
+    const button = form.querySelector('button')!;
+    const done = box.querySelector<HTMLElement>('.done')!;
+    let sending = false;
+
+    // Click or Enter. Input without "@" does nothing.
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = input.value;
+      if (sending || !email.includes('@')) return;
+      sending = true;
+      button.textContent = 'Sending…';
+      try {
+        await subscribe(email);
+        done.querySelector('.msg')!.textContent =
+          email + ' に確認メールを送りました。メール内のリンクを押すと登録が完了します。';
+        form.hidden = true;
+        done.hidden = false;
+      } finally {
+        sending = false;
+        button.textContent = 'Subscribe';
+      }
+    });
+  });
+</script>
