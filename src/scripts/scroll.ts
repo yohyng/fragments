@@ -40,6 +40,7 @@ document.addEventListener(
   (e) => {
     const t = e.target as Column;
     if (!t || !t.hasAttribute || !t.hasAttribute('data-scroll')) return;
+    if (t.hasAttribute('data-restoring')) return;
     if (t.scrollTop + t.clientHeight >= t.scrollHeight - 2) t.setAttribute('data-atend', '');
     else t.removeAttribute('data-atend');
     const th = place(t);
