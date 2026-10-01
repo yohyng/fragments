@@ -1,0 +1,44 @@
+/* Design tokens — copied from design_handoff_fragments/styles.css :root
+   and the overrides in design_handoff_fragments/fragments v2.dc.html :root. */
+:root {
+  --color-bg: #f3f2f2;
+  --color-surface: #eae9e9;
+  --color-text: #201f1d;
+  --color-divider: color-mix(in srgb, #201f1d 16%, transparent);
+
+  --color-neutral-100: #f8f4f4;
+  --color-neutral-200: #eae7e7;
+  --color-neutral-300: #d7d3d3;
+  --color-neutral-400: #bab6b6;
+  --color-neutral-500: #9b9797;
+  --color-neutral-600: #7d7979;
+  --color-neutral-700: #605d5d;
+  --color-neutral-800: #444141;
+  --color-neutral-900: #2d2b2b;
+
+  --color-accent: #0000ff;
+  --color-accent-100: #e8e8ff;
+  --color-accent-200: #d0d0ff;
+  --color-accent-300: #a0a0ff;
+  --color-accent-400: #6060ff;
+  --color-accent-500: #0000ff;
+  --color-accent-600: #0000d8; /* hover */
+  --color-accent-700: #0000ff;
+  --color-accent-800: #0000b0;
+  --color-accent-900: #000080;
+
+  --sel-bg: var(--color-accent);
+  --sel-fg: #fff;
+
+  /* Latin: site name / dates, categories, about, subscribe, note numbers */
+  --font-heading: "Cormorant Garamond", system-ui, sans-serif;
+  --font-body: "Lora", system-ui, sans-serif;
+  /* Japanese: headings & subtitles / body, notes, index */
+  --font-mincho-heading: 'Shippori Mincho';
+  --font-mincho: 'Zen Old Mincho';
+}
+
+::selection {
+  background: var(--sel-bg);
+  color: var(--sel-fg);
+}
