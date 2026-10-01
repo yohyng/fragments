@@ -18,6 +18,7 @@ const next = posts[i - 1];
 const related = posts.filter((p) => p.category === post.category && p.slug !== post.slug).slice(0, 3);
 ---
 
+<div class="end">
 <aside class="sub" aria-label="購読">
   <Subscribe />
 </aside>
@@ -55,6 +56,7 @@ const related = posts.filter((p) => p.category === post.category && p.slug !== p
     </nav>
   )
 }
+</div>
 
 <style>
   /* Article end: subscribe → prev / next → related (widths follow the body's 34em) */
@@ -140,5 +142,66 @@ const related = posts.filter((p) => p.category === post.category && p.slug !== p
     font-size: 11px;
     color: var(--color-neutral-700);
     font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Tablet (p6): body is 30em × 15.5px = 465px ── */
+  @media (max-width: 1199px) {
+    .sub,
+    .pager,
+    .related {
+      max-width: 465px;
+    }
+    .sub {
+      margin-top: 72px;
+      padding: 14px 0 12px;
+      border-top-color: var(--color-divider);
+    }
+    .pager {
+      font-size: 13.5px;
+    }
+    .related {
+      margin-top: 40px;
+    }
+  }
+
+  /* ── Phone (p5): stacked, after the notes ── */
+  @media (max-width: 759px) {
+    .end {
+      display: flex;
+      flex-direction: column;
+      margin-top: 24px;
+      font-family: var(--font-mincho);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .sub,
+    .pager,
+    .related {
+      max-width: none;
+    }
+    .sub {
+      margin-top: 0;
+      padding: 14px 0 10px;
+    }
+    .pager {
+      display: flex;
+      flex-direction: column;
+      margin-top: 32px;
+      font-size: inherit;
+      line-height: inherit;
+    }
+    .pager a {
+      padding: 8px 0;
+    }
+    .pager .next {
+      align-items: stretch;
+      text-align: left;
+    }
+    .pager .label {
+      font-size: 11px;
+    }
+    .related {
+      margin-top: 28px;
+    }
   }
 </style>

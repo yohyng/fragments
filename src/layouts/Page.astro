@@ -7,15 +7,17 @@ import { getPosts } from '../lib/posts';
 
 interface Props {
   title: string;
+  /** 'top': below 1200px only the index is shown; 'article': only the right column */
+  mode?: 'top' | 'article';
   /** slug of the article being read */
   current?: string;
 }
-const { title, current } = Astro.props;
+const { title, current, mode = 'article' } = Astro.props;
 const posts = await getPosts();
 ---
 
 <Base title={title}>
-  <div class="page">
+  <div class:list={['page', `page--${mode}`]}>
     <SiteIndex posts={posts} current={current} />
     <slot />
   </div>
@@ -29,5 +31,21 @@ const posts = await getPosts();
     grid-template-columns: 360px minmax(0, 1fr);
     column-gap: 56px;
     padding: 48px 32px 32px;
+  }
+  /* Tablet (p6/p7) */
+  @media (max-width: 1199px) {
+    .page {
+      display: block;
+      padding: 40px 36px 64px;
+    }
+    .page--article > :global([data-index]) {
+      display: none;
+    }
+  }
+  /* Phone (p4/p5) */
+  @media (max-width: 759px) {
+    .page {
+      padding: 32px 20px 44px;
+    }
   }
 </style>

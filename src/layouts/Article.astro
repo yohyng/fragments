@@ -12,7 +12,7 @@ const { title, subtitle, date } = Astro.props;
 ---
 
 <main class="column" data-scroll data-noscrollbar>
-  <div class="rule" aria-hidden="true"></div>
+  <div class="rule"><a class="site" href="/">fragments</a></div>
   <article>
     <header class="head">
       <h1>{title}</h1>
@@ -29,6 +29,7 @@ const { title, subtitle, date } = Astro.props;
 </main>
 
 <style>
+  /* ≥1200px: PC (p2/p8). ≤1199px: tablet (p6). ≤759px: phone (p5). */
 
   .column {
     height: 100%;
@@ -185,6 +186,13 @@ const { title, subtitle, date } = Astro.props;
     background: var(--color-accent-100);
   }
 
+  .site {
+    display: none;
+  }
+  .body :global(.notes-list) {
+    display: none;
+  }
+
   /* Elements inside the body (p8) */
   .body :global(h2) {
     font-family: var(--font-mincho-heading);
@@ -223,6 +231,112 @@ const { title, subtitle, date } = Astro.props;
   .body :global(li) {
     margin: 0;
   }
+
+  /* ── Tablet (p6): no index; body 30em, notes 210px at 40px ── */
+  @media (max-width: 1199px) {
+    .rule {
+      z-index: 2;
+      height: auto;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .site {
+      display: block;
+      font-family: var(--font-heading);
+      font-size: 28px;
+      line-height: 1.2;
+      text-decoration: none;
+    }
+    .site,
+    .site:hover {
+      color: var(--color-text);
+    }
+    .head {
+      min-height: 0;
+      padding: 56px 0 40px;
+    }
+    h1 {
+      font-size: 28px;
+      line-height: 1.45;
+      letter-spacing: -0.015em;
+    }
+    .subtitle {
+      font-size: 15px;
+    }
+    .date {
+      margin-top: 8px;
+    }
+    .body {
+      max-width: 30em;
+      font-size: 15.5px;
+    }
+    .body :global(.sidenote) {
+      width: 210px;
+      margin-right: -250px;
+    }
+    .end-space {
+      height: 80px;
+    }
+  }
+
+  /* ── Phone (p5): one column; notes gathered after the body ── */
+  @media (max-width: 759px) {
+    .rule {
+      z-index: 1;
+      display: block;
+    }
+    .site {
+      font-size: 22px;
+    }
+    .head {
+      padding: 40px 0 36px;
+    }
+    h1 {
+      font-size: 24px;
+    }
+    .body {
+      max-width: none;
+    }
+    .body :global(.sidenote) {
+      display: none;
+    }
+    .body :global(.note-ref) {
+      min-width: 18px;
+      height: 18px;
+      padding: 0 4px;
+      font-size: 11px;
+      vertical-align: 3px;
+    }
+    .body :global(.notes-list) {
+      display: flex;
+      flex-direction: column;
+      margin-top: 56px;
+      border-top: 1px solid var(--color-divider);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.55;
+      letter-spacing: normal;
+      text-align: start;
+    }
+    .body :global(.notes-item) {
+      padding: 10px 0;
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--color-neutral-800);
+      text-align: left;
+    }
+    .body :global(.notes-item.is-hl) {
+      background: var(--color-accent-100);
+    }
+    .body :global(.notes-item.is-hl .note-num) {
+      background: var(--color-accent-900);
+    }
+    .end-space {
+      height: 48px;
+    }
+  }
 </style>
 
 <script>
@@ -238,7 +352,9 @@ const { title, subtitle, date } = Astro.props;
     if (id) pair(id).forEach((n) => n.classList.add('is-hl'));
   };
   const go = (targetId: string, id: string) => {
-    const el = document.getElementById(targetId);
+    let el = document.getElementById(targetId);
+    // phones hide the sidenotes and show the list after the body instead
+    if (el && !el.offsetParent) el = document.getElementById(`notes-${id}`) ?? el;
     if (el) {
       const r = el.getBoundingClientRect();
       const sc = el.closest<HTMLElement>('[data-scroll]');
@@ -258,14 +374,18 @@ const { title, subtitle, date } = Astro.props;
     }, 1600);
   };
 
+  // Phones (p5) have no hover highlight, only the jump.
+  const phone = matchMedia('(max-width: 759px)');
   document.querySelectorAll<HTMLElement>('[data-note]').forEach((node) => {
     const id = node.dataset.note!;
     node.addEventListener('mouseenter', () => {
+      if (phone.matches) return;
       clearTimeout(timer);
       jumping = false;
       setHl(id);
     });
     node.addEventListener('mouseleave', () => {
+      if (phone.matches) return;
       if (!jumping) setHl(null);
     });
   });

@@ -6,6 +6,11 @@
 //
 // <aside> may not sit inside <p>, so a paragraph holding a note is emitted as
 // <div class="p"> (styled the same as <p>).
+//
+// The notes are also listed after the body (<section class="notes-list">),
+// which is what phones show instead of the floated sidenotes:
+//
+//   <div id="notes-n1" class="notes-item" data-note="n1">…</div>
 
 const MARK = /\[\^([\w-]+)\]/g;
 
@@ -17,6 +22,7 @@ export default function rehypeSidenotes() {
     const notes = file.data?.astro?.frontmatter?.notes ?? [];
     const byId = new Map(notes.map((n) => [n.id, n]));
     let count = 0;
+    const listed = [];
 
     const build = (id) => {
       const note = byId.get(id);
@@ -25,14 +31,16 @@ export default function rehypeSidenotes() {
       const ref = el('sup', { id: `ref-${id}`, className: ['note-ref'], dataNote: id }, [
         el('a', { href: `#note-${id}`, ariaLabel: `注${num}` }, [text(num)]),
       ]);
-      const aside = el('aside', { id: `note-${id}`, className: ['sidenote'], dataNote: id }, [
+      const content = () => [
         el('span', { className: ['sidenote-head'] }, [
           el('a', { href: `#ref-${id}`, className: ['note-num'], ariaLabel: `本文の注${num}へ戻る` }, [text(num)]),
           text(note.title),
         ]),
         ...(note.cite ? [el('span', { className: ['sidenote-cite'] }, [text(note.cite)])] : []),
         el('span', { className: ['sidenote-body'] }, [text(note.body)]),
-      ]);
+      ];
+      const aside = el('aside', { id: `note-${id}`, className: ['sidenote'], dataNote: id }, content());
+      listed.push(el('div', { id: `notes-${id}`, className: ['notes-item'], dataNote: id }, content()));
       return [ref, aside];
     };
 
@@ -63,5 +71,8 @@ export default function rehypeSidenotes() {
       return found;
     };
     walk(tree);
+    if (listed.length) {
+      tree.children.push(el('section', { className: ['notes-list'], ariaLabel: '注' }, listed));
+    }
   };
 }

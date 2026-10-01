@@ -62,6 +62,10 @@ const LIMIT = 20;
     gap: 22px;
     padding-bottom: 96px;
   }
+  /* never squeeze a block to fit the column (it scrolls instead) */
+  .index > * {
+    flex-shrink: 0;
+  }
   .site {
     position: sticky;
     top: 0;
@@ -179,6 +183,67 @@ const LIMIT = 20;
   .about:hover { color: var(--color-text); }
   .subscribe,
   .subscribe:hover { color: var(--color-accent-700); }
+
+  /* ── Tablet top (p7): 340px column ── */
+  @media (max-width: 1199px) {
+    .index {
+      width: 340px;
+      padding-bottom: 80px;
+    }
+    .site { font-size: 28px; }
+    .intro {
+      min-height: 0;
+    }
+    .cats {
+      gap: 0 16px;
+      margin-top: 58px;
+      padding-top: 0;
+    }
+    .cat {
+      font-size: 14px;
+      padding: 10px 0 6px;
+    }
+    .list { margin-top: -10px; }
+    .item {
+      padding: 9px 0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .item-date { font-size: 11px; }
+    .more { font-size: 14px; }
+    .links {
+      flex-direction: row;
+      gap: 24px;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .links a { padding: 10px 0; }
+  }
+
+  /* ── Phone top (p4): one column; categories scroll sideways ── */
+  @media (max-width: 759px) {
+    .index {
+      width: auto;
+      gap: 20px;
+      padding-bottom: 48px;
+    }
+    .site { font-size: 26px; }
+    .intro { padding-top: 20px; }
+    .cats {
+      flex-wrap: nowrap;
+      gap: 0 18px;
+      margin-top: 36px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .cats::-webkit-scrollbar { display: none; }
+    .cat {
+      flex: none;
+      padding: 12px 0 8px;
+    }
+    .list { margin-top: -20px; }
+    .links a { padding: 12px 0; }
+  }
 </style>
 
 <script>
