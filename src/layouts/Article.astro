@@ -1,7 +1,7 @@
 ---
 // Right column of an article page: header rule, title block, body (with
 // sidenotes), then the `end` slot, a 96px space and the bottom rule.
-import { formatDate } from '../lib/posts';
+import { formatDate, isoDate } from '../lib/posts';
 
 interface Props {
   title: string;
@@ -17,7 +17,7 @@ const { title, subtitle, date } = Astro.props;
     <header class="head">
       <h1>{title}</h1>
       {subtitle && <div class="subtitle">{subtitle}</div>}
-      <time class="date" datetime={date.toISOString().slice(0, 10)}>{formatDate(date)}</time>
+      <time class="date" datetime={isoDate(date)}>{formatDate(date)}</time>
     </header>
     <div class="body">
       <slot />

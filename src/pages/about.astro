@@ -5,7 +5,7 @@ import Page from '../layouts/Page.astro';
 import { site } from '../lib/site';
 ---
 
-<Page title="about — fragments">
+<Page title="about — fragments" description={`${site.name}について。${site.catchJa} ${site.catchEn}`}>
   <main class="column" data-scroll data-noscrollbar>
     <div class="rule"><a class="site" href="/">fragments</a></div>
     <header class="head">

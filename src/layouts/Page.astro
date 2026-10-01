@@ -4,19 +4,19 @@
 import Base from './Base.astro';
 import SiteIndex from '../components/SiteIndex.astro';
 import { getPosts } from '../lib/posts';
+import type { Props as SeoProps } from '../components/Seo.astro';
 
-interface Props {
-  title: string;
+interface Props extends SeoProps {
   /** 'top': below 1200px only the index is shown; 'article': only the right column */
   mode?: 'top' | 'article';
   /** slug of the article being read */
   current?: string;
 }
-const { title, current, mode = 'article' } = Astro.props;
+const { current, mode = 'article', ...seo } = Astro.props;
 const posts = await getPosts();
 ---
 
-<Base title={title}>
+<Base {...seo}>
   <div class:list={['page', `page--${mode}`]}>
     <SiteIndex posts={posts} current={current} />
     <slot />

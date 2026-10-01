@@ -1,0 +1,82 @@
+---
+// <head> metadata: description, canonical, OGP, Twitter card, RSS link and
+// JSON-LD (WebSite + Person on every page, plus whatever the page passes).
+import { site } from '../lib/site';
+import { isoDate } from '../lib/posts';
+
+export interface SeoArticle {
+  published: Date;
+  modified: Date;
+  section: string;
+  tags: string[];
+}
+export interface Props {
+  title: string;
+  description?: string;
+  type?: 'website' | 'article';
+  article?: SeoArticle;
+  /** extra JSON-LD nodes for this page */
+  jsonLd?: Record<string, unknown>[];
+  noindex?: boolean;
+}
+
+const { title, description = site.description, type = 'website', article, jsonLd = [], noindex = false } = Astro.props;
+const base = Astro.site ?? new URL(site.url);
+const canonical = new URL(Astro.url.pathname, base).href;
+const image = site.ogImage ? new URL(site.ogImage, base).href : undefined;
+
+const siteId = new URL('/#website', base).href;
+const personId = new URL('/#author', base).href;
+const graph = [
+  {
+    '@type': 'WebSite',
+    '@id': siteId,
+    url: new URL('/', base).href,
+    name: site.name,
+    description: site.description,
+    inLanguage: site.lang,
+    publisher: { '@id': personId },
+  },
+  {
+    '@type': 'Person',
+    '@id': personId,
+    name: site.author.name,
+    url: site.author.url,
+  },
+  ...jsonLd,
+];
+const ld = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(/</g, '\\u003c');
+---
+
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex" />}
+<link rel="alternate" type="application/rss+xml" title={site.name} href={new URL('/rss.xml', base).href} />
+<link rel="sitemap" href={new URL('/sitemap.xml', base).href} />
+
+<meta property="og:site_name" content={site.name} />
+<meta property="og:locale" content={site.locale} />
+<meta property="og:type" content={type} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+{image && <meta property="og:image" content={image} />}
+{
+  article && (
+    <>
+      <meta property="article:published_time" content={isoDate(article.published)} />
+      <meta property="article:modified_time" content={isoDate(article.modified)} />
+      <meta property="article:author" content={site.author.url} />
+      <meta property="article:section" content={article.section} />
+      {article.tags.map((t) => <meta property="article:tag" content={t} />)}
+    </>
+  )
+}
+
+<meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
+{site.twitter && <meta name="twitter:site" content={site.twitter} />}
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+{image && <meta name="twitter:image" content={image} />}
+
+<script type="application/ld+json" set:html={ld} />

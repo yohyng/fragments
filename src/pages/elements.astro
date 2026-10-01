@@ -5,7 +5,7 @@ import Article from '../layouts/Article.astro';
 import { Content, frontmatter } from '../samples/elements.mdx';
 ---
 
-<Page title={`${frontmatter.title} — fragments`}>
+<Page title={`${frontmatter.title} — fragments`} noindex>
   <Article title={frontmatter.title} subtitle={frontmatter.subtitle} date={new Date(frontmatter.date)}>
     <Content />
   </Article>

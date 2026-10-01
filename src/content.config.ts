@@ -25,6 +25,12 @@ const posts = defineCollection({
     title: z.string(),
     subtitle: z.string().default(''),
     category: z.enum(categories),
+    /** last substantial edit; dateModified falls back to `date` */
+    updated: z.coerce.date().optional(),
+    /** meta / OGP description; falls back to the start of the body */
+    description: z.string().optional(),
+    /** keywords (JSON-LD) and article:tag (OGP) */
+    tags: z.array(z.string()).default([]),
     notes: z.array(note).default([]),
   }),
 });

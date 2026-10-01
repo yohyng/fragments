@@ -3,7 +3,8 @@ import { render } from 'astro:content';
 import Page from '../../layouts/Page.astro';
 import Article from '../../layouts/Article.astro';
 import ArticleEnd from '../../components/ArticleEnd.astro';
-import { getPosts, type Post } from '../../lib/posts';
+import { getPosts, excerpt, isoDate, type Post } from '../../lib/posts';
+import { site } from '../../lib/site';
 
 export async function getStaticPaths() {
   const posts = await getPosts();
@@ -16,9 +17,40 @@ interface Props {
 }
 const { post, posts } = Astro.props;
 const { Content } = await render(post.entry);
+
+const base = Astro.site ?? new URL(site.url);
+const url = new URL(Astro.url.pathname, base).href;
+const description = excerpt(post);
+const modified = post.updated ?? post.date;
+const keywords = post.tags.length ? post.tags : [post.category];
+const articleLd = {
+  '@type': 'Article',
+  '@id': url + '#article',
+  mainEntityOfPage: url,
+  url,
+  headline: post.title,
+  ...(post.subtitle && { alternativeHeadline: post.subtitle }),
+  description,
+  author: { '@id': new URL('/#author', base).href },
+  publisher: { '@id': new URL('/#author', base).href },
+  isPartOf: { '@id': new URL('/#website', base).href },
+  datePublished: isoDate(post.date),
+  dateModified: isoDate(modified),
+  articleSection: post.category,
+  keywords: keywords.join(', '),
+  inLanguage: site.lang,
+  ...(site.ogImage && { image: new URL(site.ogImage, base).href }),
+};
 ---
 
-<Page title={`${post.title} — fragments`} current={post.slug}>
+<Page
+  title={`${post.title} — ${site.name}`}
+  description={description}
+  type="article"
+  article={{ published: post.date, modified, section: post.category, tags: keywords }}
+  jsonLd={[articleLd]}
+  current={post.slug}
+>
   <Article title={post.title} subtitle={post.subtitle} date={post.date}>
     <Content />
     <ArticleEnd slot="end" post={post} posts={posts} />
