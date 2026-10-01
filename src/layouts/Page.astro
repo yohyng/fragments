@@ -45,16 +45,10 @@ const posts = await getPosts();
   @media (max-width: 1159px) {
     .page {
       display: block;
-      padding: 40px 36px 64px;
+      padding: 0; /* moved inside the column: see --inset-* in base.css */
     }
     .page--article > :global([data-index]) {
       display: none;
-    }
-  }
-  /* Phone (p4/p5) */
-  @media (max-width: 759px) {
-    .page {
-      padding: 32px 20px 44px;
     }
   }
 </style>

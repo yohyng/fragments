@@ -26,6 +26,7 @@ const { title, subtitle, date } = Astro.props;
   <slot name="end" />
   <div class="end-space"></div>
   <div class="endrule" data-endrule></div>
+  <div class="scroll-foot" aria-hidden="true"></div>
 </main>
 
 <style>
@@ -253,7 +254,14 @@ const { title, subtitle, date } = Astro.props;
 
   /* ── Tablet (p6): no index; body 30em, notes 210px at 40px ── */
   @media (max-width: 1159px) {
+    .column {
+      padding: 0 var(--inset-x);
+    }
+    .endrule {
+      bottom: var(--inset-bottom);
+    }
     .rule {
+      padding-top: var(--inset-top);
       z-index: 2;
       height: auto;
       box-sizing: border-box;
@@ -378,8 +386,14 @@ const { title, subtitle, date } = Astro.props;
       const r = el.getBoundingClientRect();
       const sc = el.closest<HTMLElement>('[data-scroll]');
       if (sc) {
+        // the visible part of the column, without the margins inside it
+        const cs = getComputedStyle(sc);
+        const it = parseFloat(cs.getPropertyValue('--inset-top')) || 0;
+        const ib = parseFloat(cs.getPropertyValue('--inset-bottom')) || 0;
         const sr = sc.getBoundingClientRect();
-        sc.scrollTo({ top: sc.scrollTop + r.top - sr.top - sr.height / 3, behavior: 'smooth' });
+        const top = sr.top + it;
+        const height = sr.height - it - ib;
+        sc.scrollTo({ top: sc.scrollTop + r.top - top - height / 3, behavior: 'smooth' });
       } else {
         window.scrollTo({ top: window.scrollY + r.top - window.innerHeight / 3, behavior: 'smooth' });
       }

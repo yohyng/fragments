@@ -43,3 +43,23 @@ a:hover { color: var(--color-accent-600); }
 /* Bottom rule of a scroll column: shown only when scrolled to the end */
 [data-endrule] { opacity: 0; transition: opacity .5s ease; }
 [data-atend] [data-endrule] { opacity: 1; }
+
+/* Below 1160px the visible column fills the screen and the page margins live
+   inside it (so a swipe anywhere scrolls it): --inset-* are those margins.
+   The top one is part of the sticky header; the bottom one is this strip. */
+.scroll-foot { display: none; }
+@media (max-width: 1159px) {
+  [data-scroll] { --inset-top: 40px; --inset-bottom: 64px; --inset-x: 36px; }
+  .scroll-foot {
+    display: block;
+    flex: none;
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    height: var(--inset-bottom);
+    background: var(--color-bg);
+  }
+}
+@media (max-width: 759px) {
+  [data-scroll] { --inset-top: 32px; --inset-bottom: 44px; --inset-x: 20px; }
+}

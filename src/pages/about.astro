@@ -26,6 +26,7 @@ import { site } from '../lib/site';
     </div>
     <div class="end-space"></div>
     <div class="endrule" data-endrule></div>
+    <div class="scroll-foot" aria-hidden="true"></div>
   </main>
 </Page>
 
@@ -147,7 +148,14 @@ import { site } from '../lib/site';
      site name in the header, contact where the notes go (tablet) or
      after the text (phone). */
   @media (max-width: 1159px) {
+    .column {
+      padding: 0 var(--inset-x);
+    }
+    .endrule {
+      bottom: var(--inset-bottom);
+    }
     .rule {
+      padding-top: var(--inset-top);
       z-index: 2;
       height: auto;
       box-sizing: border-box;

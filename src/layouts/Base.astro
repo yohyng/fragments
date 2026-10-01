@@ -22,6 +22,15 @@ const { title } = Astro.props;
       ['gesturestart', 'gesturechange'].forEach((t) =>
         document.addEventListener(t, (e) => e.preventDefault(), { passive: false }),
       );
+      // A swipe that starts outside every column (gaps, margins) must not
+      // drag the page.
+      document.addEventListener(
+        'touchmove',
+        (e) => {
+          if (!(e.target instanceof Element && e.target.closest('[data-scroll]'))) e.preventDefault();
+        },
+        { passive: false },
+      );
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

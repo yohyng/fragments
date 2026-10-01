@@ -51,6 +51,7 @@ const LIMIT = 20;
     <a class="about" href="/about/">about</a>
     <a class="subscribe" href="/subscribe/">subscribe</a>
   </div>
+  <div class="scroll-foot" aria-hidden="true"></div>
 </nav>
 
 <style>
@@ -186,11 +187,16 @@ const LIMIT = 20;
 
   /* ── Tablet top (p7): 340px column ── */
   @media (max-width: 1159px) {
+    /* full screen; the content keeps its 340px column at the left */
     .index {
-      width: 340px;
-      padding-bottom: 80px;
+      padding: 0 calc(100% - 340px - var(--inset-x)) 0 var(--inset-x);
     }
-    .site { font-size: 28px; }
+    .site {
+      font-size: 28px;
+      padding-top: var(--inset-top);
+    }
+    /* 80px below the links, then the bottom margin strip */
+    .scroll-foot { margin-top: calc(80px - 22px); }
     .intro {
       min-height: 0;
     }
@@ -223,11 +229,11 @@ const LIMIT = 20;
   /* ── Phone top (p4): one column; categories scroll sideways ── */
   @media (max-width: 759px) {
     .index {
-      width: auto;
       gap: 20px;
-      padding-bottom: 48px;
+      padding: 0 var(--inset-x);
     }
     .site { font-size: 26px; }
+    .scroll-foot { margin-top: calc(48px - 20px); }
     .intro { padding-top: 20px; }
     .cats {
       flex-wrap: nowrap;

@@ -9,6 +9,17 @@
 type Column = HTMLElement & { _h?: ReturnType<typeof setTimeout> };
 
 const thumbs = new Map<HTMLElement, HTMLElement>();
+
+// Margins drawn inside a full-screen column (--inset-* in base.css).
+function insets(sc: HTMLElement) {
+  const cs = getComputedStyle(sc);
+  return {
+    left: parseFloat(cs.paddingLeft) || 0,
+    right: parseFloat(cs.paddingRight) || 0,
+    top: parseFloat(cs.getPropertyValue('--inset-top')) || 0,
+    bottom: parseFloat(cs.getPropertyValue('--inset-bottom')) || 0,
+  };
+}
 const ends = new Map<HTMLElement, HTMLElement>();
 
 function place(sc: HTMLElement): HTMLElement {
@@ -22,14 +33,16 @@ function place(sc: HTMLElement): HTMLElement {
     host.appendChild(th);
     thumbs.set(sc, th);
   }
-  const ratio = sc.clientHeight / sc.scrollHeight;
+  const ins = insets(sc);
+  // what is visible of what there is, both without the inner margins
+  const ratio = (sc.clientHeight - ins.top - ins.bottom) / (sc.scrollHeight - ins.top - ins.bottom);
   th.style.display = ratio >= 1 ? 'none' : 'block';
   const head = sc.firstElementChild as HTMLElement | null;
   const off = head ? head.offsetHeight + 10 : 0;
-  const track = sc.clientHeight - off - 10;
+  const track = sc.clientHeight - off - 10 - ins.bottom;
   const h = Math.max(24, track * ratio);
   th.style.height = h + 'px';
-  th.style.left = sc.offsetLeft + sc.offsetWidth - 1 + 'px';
+  th.style.left = sc.offsetLeft + sc.offsetWidth - ins.right - 1 + 'px';
   th.style.top =
     sc.offsetTop + off + (track - h) * (sc.scrollTop / Math.max(1, sc.scrollHeight - sc.clientHeight)) + 'px';
   return th;
@@ -55,9 +68,10 @@ document.addEventListener(
         t.parentElement!.appendChild(er);
         ends.set(t, er);
       }
-      er.style.left = t.offsetLeft + 'px';
-      er.style.width = t.clientWidth + 'px';
-      er.style.top = t.offsetTop + t.clientHeight + 'px';
+      const ins = insets(t);
+      er.style.left = t.offsetLeft + ins.left + 'px';
+      er.style.width = t.clientWidth - ins.left - ins.right + 'px';
+      er.style.top = t.offsetTop + t.clientHeight - ins.bottom + 'px';
       er.style.opacity = t.hasAttribute('data-atend') ? '1' : '0';
     }
     clearTimeout(t._h);
