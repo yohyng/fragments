@@ -23,11 +23,31 @@ const { title } = Astro.props;
         document.addEventListener(t, (e) => e.preventDefault(), { passive: false }),
       );
       // A swipe that starts outside every column (gaps, margins) must not
-      // drag the page.
+      // drag the page. Where overscroll-behavior is missing (iOS < 16), a
+      // column pulled past its top or bottom must not bounce either.
+      const noOverscroll = !CSS.supports('overscroll-behavior', 'none');
+      let startX = 0;
+      let startY = 0;
+      document.addEventListener(
+        'touchstart',
+        (e) => {
+          startX = e.touches[0].clientX;
+          startY = e.touches[0].clientY;
+        },
+        { passive: true },
+      );
       document.addEventListener(
         'touchmove',
         (e) => {
-          if (!(e.target instanceof Element && e.target.closest('[data-scroll]'))) e.preventDefault();
+          const col = e.target instanceof Element ? e.target.closest('[data-scroll]') : null;
+          if (!col) return e.preventDefault();
+          if (!noOverscroll || e.touches.length > 1) return;
+          const dx = e.touches[0].clientX - startX;
+          const dy = e.touches[0].clientY - startY;
+          if (Math.abs(dy) <= Math.abs(dx)) return;
+          const atTop = col.scrollTop <= 0;
+          const atBottom = col.scrollTop + col.clientHeight >= col.scrollHeight - 1;
+          if ((atTop && dy > 0) || (atBottom && dy < 0)) e.preventDefault();
         },
         { passive: false },
       );
