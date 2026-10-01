@@ -1,0 +1,158 @@
+---
+import { categories } from '../content.config';
+import { formatDate, type Post } from '../lib/posts';
+
+interface Props {
+  posts: Post[];
+  /** slug of the article being read */
+  current?: string;
+}
+const { posts, current } = Astro.props;
+const LIMIT = 20;
+---
+
+<nav class="index" data-scroll data-noscrollbar aria-label="記事索引">
+  <a class="site" href="/">fragments</a>
+  <div class="intro">
+    <span class="intro-ja">建築・空間・デザインをめぐる思索、試論 /</span>
+    <span class="intro-en">Explorations and Abductive Speculations on Architecture, Space, and Design.</span>
+    <div class="cats">
+      {['all', ...categories].map((c) => <span class:list={['cat', { 'is-active': c === 'all' }]}>{c}</span>)}
+    </div>
+  </div>
+  <div class="list">
+    {
+      posts.slice(0, LIMIT).map((p) => (
+        <a class:list={['item', { 'is-current': p.slug === current }]} href={`/posts/${p.slug}/`}>
+          <span class="item-title">
+            {p.title}
+            {p.subtitle && <span class="item-sub">{p.subtitle}</span>}
+          </span>
+          <span class="item-date">{formatDate(p.date)}</span>
+        </a>
+      ))
+    }
+  </div>
+  {posts.length > LIMIT && <button class="more" type="button">さらに読み込む</button>}
+  <div class="links">
+    <a class="about" href="/about/">about</a>
+    <a class="subscribe" href="/subscribe/">subscribe</a>
+  </div>
+</nav>
+
+<style>
+  .index {
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding-bottom: 96px;
+  }
+  .site {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--color-bg);
+    font-family: var(--font-heading);
+    font-size: 30px;
+    line-height: 1.2;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--color-neutral-700);
+    text-decoration: none;
+  }
+  .site,
+  .site:hover { color: var(--color-text); }
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 222px;
+    box-sizing: border-box;
+    padding-top: 34px;
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--color-neutral-800);
+  }
+  .intro-ja { font-family: var(--font-mincho); }
+  .intro-en { font-family: var(--font-body); font-style: italic; }
+  .cats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin-top: auto;
+    padding-top: 14px;
+    font-family: var(--font-body);
+  }
+  .cat {
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-text);
+    border-bottom: 1px solid transparent;
+  }
+  .cat.is-active {
+    color: var(--color-accent-700);
+    border-bottom-color: var(--color-accent);
+  }
+  .list {
+    display: flex;
+    flex-direction: column;
+  }
+  .item {
+    display: block;
+    padding: 3px 0;
+    font-size: 13px;
+    line-height: 1.75;
+    text-decoration: none;
+    color: var(--color-text);
+  }
+  .item.is-current,
+  .item:hover { color: var(--color-accent-700); }
+  .item-title {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: var(--font-mincho);
+  }
+  .item-sub {
+    margin-left: 8px;
+    color: var(--color-neutral-700);
+  }
+  .item-date {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 10.5px;
+    line-height: 1.5;
+    color: var(--color-neutral-700);
+    font-variant-numeric: tabular-nums;
+  }
+  .more {
+    align-self: stretch;
+    text-align: left;
+    margin-top: 4px;
+    padding: 10px 0 6px;
+    border: 0;
+    border-top: 1px solid var(--color-divider);
+    font-family: var(--font-mincho);
+    font-size: 13px;
+    color: var(--color-neutral-500);
+    background: none;
+    cursor: pointer;
+  }
+  .more:hover { color: var(--color-neutral-700); }
+  .links {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-mincho);
+    font-size: 13px;
+    line-height: 1.75;
+  }
+  .about,
+  .subscribe { text-decoration: none; }
+  .about,
+  .about:hover { color: var(--color-text); }
+  .subscribe,
+  .subscribe:hover { color: var(--color-accent-700); }
+</style>
