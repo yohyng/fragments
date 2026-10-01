@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Old+Mincho:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500&family=Noto+Sans+JP:wght@400;500&family=BIZ+UDPGothic&family=Zen+Kaku+Gothic+New:wght@400;500&family=Shippori+Mincho:wght@400;500&family=Zen+Old+Mincho:wght@400;600&display=swap">
+<style>
+:root{--color-accent:#0000ff;--color-accent-100:#e8e8ff;--color-accent-200:#d0d0ff;--color-accent-300:#a0a0ff;--color-accent-400:#6060ff;--color-accent-500:#0000ff;--color-accent-600:#0000d8;--color-accent-700:#0000ff;--color-accent-800:#0000b0;--color-accent-900:#000080}
+body{background:var(--color-neutral-300);margin:0}
+a{color:var(--color-accent-700);text-underline-offset:3px;text-decoration-thickness:1px}
+a:hover{color:var(--color-accent-600)}
+[data-noscrollbar]::-webkit-scrollbar{display:none}
+input[type=email]::placeholder{font-size:12px;color:var(--color-neutral-500)}
+[data-screen-label="p5 Mobile article"] input[type=email]::placeholder{font-size:10.5px}
+[data-endrule]{opacity:0;transition:opacity .5s ease}
+[data-atend] [data-endrule]{opacity:1}
+::selection{background:var(--sel-bg,var(--color-accent));color:var(--sel-fg,#fff)}
+</style>
+</helmet>
+<section style="padding:64px;display:flex;flex-direction:column;gap:32px">
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:900px">
+    <div style="font-family:var(--font-heading);font-size:14px;letter-spacing:0.12em;color:var(--color-neutral-700)">V2 — BASED ON 3b</div>
+    <div style="font-family:'Shippori Mincho';font-size:34px;color:var(--color-text)">fragments：ページ一式</div>
+    <div style="font-family:'Zen Old Mincho';font-size:14px;line-height:1.9;color:var(--color-neutral-800)">どのページも左に同じ索引（サイト名・紹介文・記事一覧・About / RSS）を置き、右の段の中身だけを入れ替えます。上の罫線は左右どちらも同じ高さです。一覧の記事のうち「空間デザインと時間」以外は仮のものです。</div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px 28px;padding:14px 18px;border:1px solid var(--color-neutral-500);border-radius:var(--radius-md);background:#fff;color:#201f1d;font-family:system-ui,sans-serif;font-size:12px;max-width:900px">
+    <span style="font-weight:600;letter-spacing:0.04em">TEST COLORS</span>
+    <sc-for list="{{ colorCtl }}" as="c" hint-placeholder-count="3">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><span>{{ c.label }}</span><input type="color" value="{{ c.value }}" onChange="{{ c.set }}" style="width:32px;height:24px;padding:0;border:1px solid #ccc;border-radius:2px;background:none;cursor:pointer"><span style="font-family:ui-monospace,monospace;color:#555">{{ c.value }}</span></label>
+    </sc-for>
+    <sc-for list="{{ fontCtl }}" as="fc" hint-placeholder-count="5"><label style="display:flex;align-items:center;gap:6px"><span>{{ fc.label }}</span><select value="{{ fc.value }}" onChange="{{ fc.set }}" style="font:inherit;max-width:150px;padding:3px 6px;border:1px solid #bbb;border-radius:2px;background:#fff"><sc-for list="{{ fontOpts }}" as="o" hint-placeholder-count="7"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select></label></sc-for>
+    <button onClick="{{ resetColors }}" style="font:inherit;white-space:nowrap;flex-shrink:0;padding:4px 12px;border:1px solid #bbb;border-radius:2px;background:#fff;cursor:pointer">リセット</button>
+  </div>
+  <div style="display:flex;gap:56px;align-items:flex-start;flex-wrap:wrap">
+
+    <div id="p1" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:var(--font-heading);font-size:15px;color:var(--color-accent-700);border:1px solid var(--color-accent);border-radius:var(--radius-sm);padding:1px 8px">p1</span><span style="font-family:'Shippori Mincho';font-size:16px">トップ：左の索引だけ</span></div>
+      <div data-screen-label="p1 Top" style="width:1440px;height:960px;overflow:hidden;background:var(--color-bg);box-shadow:var(--shadow-sm);color:var(--color-text);display:grid;grid-template-columns:360px minmax(0,1fr);column-gap:56px;padding:48px 32px 32px">
+        <div data-scroll="" data-noscrollbar="" style="height:100%;overflow-y:auto;scrollbar-width:none;display:flex;flex-direction:column;gap:22px;padding-bottom:96px">
+          <div data-f="site" style="position:sticky;top:0;z-index:1;background:var(--color-bg);font-family:var(--font-heading);font-size:30px;line-height:1.2;padding-bottom:6px;border-bottom:1px solid var(--color-neutral-700)">fragments</div>
+          <div style="display:flex;flex-direction:column;gap:4px;min-height:222px;box-sizing:border-box;padding-top:34px;font-size:13px;line-height:1.75;color:var(--color-neutral-800)"><span style="font-family:'Zen Old Mincho'">建築・空間・デザインをめぐる思索、試論 /</span><span style="font-family:var(--font-body);font-style:italic">Explorations and Abductive Speculations on Architecture, Space, and Design.</span><div style="display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:auto;padding-top:14px;font-family:var(--font-body)"><sc-for list="{{ cats }}" as="c" hint-placeholder-count="5"><span onClick="{{ c.pick }}" style="cursor:pointer;font-size:13px;line-height:1.6;color:{{ c.color }};border-bottom:1px solid {{ c.line }}">{{ c.name }}</span></sc-for></div></div>
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ listTop }}" as="p" hint-placeholder-count="9">
+              <a href="#p2" style="display:block;padding:3px 0;font-size:13px;line-height:1.75;text-decoration:none;color:{{ p.color }}" style-hover="color:var(--color-accent-700)"><span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Zen Old Mincho'">{{ p.title }}<span data-f="sub" style="margin-left:8px;color:{{ p.subColor }}">{{ p.sub }}</span></span><span style="display:block;font-family:var(--font-body);font-size:10.5px;line-height:1.5;color:{{ p.subColor }};font-variant-numeric:tabular-nums">{{ p.date }}</span></a>
+            </sc-for>
+          </div>
+          <sc-if value="{{ hasMore }}" hint-placeholder-val="{{ false }}"><button onClick="{{ loadMore }}" style="align-self:stretch;text-align:left;margin-top:4px;padding:10px 0 6px;border-top:1px solid var(--color-divider);font-family:'Zen Old Mincho';font-size:13px;color:var(--color-neutral-500);background:none;border-left:0;border-right:0;border-bottom:0;cursor:pointer" style-hover="color:var(--color-neutral-700)">{{ moreLabel }}</button></sc-if>
+          <div style="display:flex;flex-direction:column;font-family:'Zen Old Mincho';font-size:13px;line-height:1.75">
+            <a href="#p3" style="color:var(--color-text);text-decoration:none">about</a>
+            <a href="fragments substack.dc.html#s4" style="color:var(--color-accent-700);text-decoration:none">subscribe</a>
+          </div>
+        </div>
+        <div></div>
+      </div>
+      <div style="max-width:1440px;font-family:'Zen Old Mincho';font-size:13px;line-height:1.9;color:var(--color-neutral-800)">トップは左の索引だけで、右側は空けています。記事を選ぶと右の段に本文が出ます（p2）。</div>
+    </div>
+
+    <div id="p2" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:var(--font-heading);font-size:15px;color:var(--color-accent-700);border:1px solid var(--color-accent);border-radius:var(--radius-sm);padding:1px 8px">p2</span><span style="font-family:'Shippori Mincho';font-size:16px">記事：本文と注</span></div>
+      <div data-screen-label="p2 Article" style="width:1440px;height:960px;overflow:hidden;background:var(--color-bg);box-shadow:var(--shadow-sm);color:var(--color-text);display:grid;grid-template-columns:360px minmax(0,1fr);column-gap:56px;padding:48px 32px 32px">
+        <div data-scroll="" data-noscrollbar="" style="height:100%;overflow-y:auto;scrollbar-width:none;display:flex;flex-direction:column;gap:22px;padding-bottom:96px">
+          <div data-f="site" style="position:sticky;top:0;z-index:1;background:var(--color-bg);font-family:var(--font-heading);font-size:30px;line-height:1.2;padding-bottom:6px;border-bottom:1px solid var(--color-neutral-700)">fragments</div>
+          <div style="display:flex;flex-direction:column;gap:4px;min-height:222px;box-sizing:border-box;padding-top:34px;font-size:13px;line-height:1.75;color:var(--color-neutral-800)"><span style="font-family:'Zen Old Mincho'">建築・空間・デザインをめぐる思索、試論 /</span><span style="font-family:var(--font-body);font-style:italic">Explorations and Abductive Speculations on Architecture, Space, and Design.</span><div style="display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:auto;padding-top:14px;font-family:var(--font-body)"><sc-for list="{{ cats }}" as="c" hint-placeholder-count="5"><span onClick="{{ c.pick }}" style="cursor:pointer;font-size:13px;line-height:1.6;color:{{ c.color }};border-bottom:1px solid {{ c.line }}">{{ c.name }}</span></sc-for></div></div>
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ listArticle }}" as="p" hint-placeholder-count="9">
+              <a href="#p2" style="display:block;padding:3px 0;font-size:13px;line-height:1.75;text-decoration:none;color:{{ p.color }}" style-hover="color:var(--color-accent-700)"><span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Zen Old Mincho'">{{ p.title }}<span data-f="sub" style="margin-left:8px;color:{{ p.subColor }}">{{ p.sub }}</span></span><span style="display:block;font-family:var(--font-body);font-size:10.5px;line-height:1.5;color:{{ p.subColor }};font-variant-numeric:tabular-nums">{{ p.date }}</span></a>
+            </sc-for>
+          </div>
+          <sc-if value="{{ hasMore }}" hint-placeholder-val="{{ false }}"><button onClick="{{ loadMore }}" style="align-self:stretch;text-align:left;margin-top:4px;padding:10px 0 6px;border-top:1px solid var(--color-divider);font-family:'Zen Old Mincho';font-size:13px;color:var(--color-neutral-500);background:none;border-left:0;border-right:0;border-bottom:0;cursor:pointer" style-hover="color:var(--color-neutral-700)">{{ moreLabel }}</button></sc-if>
+          <div style="display:flex;flex-direction:column;font-family:'Zen Old Mincho';font-size:13px;line-height:1.75">
+            <a href="#p3" style="color:var(--color-text);text-decoration:none">about</a>
+            <a href="fragments substack.dc.html#s4" style="color:var(--color-accent-700);text-decoration:none">subscribe</a>
+          </div>
+        </div>
+        <div data-scroll="" data-noscrollbar="" style="height:100%;overflow-y:auto;scrollbar-width:none;padding-bottom:0">
+          <div style="position:sticky;top:0;z-index:1;background:var(--color-bg);height:36px;padding-bottom:6px;box-sizing:content-box;border-bottom:1px solid var(--color-neutral-700)"></div>
+          <div style="display:flex;flex-direction:column;gap:4px;padding-top:56px;min-height:220px;box-sizing:border-box">
+            <h1 style="font-family:'Shippori Mincho';font-weight:500;font-size:clamp(26px, 1.4rem + 0.6vw, 32px);line-height:1.4;letter-spacing:0.02em;margin:0">空間デザインと時間</h1>
+            <div style="font-family:'Shippori Mincho';font-size:17px;line-height:1.6;color:var(--color-neutral-800)">陳腐化と多様性について</div><div style="font-family:var(--font-body);font-size:12px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums;margin-top:10px">2026.10.01</div>
+          </div>
+          <div style="max-width:34em;font-family:'Zen Old Mincho';font-size:clamp(15px, 0.8rem + 0.2vw, 16px);line-height:1.9;text-align:justify;letter-spacing:0.02em">
+            <p style="margin:0;text-indent:1em">空間デザインと名指される、建築でもデザインでもない、この領域の本質はなんなんだろうと沸々としている。そのことを考えているうちに、空間デザインそのものの性質を定義するのではなく、デザインが時間のなかでどのように「残っていくのか」から考えてみることもできるのではないかと思った。</p>
+            <p style="margin:0;text-indent:1em">きっかけになったのは、以前にも文章の中で出現した、コルネットの系統図である。そこから考えたのは、自然界における形質の残り方と、人工物における形質の残り方には、少し異なる構造があるのではないか、ということだった。</p>
+            <p style="margin:0;text-indent:1em">生物の進化では、遺伝的な情報の多くは親から子へと世代をまたいで継承される。もちろん、進化が常にゆっくりと起こるわけではないし、微生物における水平遺伝子伝播のように<sup id="ref-n1" onMouseEnter="{{ enter.n1 }}" onMouseLeave="{{ leave }}" onClick="{{ jump.n1 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;text-indent:0;min-width:15px;height:15px;padding:0 3px;box-sizing:border-box;font-size:10px;line-height:1;color:#fff;cursor:pointer;font-variant-numeric:tabular-nums;border-radius:1px;margin:0 2px;vertical-align:4px;background:{{ refBg.n1 }}">1</sup><span id="note-n1" onMouseEnter="{{ enter.n1 }}" onMouseLeave="{{ leave }}" style="float:right;clear:right;width:300px;margin-right:-388px;margin-bottom:16px;text-indent:0;text-align:left;font-size:13px;line-height:1.8;color:var(--color-neutral-800);background:{{ hl.n1 }}"><span style="display:block;color:var(--color-text)"><span onClick="{{ back.n1 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;text-indent:0;min-width:15px;height:15px;padding:0 3px;box-sizing:border-box;font-size:10px;line-height:1;color:#fff;cursor:pointer;font-variant-numeric:tabular-nums;border-radius:1px;margin-right:8px;vertical-align:2px;background:{{ refBg.n1 }}">1</span>水平遺伝子伝播</span><span style="display:block;font-family:var(--font-body);font-size:12px;line-height:1.6;color:var(--color-neutral-700);margin:2px 0 4px">Luis Boto, “Horizontal gene transfer in evolution: facts and challenges,” Proceedings of the Royal Society B, 2010.</span><span style="display:block;text-align:justify">親から子への遺伝とは異なり、系統をまたいで遺伝情報が移動する「水平遺伝子伝播（Horizontal Gene Transfer）」について整理したレビュー。特に微生物の進化において、単純な樹形の系統関係だけでは捉えられない遺伝情報の移動が重要な役割を持つことを論じている</span></span>、単純な親子関係だけでは説明できない情報伝達も存在する。それでも、生物の形質が基本的には個体の繁殖と世代交代を通じて受け継がれていくことには変わりない。</p>
+            <p style="margin:0;text-indent:1em">ここで興味深いのは、生物の適応可能性を支えているものの一つが、ある時点に存在する個体や集団の「多様性」だということだ。環境が均質でなければ、ある場所では有利な形質が、別の場所では不利になることもある。異なる形質が同時に存在することで、環境が変化したときにも、系全体として何らかの応答を残しておくことができる。</p>
+            <p style="margin:0;text-indent:1em">そう考えると、生物はある意味で、空間のなかに可能性を分散させているとも言える。（もちろん休眠遺伝子などの、時間軸的な可能性の分散装置も存在するが）</p>
+            <p style="margin:0;text-indent:1em">一方で、人工物の面白さは、必ずしも現在存在している形質だけが次の形質につながるわけではないところにある。コルネットの系統図を見ると、親から子、子から孫へと形が連続的に継承されるだけではなく、別の系統からある特徴が持ち込まれたり、一度姿を消した古い形態が後の時代に再び現れたりする。TemkinとEldredgeがコルネットなどの人工物を分析して示したのも、物質文化の変化には、生物の系統樹をそのまま当てはめるだけでは捉えられない情報伝達が存在するということだった<sup id="ref-n2" onMouseEnter="{{ enter.n2 }}" onMouseLeave="{{ leave }}" onClick="{{ jump.n2 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;text-indent:0;min-width:15px;height:15px;padding:0 3px;box-sizing:border-box;font-size:10px;line-height:1;color:#fff;cursor:pointer;font-variant-numeric:tabular-nums;border-radius:1px;margin:0 2px;vertical-align:4px;background:{{ refBg.n2 }}">2</sup><span id="note-n2" onMouseEnter="{{ enter.n2 }}" onMouseLeave="{{ leave }}" style="float:right;clear:right;width:300px;margin-right:-388px;margin-bottom:16px;text-indent:0;text-align:left;font-size:13px;line-height:1.8;color:var(--color-neutral-800);background:{{ hl.n2 }}"><span style="display:block;color:var(--color-text)"><span onClick="{{ back.n2 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;text-indent:0;min-width:15px;height:15px;padding:0 3px;box-sizing:border-box;font-size:10px;line-height:1;color:#fff;cursor:pointer;font-variant-numeric:tabular-nums;border-radius:1px;margin-right:8px;vertical-align:2px;background:{{ refBg.n2 }}">2</span>人工物の系統とコルネットについて</span><span style="display:block;font-family:var(--font-body);font-size:12px;line-height:1.6;color:var(--color-neutral-700);margin:2px 0 4px">Ilya Tëmkin &amp; Niles Eldredge, “Phylogenetics and Material Cultural Evolution,” Current Anthropology, 2007.</span><span style="display:block;text-align:justify">生物学で用いられる系統解析を、楽器などの人工物の変化に適用しながら、その限界を検討した論文。弦楽器のプサルタリーと金管楽器のコルネットを分析し、人工物では親から子へと連続するような垂直的な継承だけでなく、別系統から特徴が持ち込まれる「水平的な情報伝達」が頻繁に起こることを示している。人工物の歴史を単純な樹形図だけでは表現しきれない、という議論の出発点。</span></span>。</p>
+            <p style="margin:0;text-indent:1em">なかでも面白いのが、一度姿を消したコルネットの形態が後になって復活する「ラザロ・エフェクト」だろう<sup id="ref-n3" onMouseEnter="{{ enter.n3 }}" onMouseLeave="{{ leave }}" onClick="{{ jump.n3 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;text-indent:0;min-width:15px;height:15px;padding:0 3px;box-sizing:border-box;font-size:10px;line-height:1;color:#fff;cursor:pointer;font-variant-numeric:tabular-nums;border-radius:1px;margin:0 2px;vertical-align:4px;background:{{ refBg.n3 }}">3</sup><span id="note-n3" onMouseEnter="{{ enter.n3 }}" onMouseLeave="{{ leave }}" style="float:right;clear:right;width:300px;margin-right:-388px;margin-bottom:16px;text-indent:0;text-align:left;font-size:13px;line-height:1.8;color:var(--color-neutral-800);background:{{ hl.n3 }}"><span style="display:block;color:var(--color-text)"><span onClick="{{ back.n3 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;text-indent:0;min-width:15px;height:15px;padding:0 3px;box-sizing:border-box;font-size:10px;line-height:1;color:#fff;cursor:pointer;font-variant-numeric:tabular-nums;border-radius:1px;margin-right:8px;vertical-align:2px;background:{{ refBg.n3 }}">3</span>コルネットの「ラザロ・エフェクト」について</span><span style="display:block;font-family:var(--font-body);font-size:12px;line-height:1.6;color:var(--color-neutral-700);margin:2px 0 4px">Niles Eldredge, “Paleontology and Cornets: Thoughts on Material Cultural Evolution,” Evolution: Education and Outreach, 2011.</span><span style="display:block;text-align:justify">古生物学者ナイルズ・エルドリッジが、自身のコルネット・コレクションをもとに、生物進化と人工物の変化を比較した論考。19世紀末に一度ほとんど姿を消したコルネットの形態が、後の時代に再び現れる現象を「Lazarus effect（ラザロ・エフェクト）」として紹介している。生物では絶滅した種そのものが再び戻ることはないのに対し、人工物では過去の形態や情報が残っていれば、それを時間を越えて再び呼び戻すことができる、という違いが示されている。</span></span>。ある時代には適応的だったデザインが、時代が変わることで陳腐化する。デザインは、その時代の技術や価値観、社会状況、素材、経済性など、さまざまな関係の束として成立している。その意味では、その時代における一つの固有解でもある。だから空間デザインには、ファッションや流行に近い側面もある。</p>
+            <p style="margin:0;text-indent:1em">しかし、陳腐化することと、可能性が失われることは同じではない。一度使われなくなった形質であっても、実物や図面、写真、記録などが残っていれば、何十年、何百年後に再び取り出すことができる。ある時代には不要になったものが、環境や社会の条件が変わることで、突然もう一度意味を持つこともある。</p>
+            <p style="margin:0;text-indent:1em">だとすると、人工物にとって重要なのは、その時代に何が生き残っているかだけではなく、過去に存在した形質へ再びアクセスできることなのかもしれない。生物が、同時代に存在する形質の多様性によって可能性を保持しているとすれば、人工物は、歴史のなかに蓄積された形質によって可能性を保持することができる。</p>
+            <p style="margin:0;text-indent:1em">言い換えれば、生物が空間的な多様性を一つの適応資源として持つのに対して、人工物にとっては時間的な多様性が大きな適応資源になり得る。もちろん、これは生物と人工物を完全に二分する話ではない。生物にも時間を越えて多様性を保持する仕組みはあるし、人工物にも地域や文化による空間的な多様性がある。ただ人工物の場合、記録さえ残っていれば、現在の系統とは直接つながっていない過去の形質を、時間を飛び越えて意図的に呼び戻すことができる。この自由度はとても大きい。</p>
+            <p style="margin:0;text-indent:1em">そう考えると、「残す」ということの意味も少し変わって見えてくる。AIが何度も冬の時代を経験した先に現在の隆盛があるとするなら、そこでは過去の研究が参照可能なかたちで残されていたことが重要だったはずだ。ある時代には実用化できなかったアイデアでも、論文や書籍として残っていれば、計算能力や周辺技術、社会環境が変わったときに、もう一度取り出すことができる。</p>
+            <p style="margin:0;text-indent:1em">論文は論文を読めばよく、書籍は書籍を開けばいい。しかし、いわゆるインテリアデザインとしての空間は残りにくい。写真や図面は残る。しかし、それらは空間そのものではない。光や音、距離感、身体の動き、視線の変化、素材との距離といった、空間を体験するときの多くの情報は失われてしまう。建物自体も改修され、解体され、やがて消えていく。もちろん経済的なロジックに伴った解体も存在する。建築と比べてインテリアとしての空間は儚さが伴う。</p>
+            <p style="margin:0;text-indent:1em">それと同時に、少しアクロバティックな接続ではあるが、3D Gaussian Splattingのような技術やXRデバイスの進化を見ていると、これまでとは違う空間の残し方が現れ始めているようにも思う。いずれ、空間の幾何形状だけではなく、そのなかを移動し、見回し、スケールを身体的に感じるような体験まで含めて、ゲームエンジンなどの環境に保存できるようになるかもしれない。</p>
+            <p style="margin:0;text-indent:1em">そうなれば、過去の空間に後から遡り、そこに存在した形質を再び発見することができる。ただ、これはこれで別種の問題がある。</p>
+            <p style="margin:0;text-indent:1em">紙に印刷された書籍は、現状、百年前のものでもそのまま読むことができる。一方で、デジタルメディアは移ろいが非常に速い。JPEGのように広く普及した画像形式は比較的ロバストになってきたが、3D Gaussian Splattingのような新しい技術が、十年後にも現在と同じように扱える保証はない。新しい形式に置き換えられ、ソフトウェアやハードウェアが失われれば、データそのものは残っていてもアクセスできなくなるかもしれない。だから空間を「保存する」だけでは、おそらく足りない。未来から再びアクセスできる状態で残すことはいかにして可能か。これはデジタルメディアに囲まれた現代の大きな問いであることには変わりない。</p>
+            <p style="margin:0;text-indent:1em">空間デザインには陳腐化がつきものだという。けれども同時に、その時代固有の要素に呼応した、固有の空間が生まれることも多い。確かにそれは時代が移ろうと魅力が変わってしまう。けれどももし、陳腐化した空間が、何十年、何百年後に再び発見され、そのなかに別の時代にとっての可能性が見出されたらどうだろうか。それは思いもよらないレファレンスになるのではないか。そのためには、空間の形質が時間を越えて参照可能であり続けなければならない。本質的で普遍なものだけを残すのではなくて、関係性の中で生まれ出た固有な解、世俗的な現象それ自体を保存しておくことが、後の世のクリエイションの多様さにつながるはずなのだと思う。</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:96px;padding:48px 0 12px;border-top:1px solid var(--color-text);font-family:'Zen Old Mincho';font-size:14px;max-width:calc(34 * clamp(15px, 0.8rem + 0.2vw, 16px));">
+            <sc-if value="{{ subNotDone }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;height:34px;border:1px solid var(--color-accent);border-radius:0">
+              <input type="email" placeholder="email@example.com　新着記事をメールで受け取る" value="{{ subEmail }}" onChange="{{ subChange }}" onKeyDown="{{ subKey }}" style="flex:1;min-width:0;height:100%;padding:0 12px;font-family:var(--font-body),'Zen Old Mincho',serif;font-size:14px;color:var(--color-text);background:transparent;border:0;border-radius:0;outline:none" style-focus="box-shadow:inset 0 0 0 0.5px var(--color-accent)">
+              <button onClick="{{ subSubmit }}" style="flex:none;display:flex;align-items:center;padding:0 14px;font-family:var(--font-body);font-size:13px;color:#fff;background:var(--color-accent);text-decoration:none;border:0;border-radius:0;cursor:pointer" style-hover="background:var(--color-accent-600)">{{ subBtn }}</button>
+            </div>
+            </sc-if>
+            <sc-if value="{{ subDone }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <div style="display:flex;align-items:center;gap:10px;height:34px;padding:0 12px;border:1px solid var(--color-accent);background:var(--color-accent-100);font-family:var(--font-body);font-size:13px;color:var(--color-accent-700)"><span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:var(--color-accent);color:#fff;font-size:11px;line-height:1">✓</span><span>Subscribed</span></div>
+                <div style="font-size:11.5px;line-height:1.7;color:var(--color-neutral-700)">{{ subMsg }}</div>
+              </div>
+            </sc-if>
+          </div>
+          <div style="max-width:calc(34 * clamp(15px, 0.8rem + 0.2vw, 16px));display:grid;grid-template-columns:1fr 1fr;column-gap:24px;margin-top:40px;font-family:'Zen Old Mincho';font-size:13px;line-height:1.75">
+            <a href="#" style="display:flex;flex-direction:column;color:var(--color-text);text-decoration:none" style-hover="color:var(--color-accent-700)"><span style="font-family:var(--font-body);font-size:11.5px;color:var(--color-neutral-700)">前の記事</span><span>記事のタイトル</span></a>
+            <a href="#" style="display:flex;flex-direction:column;align-items:flex-end;text-align:right;color:var(--color-text);text-decoration:none;" style-hover="color:var(--color-accent-700)"><span style="font-family:var(--font-body);font-size:11.5px;color:var(--color-neutral-700)">次の記事</span><span>床の記憶</span></a>
+          </div>
+          <div style="max-width:calc(34 * clamp(15px, 0.8rem + 0.2vw, 16px));display:flex;flex-direction:column;margin-top:48px">
+            <div style="font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700);padding-bottom:6px">関連する記事</div>
+            <a href="#" style="display:block;padding:6px 0;font-family:'Zen Old Mincho';font-size:14px;line-height:1.6;color:var(--color-text);text-decoration:none" style-hover="color:var(--color-accent-700)"><span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">展示空間の系譜<span style="margin-left:8px;color:var(--color-neutral-700)">ホワイトキューブ以前と以後</span></span><span style="display:block;font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums">2026.08.04</span></a>
+            <a href="#" style="display:block;padding:6px 0;font-family:'Zen Old Mincho';font-size:14px;line-height:1.6;color:var(--color-text);text-decoration:none" style-hover="color:var(--color-accent-700)"><span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">写真は空間を残せるか</span><span style="display:block;font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums">2026.07.04</span></a>
+            <a href="#" style="display:block;padding:6px 0;font-family:'Zen Old Mincho';font-size:14px;line-height:1.6;color:var(--color-text);text-decoration:none" style-hover="color:var(--color-accent-700)"><span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">廃材のゆくえ<span style="margin-left:8px;color:var(--color-neutral-700)">解体現場からの記録</span></span><span style="display:block;font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums">2026.06.17</span></a>
+          </div>
+          <div style="height:96px"></div><div data-endrule="" style="position:sticky;bottom:0;height:0;border-top:1px solid var(--color-neutral-700)"></div>
+        </div>
+      </div>
+      <div style="max-width:1440px;font-family:'Zen Old Mincho';font-size:13px;line-height:1.9;color:var(--color-neutral-800)">本文は画面幅に合わせて15〜16px（行間1.9）で変わり、1行は全角34字までにしています。注は13px、見出しは本文の約2倍です。左の記事一覧の上端と本文の上端は同じ高さに揃えています。左の一覧と本文はそれぞれ独立してスクロールします。スクロールバーは幅1pxのグレーの線だけで、スクロールを始めるとフェードインし、止まって0.7秒ほどでフェードアウトします。上の罫線は固定です。左の一覧で読んでいる記事が金色になります。本文の終わりには前後の記事へのリンクを置きました（いちばん新しい記事なので「次の記事」はありません）。</div>
+    </div>
+
+    <div id="p8" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:var(--font-heading);font-size:15px;color:var(--color-accent-700);border:1px solid var(--color-accent);border-radius:var(--radius-sm);padding:1px 8px">p8</span><span style="font-family:'Shippori Mincho';font-size:16px">記事：要素の見本（見出し・画像・引用・カード）</span></div>
+      <div data-screen-label="p8 Article elements" style="width:1440px;height:960px;overflow:hidden;background:var(--color-bg);box-shadow:var(--shadow-sm);color:var(--color-text);display:grid;grid-template-columns:360px minmax(0,1fr);column-gap:56px;padding:48px 32px 32px">
+        <div data-scroll="" data-noscrollbar="" style="height:100%;overflow-y:auto;scrollbar-width:none;display:flex;flex-direction:column;gap:22px;padding-bottom:96px">
+          <div data-f="site" style="position:sticky;top:0;z-index:1;background:var(--color-bg);font-family:var(--font-heading);font-size:30px;line-height:1.2;padding-bottom:6px;border-bottom:1px solid var(--color-neutral-700)">fragments</div>
+          <div style="display:flex;flex-direction:column;gap:4px;min-height:222px;box-sizing:border-box;padding-top:34px;font-size:13px;line-height:1.75;color:var(--color-neutral-800)"><span style="font-family:'Zen Old Mincho'">建築・空間・デザインをめぐる思索、試論 /</span><span style="font-family:var(--font-body);font-style:italic">Explorations and Abductive Speculations on Architecture, Space, and Design.</span><div style="display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:auto;padding-top:14px;font-family:var(--font-body)"><sc-for list="{{ cats }}" as="c" hint-placeholder-count="5"><span onClick="{{ c.pick }}" style="cursor:pointer;font-size:13px;line-height:1.6;color:{{ c.color }};border-bottom:1px solid {{ c.line }}">{{ c.name }}</span></sc-for></div></div>
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ listArticle }}" as="p" hint-placeholder-count="9">
+              <a href="#p2" style="display:block;padding:3px 0;font-size:13px;line-height:1.75;text-decoration:none;color:{{ p.color }}" style-hover="color:var(--color-accent-700)"><span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Zen Old Mincho'">{{ p.title }}<span data-f="sub" style="margin-left:8px;color:{{ p.subColor }}">{{ p.sub }}</span></span><span style="display:block;font-family:var(--font-body);font-size:10.5px;line-height:1.5;color:{{ p.subColor }};font-variant-numeric:tabular-nums">{{ p.date }}</span></a>
+            </sc-for>
+          </div>
+          <sc-if value="{{ hasMore }}" hint-placeholder-val="{{ false }}"><button onClick="{{ loadMore }}" style="align-self:stretch;text-align:left;margin-top:4px;padding:10px 0 6px;border-top:1px solid var(--color-divider);font-family:'Zen Old Mincho';font-size:13px;color:var(--color-neutral-500);background:none;border-left:0;border-right:0;border-bottom:0;cursor:pointer" style-hover="color:var(--color-neutral-700)">{{ moreLabel }}</button></sc-if>
+          <div style="display:flex;flex-direction:column;font-family:'Zen Old Mincho';font-size:13px;line-height:1.75">
+            <a href="#p3" style="color:var(--color-text);text-decoration:none">about</a>
+            <a href="fragments substack.dc.html#s4" style="color:var(--color-accent-700);text-decoration:none">subscribe</a>
+          </div>
+        </div>
+        <div data-scroll="" data-noscrollbar="" style="height:100%;overflow-y:auto;scrollbar-width:none;padding-bottom:0">
+          <div style="position:sticky;top:0;z-index:1;background:var(--color-bg);height:36px;padding-bottom:6px;box-sizing:content-box;border-bottom:1px solid var(--color-neutral-700)"></div>
+          <div style="display:flex;flex-direction:column;gap:4px;padding-top:56px;min-height:220px;box-sizing:border-box">
+            <h1 style="font-family:'Shippori Mincho';font-weight:500;font-size:clamp(26px, 1.4rem + 0.6vw, 32px);line-height:1.4;letter-spacing:0.02em;margin:0">記事要素の見本</h1>
+            <div style="font-family:'Shippori Mincho';font-size:17px;line-height:1.6;color:var(--color-neutral-800)">見出し・画像・引用・カード</div><div style="font-family:var(--font-body);font-size:12px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums;margin-top:10px">2026.10.01</div>
+          </div>
+          <div style="max-width:34em;font-family:'Zen Old Mincho';font-size:clamp(15px, 0.8rem + 0.2vw, 16px);line-height:1.9;text-align:justify;letter-spacing:0.02em">
+            <p style="margin:0;text-indent:1em">ここに本文のダミーテキストが入ります。記事の中で使う見出し、画像、引用、書誌カードなどの要素を、実際の組み方で並べた見本のページです。</p>
+            <p style="margin:0;text-indent:1em">本文は段落の間を空けず、字下げだけで続けます。注は本文の横に置かれます<sup id="ref-x1" onMouseEnter="{{ enter.x1 }}" onMouseLeave="{{ leave }}" onClick="{{ jump.x1 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;text-indent:0;min-width:15px;height:15px;padding:0 3px;box-sizing:border-box;font-size:10px;line-height:1;color:#fff;cursor:pointer;font-variant-numeric:tabular-nums;border-radius:1px;margin:0 2px;vertical-align:4px;background:{{ refBg.x1 }}">1</sup><span id="note-x1" onMouseEnter="{{ enter.x1 }}" onMouseLeave="{{ leave }}" style="float:right;clear:right;width:300px;margin-right:-388px;margin-bottom:16px;text-indent:0;text-align:left;font-size:13px;line-height:1.8;color:var(--color-neutral-800);background:{{ hl.x1 }}"><span style="display:block;color:var(--color-text)"><span onClick="{{ back.x1 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;text-indent:0;min-width:15px;height:15px;padding:0 3px;box-sizing:border-box;font-size:10px;line-height:1;color:#fff;cursor:pointer;font-variant-numeric:tabular-nums;border-radius:1px;margin-right:8px;vertical-align:2px;background:{{ refBg.x1 }}">1</span>注の見出し</span><span style="display:block;font-family:var(--font-body);font-size:12px;line-height:1.6;color:var(--color-neutral-700);margin:2px 0 4px">著者名「論文のタイトル」『掲載誌』2020年。</span><span style="display:block;text-align:justify">注の本文のダミーテキストです。</span></span>。</p>
+            <h2 style="font-family:'Shippori Mincho';font-weight:500;font-size:22px;line-height:1.5;letter-spacing:0.02em;margin:2.2em 0 0.8em">見出し（大）：節のタイトル</h2>
+            <p style="margin:0;text-indent:1em">見出しのあとの段落です。見出しは本文よりひと回り大きい明朝で、上に広めの余白をとって節の区切りを示します。</p>
+            <h3 style="font-family:'Shippori Mincho';font-weight:500;font-size:17px;line-height:1.6;margin:1.8em 0 0.4em">見出し（小）：項のタイトル</h3>
+            <p style="margin:0;text-indent:1em">小見出しのあとの段落です。小見出しは本文と同じくらいの大きさで、太さと余白だけで区別します。</p>
+            <figure style="margin:2.2em 0">
+              <div style="aspect-ratio:3 / 2;background:var(--color-neutral-200);border:6px solid var(--color-surface);outline:1px solid var(--color-divider);display:flex;align-items:center;justify-content:center;font-family:var(--font-body);font-size:12px;color:var(--color-neutral-600)">image（3:2）</div>
+              <figcaption style="margin-top:10px;font-size:12px;line-height:1.7;color:var(--color-neutral-700);text-align:left">図1　画像のキャプションが入ります。撮影：氏名</figcaption>
+            </figure>
+            <p style="margin:0;text-indent:1em">画像のあとの段落です。画像は本文の幅いっぱいに置き、キャプションは小さなグレーで左揃えにします。</p>
+            <blockquote style="margin:2em 0;padding:2px 0 2px 1.5em;border-left:1px solid var(--color-accent);color:var(--color-neutral-800)">
+              <p style="margin:0;text-indent:1em">引用文がここに入ります。他の文献から引いた文章は、左に差し色の細い線を引き、少し字下げして本文と区別します。</p>
+              <cite style="display:block;margin-top:8px;font-style:normal;font-size:12px;color:var(--color-neutral-700)">— 著者名『書名』出版社、2020年、p.24</cite>
+            </blockquote>
+            <p style="margin:0;text-indent:1em">引用のあとの段落です。書籍や商品を紹介するときは、次のようなカードを使います。</p>
+            <a href="#" style="display:grid;grid-template-columns:72px minmax(0,1fr);column-gap:16px;margin:2em 0;padding:14px;border:1px solid var(--color-divider);text-decoration:none;color:var(--color-text);text-indent:0;text-align:left" style-hover="border-color:var(--color-accent)">
+              <div style="width:72px;height:104px;background:var(--color-neutral-200);display:flex;align-items:center;justify-content:center;font-family:var(--font-body);font-size:10px;color:var(--color-neutral-600)">cover</div>
+              <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                <span style="font-family:'Shippori Mincho';font-size:15px;line-height:1.5">書名がここに入ります</span>
+                <span style="font-size:12px;line-height:1.6;color:var(--color-neutral-700)">著者名（著）／出版社、2020年</span>
+                <span style="margin-top:auto;font-family:var(--font-body);font-size:12px;color:var(--color-accent-700)">Amazon ↗</span>
+              </div>
+            </a>
+            <p style="margin:0;text-indent:1em">カードのあとの段落です。リンク先のサイト名（Amazon など）はカードの右下に小さく置きます。</p>
+            <a href="#" style="display:flex;flex-direction:column;gap:2px;margin:2em 0;padding:12px 14px;border:1px solid var(--color-divider);text-decoration:none;color:var(--color-text);text-indent:0;text-align:left" style-hover="border-color:var(--color-accent)">
+              <span style="font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700)">example.com</span>
+              <span style="font-family:'Shippori Mincho';font-size:15px;line-height:1.5">外部の記事やウェブページへのリンクカード</span>
+              <span style="font-size:12px;line-height:1.6;color:var(--color-neutral-700)">ページの説明文が1〜2行で入ります。</span>
+            </a>
+            <ul style="margin:1.6em 0;padding-left:1.4em;text-indent:0">
+              <li style="margin:0">箇条書きの項目がここに入ります</li>
+              <li style="margin:0">二つ目の項目</li>
+              <li style="margin:0">三つ目の項目</li>
+            </ul>
+            <p style="margin:0;text-indent:1em">最後の段落です。</p>
+          </div>
+          <div style="height:96px"></div><div data-endrule="" style="position:sticky;bottom:0;height:0;border-top:1px solid var(--color-neutral-700)"></div>
+        </div>
+      </div>
+      <div style="max-width:1440px;font-family:'Zen Old Mincho';font-size:13px;line-height:1.9;color:var(--color-neutral-800)">記事の中で使う要素を一通り並べた見本です。見出しは大小2段、画像は3:2で本文の幅いっぱい、引用は左に差し色の細い線、書籍は表紙つきのカード、外部リンクは文字だけのカードです。中身はすべて仮のものです。</div>
+    </div>
+
+    <div id="p3" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:var(--font-heading);font-size:15px;color:var(--color-accent-700);border:1px solid var(--color-accent);border-radius:var(--radius-sm);padding:1px 8px">p3</span><span style="font-family:'Shippori Mincho';font-size:16px">About</span></div>
+      <div data-screen-label="p3 About" style="width:1440px;height:960px;overflow:hidden;background:var(--color-bg);box-shadow:var(--shadow-sm);color:var(--color-text);display:grid;grid-template-columns:360px minmax(0,1fr);column-gap:56px;padding:48px 32px 32px">
+        <div data-scroll="" data-noscrollbar="" style="height:100%;overflow-y:auto;scrollbar-width:none;display:flex;flex-direction:column;gap:22px;padding-bottom:96px">
+          <div data-f="site" style="position:sticky;top:0;z-index:1;background:var(--color-bg);font-family:var(--font-heading);font-size:30px;line-height:1.2;padding-bottom:6px;border-bottom:1px solid var(--color-neutral-700)">fragments</div>
+          <div style="display:flex;flex-direction:column;gap:4px;min-height:222px;box-sizing:border-box;padding-top:34px;font-size:13px;line-height:1.75;color:var(--color-neutral-800)"><span style="font-family:'Zen Old Mincho'">建築・空間・デザインをめぐる思索、試論 /</span><span style="font-family:var(--font-body);font-style:italic">Explorations and Abductive Speculations on Architecture, Space, and Design.</span><div style="display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:auto;padding-top:14px;font-family:var(--font-body)"><sc-for list="{{ cats }}" as="c" hint-placeholder-count="5"><span onClick="{{ c.pick }}" style="cursor:pointer;font-size:13px;line-height:1.6;color:{{ c.color }};border-bottom:1px solid {{ c.line }}">{{ c.name }}</span></sc-for></div></div>
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ listTop }}" as="p" hint-placeholder-count="9">
+              <a href="#p2" style="display:block;padding:3px 0;font-size:13px;line-height:1.75;text-decoration:none;color:{{ p.color }}" style-hover="color:var(--color-accent-700)"><span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Zen Old Mincho'">{{ p.title }}<span data-f="sub" style="margin-left:8px;color:{{ p.subColor }}">{{ p.sub }}</span></span><span style="display:block;font-family:var(--font-body);font-size:10.5px;line-height:1.5;color:{{ p.subColor }};font-variant-numeric:tabular-nums">{{ p.date }}</span></a>
+            </sc-for>
+          </div>
+          <sc-if value="{{ hasMore }}" hint-placeholder-val="{{ false }}"><button onClick="{{ loadMore }}" style="align-self:stretch;text-align:left;margin-top:4px;padding:10px 0 6px;border-top:1px solid var(--color-divider);font-family:'Zen Old Mincho';font-size:13px;color:var(--color-neutral-500);background:none;border-left:0;border-right:0;border-bottom:0;cursor:pointer" style-hover="color:var(--color-neutral-700)">{{ moreLabel }}</button></sc-if>
+          <div style="display:flex;flex-direction:column;font-family:'Zen Old Mincho';font-size:13px;line-height:1.75">
+            <a href="#p3" style="color:var(--color-text);text-decoration:none">about</a>
+            <a href="fragments substack.dc.html#s4" style="color:var(--color-accent-700);text-decoration:none">subscribe</a>
+          </div>
+        </div>
+        <div data-scroll="" data-noscrollbar="" style="height:100%;overflow-y:auto;scrollbar-width:none;padding-bottom:0;display:flex;flex-direction:column">
+          <div style="position:sticky;top:0;z-index:1;background:var(--color-bg);height:36px;padding-bottom:6px;box-sizing:content-box;border-bottom:1px solid var(--color-neutral-700)"></div>
+          <div style="display:flex;flex-direction:column;gap:4px;padding-top:56px;min-height:220px;box-sizing:border-box">
+            <h1 style="font-family:'Shippori Mincho';font-weight:500;font-size:30px;line-height:1.4;letter-spacing:0.02em;margin:0">about</h1>
+          </div>
+          <div style="display:grid;grid-template-columns:minmax(0,34em) 300px;column-gap:88px">
+            <div style="display:flex;flex-direction:column;gap:20px;font-size:clamp(15px, 0.8rem + 0.2vw, 16px);line-height:1.9">
+              <p style="margin:0;font-family:'Shippori Mincho';font-size:18px;line-height:1.7">建築・空間・デザインをめぐる思索、試論 /</p>
+              <p style="margin:0;font-family:var(--font-body);font-style:italic;font-size:16px;line-height:1.6;color:var(--color-neutral-800)">Explorations and Abductive Speculations on Architecture, Space, and Design.</p>
+              <p style="margin:0;font-family:'Zen Old Mincho';text-align:justify;color:var(--color-neutral-800);padding-top:20px;border-top:1px solid var(--color-divider)">メディアについての説明文（運営者、更新の方針など）がここに入ります。</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px;font-family:'Zen Old Mincho';font-size:12px;line-height:1.75;color:var(--color-neutral-800)">
+              <div style="display:flex;flex-direction:column"><span style="font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700)">Contact</span><a href="#">mail@example.com</a><a href="#">Twitter</a><a href="#">Instagram</a><a href="#">Facebook</a><a href="#">Website</a></div>
+              </div>
+          </div>
+          <div style="min-height:96px;flex:1 0 96px"></div><div data-endrule="" style="flex:none;position:sticky;bottom:0;height:0;border-top:1px solid var(--color-neutral-700);opacity:1"></div>
+        </div>
+      </div>
+      <div style="max-width:1440px;font-family:'Zen Old Mincho';font-size:13px;line-height:1.9;color:var(--color-neutral-800)">紹介文は本文の位置に大きく置き、連絡先などは記事の注と同じ位置（右側）に置きました。About を開いているあいだは、左の About が金色になります。</div>
+    </div>
+
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:900px;padding:22px 26px;border:1px solid var(--color-neutral-500);border-radius:var(--radius-md);background:var(--color-bg);font-family:'Zen Old Mincho';font-size:13.5px;line-height:1.9;color:var(--color-text)">
+    <div style="font-family:'Shippori Mincho';font-size:18px">レスポンシブの切り替え</div>
+    <div style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:6px 20px">
+      <span style="font-family:var(--font-body);font-variant-numeric:tabular-nums">1200px 以上</span><span>索引・本文・注の3つを並べる（p1〜p3）。索引と本文はそれぞれスクロール。</span>
+      <span style="font-family:var(--font-body);font-variant-numeric:tabular-nums">760〜1199px</span><span>トップは左の索引だけ（p7）。記事では索引を出さず、本文と注の2つを並べる（p6）。索引と本文はそれぞれの段の中でスクロール。</span>
+      <span style="font-family:var(--font-body);font-variant-numeric:tabular-nums">759px 以下</span><span>1段組み。トップ＝記事一覧（p4）、記事の注は本文の最後にまとめる（p5）。</span>
+      <span style="font-family:var(--font-body)">スクロール</span><span>全デバイス共通。上の「fragments」と区切り線は固定し、その下だけが動く。スクロール中だけ1pxの線が出て、止まると消える。</span>
+    </div>
+    <div style="color:var(--color-neutral-800)">本文の文字は 15〜16px（画面幅で変化）、1行は最大34字。どの幅でも注番号の四角、差し色、罫線の扱いは共通です。</div>
+  </div>
+  <div style="display:flex;gap:56px;align-items:flex-start;flex-wrap:wrap">
+    <div id="p4" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:var(--font-heading);font-size:15px;color:var(--color-accent-700);border:1px solid var(--color-accent);border-radius:var(--radius-sm);padding:1px 8px">p4</span><span style="font-family:'Shippori Mincho';font-size:16px">モバイル：トップ（記事一覧）</span></div>
+      <div data-screen-label="p4 Mobile top" style="width:390px;height:844px;background:var(--color-bg);box-shadow:var(--shadow-sm);color:var(--color-text);border-radius:var(--radius-lg);overflow:hidden;padding:32px 20px 44px">
+        <div data-scroll="" data-noscrollbar="" style="height:100%;overflow-y:auto;scrollbar-width:none;display:flex;flex-direction:column;gap:20px;padding-bottom:48px">
+        <div data-f="site" style="position:sticky;top:0;z-index:1;background:var(--color-bg);font-family:var(--font-heading);font-size:26px;line-height:1.2;padding-bottom:6px;border-bottom:1px solid var(--color-neutral-700)">fragments</div>
+        <div style="display:flex;flex-direction:column;gap:4px;padding-top:20px;font-size:13px;line-height:1.75;color:var(--color-neutral-800)"><span style="font-family:'Zen Old Mincho'">建築・空間・デザインをめぐる思索、試論 /</span><span style="font-family:var(--font-body);font-style:italic">Explorations and Abductive Speculations on Architecture, Space, and Design.</span></div>
+        <div style="display:flex;flex-direction:column;margin-top:20px">
+          <div style="display:flex;gap:0 18px;overflow-x:auto;scrollbar-width:none;font-family:var(--font-body)" data-noscrollbar=""><sc-for list="{{ cats }}" as="c" hint-placeholder-count="5"><span onClick="{{ c.pick }}" style="cursor:pointer;font-size:14px;line-height:1.6;padding:12px 0 8px;color:{{ c.color }};border-bottom:1px solid {{ c.line }}">{{ c.name }}</span></sc-for></div>
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ listTop }}" as="p" hint-placeholder-count="12"><a href="#p5" style="display:block;padding:9px 0;font-size:14px;line-height:1.6;text-decoration:none;color:{{ p.color }}"><span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Zen Old Mincho'">{{ p.title }}<span data-f="sub" style="margin-left:8px;color:{{ p.subColor }}">{{ p.sub }}</span></span><span style="display:block;font-family:var(--font-body);font-size:11px;line-height:1.5;color:{{ p.subColor }};font-variant-numeric:tabular-nums">{{ p.date }}</span></a></sc-for>
+          </div>
+        </div>
+        <sc-if value="{{ hasMore }}" hint-placeholder-val="{{ false }}"><button onClick="{{ loadMore }}" style="align-self:stretch;text-align:left;margin-top:4px;padding:10px 0 6px;border-top:1px solid var(--color-divider);font-family:'Zen Old Mincho';font-size:14px;color:var(--color-neutral-500);background:none;border-left:0;border-right:0;border-bottom:0;cursor:pointer" style-hover="color:var(--color-neutral-700)">{{ moreLabel }}</button></sc-if>
+          <div style="display:flex;gap:24px;font-family:'Zen Old Mincho';font-size:14px"><a href="#" style="color:var(--color-text);text-decoration:none;padding:12px 0">about</a><a href="fragments substack.dc.html#s6" style="color:var(--color-accent-700);text-decoration:none;padding:12px 0">subscribe</a></div>
+        </div>
+      </div>
+      <div style="max-width:390px;font-family:'Zen Old Mincho';font-size:13px;line-height:1.9;color:var(--color-neutral-800)">PCの左の段（索引）をそのまま1段にしたものがトップです。カテゴリは横に並べ、はみ出す分は横にスクロールします。記事の行は高さ44px以上をとって、指で押しやすくしています。</div>
+    </div>
+    <div id="p5" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:var(--font-heading);font-size:15px;color:var(--color-accent-700);border:1px solid var(--color-accent);border-radius:var(--radius-sm);padding:1px 8px">p5</span><span style="font-family:'Shippori Mincho';font-size:16px">モバイル：記事</span></div>
+      <div data-screen-label="p5 Mobile article" style="width:390px;height:844px;background:var(--color-bg);box-shadow:var(--shadow-sm);color:var(--color-text);border-radius:var(--radius-lg);overflow:hidden;padding:32px 20px 44px">
+        <div data-scroll="" data-noscrollbar="" style="height:100%;overflow-y:auto;scrollbar-width:none;padding-bottom:0">
+        <a href="#p4" style="position:sticky;top:0;z-index:1;background:var(--color-bg);display:block;text-decoration:none;color:var(--color-text)"><div data-f="site" style="font-family:var(--font-heading);font-size:22px;line-height:1.2;padding-bottom:6px;border-bottom:1px solid var(--color-neutral-700)">fragments</div></a>
+        <div style="padding:40px 0 36px"><div style="display:flex;flex-direction:column;gap:4px">
+            <h1 style="font-family:'Shippori Mincho';font-weight:500;font-size:24px;line-height:1.45;margin:0">空間デザインと時間</h1>
+            <div style="font-family:'Shippori Mincho';font-size:15px;line-height:1.6;color:var(--color-neutral-800)">陳腐化と多様性について</div>
+            <div style="font-family:var(--font-body);font-size:12px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums;margin-top:8px">2026.10.01</div>
+          </div></div>
+        <div style="font-family:'Zen Old Mincho';font-size:15.5px;line-height:1.9;text-align:justify;letter-spacing:0.02em">
+            <p style="margin:0;text-indent:1em">空間デザインと名指される、建築でもデザインでもない、この領域の本質はなんなんだろうと沸々としている。そのことを考えているうちに、空間デザインそのものの性質を定義するのではなく、デザインが時間のなかでどのように「残っていくのか」から考えてみることもできるのではないかと思った。</p>
+            <p style="margin:0;text-indent:1em">きっかけになったのは、以前にも文章の中で出現した、コルネットの系統図である。そこから考えたのは、自然界における形質の残り方と、人工物における形質の残り方には、少し異なる構造があるのではないか、ということだった。</p>
+            <p style="margin:0;text-indent:1em">生物の進化では、遺伝的な情報の多くは親から子へと世代をまたいで継承される。もちろん、進化が常にゆっくりと起こるわけではないし、微生物における水平遺伝子伝播のように<sup id="ref-m1" onClick="{{ jump.m1 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;text-indent:0;min-width:18px;height:18px;padding:0 4px;box-sizing:border-box;font-size:11px;line-height:1;color:#fff;cursor:pointer;font-variant-numeric:tabular-nums;border-radius:1px;margin:0 2px;vertical-align:3px;background:{{ refBg.m1 }}">1</sup>、単純な親子関係だけでは説明できない情報伝達も存在する。それでも、生物の形質が基本的には個体の繁殖と世代交代を通じて受け継がれていくことには変わりない。</p>
+            <p style="margin:0;text-indent:1em">ここで興味深いのは、生物の適応可能性を支えているものの一つが、ある時点に存在する個体や集団の「多様性」だということだ。環境が均質でなければ、ある場所では有利な形質が、別の場所では不利になることもある。異なる形質が同時に存在することで、環境が変化したときにも、系全体として何らかの応答を残しておくことができる。</p>
+            <p style="margin:0;text-indent:1em">そう考えると、生物はある意味で、空間のなかに可能性を分散させているとも言える。（もちろん休眠遺伝子などの、時間軸的な可能性の分散装置も存在するが）</p>
+            <p style="margin:0;text-indent:1em">一方で、人工物の面白さは、必ずしも現在存在している形質だけが次の形質につながるわけではないところにある。コルネットの系統図を見ると、親から子、子から孫へと形が連続的に継承されるだけではなく、別の系統からある特徴が持ち込まれたり、一度姿を消した古い形態が後の時代に再び現れたりする。TemkinとEldredgeがコルネットなどの人工物を分析して示したのも、物質文化の変化には、生物の系統樹をそのまま当てはめるだけでは捉えられない情報伝達が存在するということだった<sup id="ref-m2" onClick="{{ jump.m2 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;text-indent:0;min-width:18px;height:18px;padding:0 4px;box-sizing:border-box;font-size:11px;line-height:1;color:#fff;cursor:pointer;font-variant-numeric:tabular-nums;border-radius:1px;margin:0 2px;vertical-align:3px;background:{{ refBg.m2 }}">2</sup>。</p>
+            <p style="margin:0;text-indent:1em">なかでも面白いのが、一度姿を消したコルネットの形態が後になって復活する「ラザロ・エフェクト」だろう<sup id="ref-m3" onClick="{{ jump.m3 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;text-indent:0;min-width:18px;height:18px;padding:0 4px;box-sizing:border-box;font-size:11px;line-height:1;color:#fff;cursor:pointer;font-variant-numeric:tabular-nums;border-radius:1px;margin:0 2px;vertical-align:3px;background:{{ refBg.m3 }}">3</sup>。ある時代には適応的だったデザインが、時代が変わることで陳腐化する。デザインは、その時代の技術や価値観、社会状況、素材、経済性など、さまざまな関係の束として成立している。その意味では、その時代における一つの固有解でもある。だから空間デザインには、ファッションや流行に近い側面もある。</p>
+            <p style="margin:0;text-indent:1em">しかし、陳腐化することと、可能性が失われることは同じではない。一度使われなくなった形質であっても、実物や図面、写真、記録などが残っていれば、何十年、何百年後に再び取り出すことができる。ある時代には不要になったものが、環境や社会の条件が変わることで、突然もう一度意味を持つこともある。</p>
+            <p style="margin:0;text-indent:1em">だとすると、人工物にとって重要なのは、その時代に何が生き残っているかだけではなく、過去に存在した形質へ再びアクセスできることなのかもしれない。生物が、同時代に存在する形質の多様性によって可能性を保持しているとすれば、人工物は、歴史のなかに蓄積された形質によって可能性を保持することができる。</p>
+            <p style="margin:0;text-indent:1em">言い換えれば、生物が空間的な多様性を一つの適応資源として持つのに対して、人工物にとっては時間的な多様性が大きな適応資源になり得る。もちろん、これは生物と人工物を完全に二分する話ではない。生物にも時間を越えて多様性を保持する仕組みはあるし、人工物にも地域や文化による空間的な多様性がある。ただ人工物の場合、記録さえ残っていれば、現在の系統とは直接つながっていない過去の形質を、時間を飛び越えて意図的に呼び戻すことができる。この自由度はとても大きい。</p>
+            <p style="margin:0;text-indent:1em">そう考えると、「残す」ということの意味も少し変わって見えてくる。AIが何度も冬の時代を経験した先に現在の隆盛があるとするなら、そこでは過去の研究が参照可能なかたちで残されていたことが重要だったはずだ。ある時代には実用化できなかったアイデアでも、論文や書籍として残っていれば、計算能力や周辺技術、社会環境が変わったときに、もう一度取り出すことができる。</p>
+            <p style="margin:0;text-indent:1em">論文は論文を読めばよく、書籍は書籍を開けばいい。しかし、いわゆるインテリアデザインとしての空間は残りにくい。写真や図面は残る。しかし、それらは空間そのものではない。光や音、距離感、身体の動き、視線の変化、素材との距離といった、空間を体験するときの多くの情報は失われてしまう。建物自体も改修され、解体され、やがて消えていく。もちろん経済的なロジックに伴った解体も存在する。建築と比べてインテリアとしての空間は儚さが伴う。</p>
+            <p style="margin:0;text-indent:1em">それと同時に、少しアクロバティックな接続ではあるが、3D Gaussian Splattingのような技術やXRデバイスの進化を見ていると、これまでとは違う空間の残し方が現れ始めているようにも思う。いずれ、空間の幾何形状だけではなく、そのなかを移動し、見回し、スケールを身体的に感じるような体験まで含めて、ゲームエンジンなどの環境に保存できるようになるかもしれない。</p>
+            <p style="margin:0;text-indent:1em">そうなれば、過去の空間に後から遡り、そこに存在した形質を再び発見することができる。ただ、これはこれで別種の問題がある。</p>
+            <p style="margin:0;text-indent:1em">紙に印刷された書籍は、現状、百年前のものでもそのまま読むことができる。一方で、デジタルメディアは移ろいが非常に速い。JPEGのように広く普及した画像形式は比較的ロバストになってきたが、3D Gaussian Splattingのような新しい技術が、十年後にも現在と同じように扱える保証はない。新しい形式に置き換えられ、ソフトウェアやハードウェアが失われれば、データそのものは残っていてもアクセスできなくなるかもしれない。だから空間を「保存する」だけでは、おそらく足りない。未来から再びアクセスできる状態で残すことはいかにして可能か。これはデジタルメディアに囲まれた現代の大きな問いであることには変わりない。</p>
+            <p style="margin:0;text-indent:1em">空間デザインには陳腐化がつきものだという。けれども同時に、その時代固有の要素に呼応した、固有の空間が生まれることも多い。確かにそれは時代が移ろうと魅力が変わってしまう。けれどももし、陳腐化した空間が、何十年、何百年後に再び発見され、そのなかに別の時代にとっての可能性が見出されたらどうだろうか。それは思いもよらないレファレンスになるのではないか。そのためには、空間の形質が時間を越えて参照可能であり続けなければならない。本質的で普遍なものだけを残すのではなくて、関係性の中で生まれ出た固有な解、世俗的な現象それ自体を保存しておくことが、後の世のクリエイションの多様さにつながるはずなのだと思う。</p>
+        </div>
+        <div style="display:flex;flex-direction:column;margin-top:56px;border-top:1px solid var(--color-divider)">
+          <div id="note-m1" style="padding:10px 0;font-size:13px;line-height:1.8;color:var(--color-neutral-800);text-align:left;background:{{ hl.m1 }}"><span style="display:block;color:var(--color-text)"><span onClick="{{ back.m1 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;min-width:15px;height:15px;padding:0 3px;box-sizing:border-box;font-size:10px;line-height:1;color:#fff;font-variant-numeric:tabular-nums;border-radius:1px;margin-right:8px;vertical-align:2px;cursor:pointer;background:{{ refBg.m1 }}">1</span>水平遺伝子伝播</span><span style="display:block;font-family:var(--font-body);font-size:12px;line-height:1.6;color:var(--color-neutral-700);margin:2px 0 4px">Luis Boto, “Horizontal gene transfer in evolution: facts and challenges,” Proceedings of the Royal Society B, 2010.</span><span style="display:block;text-align:justify">親から子への遺伝とは異なり、系統をまたいで遺伝情報が移動する「水平遺伝子伝播（Horizontal Gene Transfer）」について整理したレビュー。特に微生物の進化において、単純な樹形の系統関係だけでは捉えられない遺伝情報の移動が重要な役割を持つことを論じている</span></div>
+          <div id="note-m2" style="padding:10px 0;font-size:13px;line-height:1.8;color:var(--color-neutral-800);text-align:left;background:{{ hl.m2 }}"><span style="display:block;color:var(--color-text)"><span onClick="{{ back.m2 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;min-width:15px;height:15px;padding:0 3px;box-sizing:border-box;font-size:10px;line-height:1;color:#fff;font-variant-numeric:tabular-nums;border-radius:1px;margin-right:8px;vertical-align:2px;cursor:pointer;background:{{ refBg.m2 }}">2</span>人工物の系統とコルネットについて</span><span style="display:block;font-family:var(--font-body);font-size:12px;line-height:1.6;color:var(--color-neutral-700);margin:2px 0 4px">Ilya Tëmkin &amp; Niles Eldredge, “Phylogenetics and Material Cultural Evolution,” Current Anthropology, 2007.</span><span style="display:block;text-align:justify">生物学で用いられる系統解析を、楽器などの人工物の変化に適用しながら、その限界を検討した論文。弦楽器のプサルタリーと金管楽器のコルネットを分析し、人工物では親から子へと連続するような垂直的な継承だけでなく、別系統から特徴が持ち込まれる「水平的な情報伝達」が頻繁に起こることを示している。人工物の歴史を単純な樹形図だけでは表現しきれない、という議論の出発点。</span></div>
+          <div id="note-m3" style="padding:10px 0;font-size:13px;line-height:1.8;color:var(--color-neutral-800);text-align:left;background:{{ hl.m3 }}"><span style="display:block;color:var(--color-text)"><span onClick="{{ back.m3 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;min-width:15px;height:15px;padding:0 3px;box-sizing:border-box;font-size:10px;line-height:1;color:#fff;font-variant-numeric:tabular-nums;border-radius:1px;margin-right:8px;vertical-align:2px;cursor:pointer;background:{{ refBg.m3 }}">3</span>コルネットの「ラザロ・エフェクト」について</span><span style="display:block;font-family:var(--font-body);font-size:12px;line-height:1.6;color:var(--color-neutral-700);margin:2px 0 4px">Niles Eldredge, “Paleontology and Cornets: Thoughts on Material Cultural Evolution,” Evolution: Education and Outreach, 2011.</span><span style="display:block;text-align:justify">古生物学者ナイルズ・エルドリッジが、自身のコルネット・コレクションをもとに、生物進化と人工物の変化を比較した論考。19世紀末に一度ほとんど姿を消したコルネットの形態が、後の時代に再び現れる現象を「Lazarus effect（ラザロ・エフェクト）」として紹介している。生物では絶滅した種そのものが再び戻ることはないのに対し、人工物では過去の形態や情報が残っていれば、それを時間を越えて再び呼び戻すことができる、という違いが示されている。</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;margin-top:24px;font-family:'Zen Old Mincho';font-size:14px;line-height:1.7">
+          <div style="display:flex;flex-direction:column;gap:8px;padding:14px 0 10px;border-top:1px solid var(--color-divider);font-family:'Zen Old Mincho';font-size:14px;">
+            <sc-if value="{{ subNotDone }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;height:34px;border:1px solid var(--color-accent);border-radius:0">
+              <input type="email" placeholder="email@example.com　新着記事をメールで受け取る" value="{{ subEmail }}" onChange="{{ subChange }}" onKeyDown="{{ subKey }}" style="flex:1;min-width:0;height:100%;padding:0 12px;font-family:var(--font-body),'Zen Old Mincho',serif;font-size:16px;color:var(--color-text);background:transparent;border:0;border-radius:0;outline:none" style-focus="box-shadow:inset 0 0 0 0.5px var(--color-accent)">
+              <button onClick="{{ subSubmit }}" style="flex:none;display:flex;align-items:center;padding:0 14px;font-family:var(--font-body);font-size:13px;color:#fff;background:var(--color-accent);text-decoration:none;border:0;border-radius:0;cursor:pointer" style-hover="background:var(--color-accent-600)">{{ subBtn }}</button>
+            </div>
+            </sc-if>
+            <sc-if value="{{ subDone }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <div style="display:flex;align-items:center;gap:10px;height:34px;padding:0 12px;border:1px solid var(--color-accent);background:var(--color-accent-100);font-family:var(--font-body);font-size:13px;color:var(--color-accent-700)"><span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:var(--color-accent);color:#fff;font-size:11px;line-height:1">✓</span><span>Subscribed</span></div>
+                <div style="font-size:11.5px;line-height:1.7;color:var(--color-neutral-700)">{{ subMsg }}</div>
+              </div>
+            </sc-if>
+          </div>
+          <a href="#" style="display:flex;flex-direction:column;margin-top:32px;padding:8px 0;color:var(--color-text);text-decoration:none"><span style="font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700)">前の記事</span><span>仮設の倫理</span></a>
+          <a href="#" style="display:flex;flex-direction:column;padding:8px 0;color:var(--color-text);text-decoration:none"><span style="font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700)">次の記事</span><span>床の記憶</span></a>
+          <div style="display:flex;flex-direction:column;margin-top:28px">
+            <div style="font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700);padding-bottom:6px">関連する記事</div>
+            <a href="#" style="display:block;padding:6px 0;font-family:'Zen Old Mincho';font-size:14px;line-height:1.6;color:var(--color-text);text-decoration:none" style-hover="color:var(--color-accent-700)"><span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">展示空間の系譜<span style="margin-left:8px;color:var(--color-neutral-700)">ホワイトキューブ以前と以後</span></span><span style="display:block;font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums">2026.08.04</span></a>
+            <a href="#" style="display:block;padding:6px 0;font-family:'Zen Old Mincho';font-size:14px;line-height:1.6;color:var(--color-text);text-decoration:none" style-hover="color:var(--color-accent-700)"><span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">写真は空間を残せるか</span><span style="display:block;font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums">2026.07.04</span></a>
+            <a href="#" style="display:block;padding:6px 0;font-family:'Zen Old Mincho';font-size:14px;line-height:1.6;color:var(--color-text);text-decoration:none" style-hover="color:var(--color-accent-700)"><span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">廃材のゆくえ<span style="margin-left:8px;color:var(--color-neutral-700)">解体現場からの記録</span></span><span style="display:block;font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums">2026.06.17</span></a>
+          </div>
+        </div>
+        <div style="height:48px"></div><div data-endrule="" style="position:sticky;bottom:0;height:0;border-top:1px solid var(--color-neutral-700)"></div>
+        </div>
+      </div>
+      <div style="max-width:390px;font-family:'Zen Old Mincho';font-size:13px;line-height:1.9;color:var(--color-neutral-800)">注番号は指で押せるよう18pxの四角にしました。押すと本文の最後にまとめた「註」の該当箇所へ移り、註の番号を押すと本文に戻ります。左上の「fragments」でトップ（記事一覧）に戻ります。</div>
+    </div>
+    <div id="p7" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:var(--font-heading);font-size:15px;color:var(--color-accent-700);border:1px solid var(--color-accent);border-radius:var(--radius-sm);padding:1px 8px">p7</span><span style="font-family:'Shippori Mincho';font-size:16px">タブレット（約834px）：トップ</span></div>
+      <div data-screen-label="p7 Tablet top" style="width:834px;height:1112px;overflow:hidden;background:var(--color-bg);box-shadow:var(--shadow-sm);color:var(--color-text);padding:40px 36px 64px">
+        <div data-scroll="" data-noscrollbar="" style="width:340px;height:100%;overflow-y:auto;scrollbar-width:none;padding-bottom:80px">
+        <div data-f="site" style="position:sticky;top:0;z-index:1;background:var(--color-bg);width:340px;font-family:var(--font-heading);font-size:28px;line-height:1.2;padding-bottom:6px;border-bottom:1px solid var(--color-neutral-700)">fragments</div>
+        <div style="width:340px;display:flex;flex-direction:column;gap:22px;padding-top:56px">
+          <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:1.75;color:var(--color-neutral-800)"><span style="font-family:'Zen Old Mincho'">建築・空間・デザインをめぐる思索、試論 /</span><span style="font-family:var(--font-body);font-style:italic">Explorations and Abductive Speculations on Architecture, Space, and Design.</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:0 16px;margin-top:40px;font-family:var(--font-body)"><sc-for list="{{ cats }}" as="c" hint-placeholder-count="5"><span onClick="{{ c.pick }}" style="cursor:pointer;font-size:14px;line-height:1.6;padding:10px 0 6px;color:{{ c.color }};border-bottom:1px solid {{ c.line }}">{{ c.name }}</span></sc-for></div>
+          <div style="display:flex;flex-direction:column;margin-top:-10px"><sc-for list="{{ listTop }}" as="p" hint-placeholder-count="14"><a href="#p6" style="display:block;padding:9px 0;font-size:14px;line-height:1.6;text-decoration:none;color:{{ p.color }}"><span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Zen Old Mincho'">{{ p.title }}<span data-f="sub" style="margin-left:8px;color:{{ p.subColor }}">{{ p.sub }}</span></span><span style="display:block;font-family:var(--font-body);font-size:11px;line-height:1.5;color:{{ p.subColor }};font-variant-numeric:tabular-nums">{{ p.date }}</span></a></sc-for></div>
+          <sc-if value="{{ hasMore }}" hint-placeholder-val="{{ false }}"><button onClick="{{ loadMore }}" style="align-self:stretch;text-align:left;margin-top:4px;padding:10px 0 6px;border-top:1px solid var(--color-divider);font-family:'Zen Old Mincho';font-size:14px;color:var(--color-neutral-500);background:none;border-left:0;border-right:0;border-bottom:0;cursor:pointer" style-hover="color:var(--color-neutral-700)">{{ moreLabel }}</button></sc-if>
+          <div style="display:flex;gap:24px;font-family:'Zen Old Mincho';font-size:14px"><a href="#" style="color:var(--color-text);text-decoration:none;padding:10px 0">about</a><a href="fragments substack.dc.html#s4" style="color:var(--color-accent-700);text-decoration:none;padding:10px 0">subscribe</a></div>
+        </div>
+        </div>
+      </div>
+      <div style="max-width:834px;font-family:'Zen Old Mincho';font-size:13px;line-height:1.9;color:var(--color-neutral-800)">PCのトップと同じく、左の索引だけを置き、右側は空けています。索引は段の中でスクロールし、スクロール中だけ1pxの線が出ます。カテゴリを選ぶと、ほかの記事が薄くなるのはPCと同じです。記事を開くと p6 の画面になり、索引は「目次」に畳まれます。</div>
+    </div>
+    <div id="p6" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:var(--font-heading);font-size:15px;color:var(--color-accent-700);border:1px solid var(--color-accent);border-radius:var(--radius-sm);padding:1px 8px">p6</span><span style="font-family:'Shippori Mincho';font-size:16px">タブレット（約834px）：記事。索引は出さず、注は右に残す</span></div>
+      <div data-screen-label="p6 Tablet" style="width:834px;height:1112px;overflow:hidden;background:var(--color-bg);box-shadow:var(--shadow-sm);color:var(--color-text);padding:40px 36px 64px;position:relative">
+        <div data-scroll="" data-noscrollbar="" style="height:100%;overflow-y:auto;scrollbar-width:none;padding-bottom:0">
+        <div style="position:sticky;top:0;z-index:2;background:var(--color-bg);display:flex;justify-content:space-between;align-items:baseline;padding-bottom:6px;border-bottom:1px solid var(--color-neutral-700)">
+          <a href="#p7" data-f="site" style="font-family:var(--font-heading);font-size:28px;line-height:1.2;color:var(--color-text);text-decoration:none">fragments</a>
+        </div>
+        <div style="padding:56px 0 40px"><div style="display:flex;flex-direction:column;gap:4px">
+            <h1 style="font-family:'Shippori Mincho';font-weight:500;font-size:28px;line-height:1.45;margin:0">空間デザインと時間</h1>
+            <div style="font-family:'Shippori Mincho';font-size:15px;line-height:1.6;color:var(--color-neutral-800)">陳腐化と多様性について</div>
+            <div style="font-family:var(--font-body);font-size:12px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums;margin-top:8px">2026.10.01</div>
+          </div></div>
+        <div style="max-width:30em;font-family:'Zen Old Mincho';font-size:15.5px;line-height:1.9;text-align:justify;letter-spacing:0.02em">
+            <p style="margin:0;text-indent:1em">空間デザインと名指される、建築でもデザインでもない、この領域の本質はなんなんだろうと沸々としている。そのことを考えているうちに、空間デザインそのものの性質を定義するのではなく、デザインが時間のなかでどのように「残っていくのか」から考えてみることもできるのではないかと思った。</p>
+            <p style="margin:0;text-indent:1em">きっかけになったのは、以前にも文章の中で出現した、コルネットの系統図である。そこから考えたのは、自然界における形質の残り方と、人工物における形質の残り方には、少し異なる構造があるのではないか、ということだった。</p>
+            <p style="margin:0;text-indent:1em">生物の進化では、遺伝的な情報の多くは親から子へと世代をまたいで継承される。もちろん、進化が常にゆっくりと起こるわけではないし、微生物における水平遺伝子伝播のように<sup id="ref-t1" onMouseEnter="{{ enter.t1 }}" onMouseLeave="{{ leave }}" onClick="{{ jump.t1 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;text-indent:0;min-width:15px;height:15px;padding:0 3px;box-sizing:border-box;font-size:10px;line-height:1;color:#fff;cursor:pointer;font-variant-numeric:tabular-nums;border-radius:1px;margin:0 2px;vertical-align:4px;background:{{ refBg.t1 }}">1</sup><span id="note-t1" onMouseEnter="{{ enter.t1 }}" onMouseLeave="{{ leave }}" style="float:right;clear:right;width:210px;margin-right:-250px;margin-bottom:16px;text-indent:0;text-align:left;font-size:13px;line-height:1.8;color:var(--color-neutral-800);background:{{ hl.t1 }}"><span style="display:block;color:var(--color-text)"><span onClick="{{ back.t1 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;text-indent:0;min-width:15px;height:15px;padding:0 3px;box-sizing:border-box;font-size:10px;line-height:1;color:#fff;cursor:pointer;font-variant-numeric:tabular-nums;border-radius:1px;margin-right:8px;vertical-align:2px;background:{{ refBg.t1 }}">1</span>水平遺伝子伝播</span><span style="display:block;font-family:var(--font-body);font-size:12px;line-height:1.6;color:var(--color-neutral-700);margin:2px 0 4px">Luis Boto, “Horizontal gene transfer in evolution: facts and challenges,” Proceedings of the Royal Society B, 2010.</span><span style="display:block;text-align:justify">親から子への遺伝とは異なり、系統をまたいで遺伝情報が移動する「水平遺伝子伝播（Horizontal Gene Transfer）」について整理したレビュー。特に微生物の進化において、単純な樹形の系統関係だけでは捉えられない遺伝情報の移動が重要な役割を持つことを論じている</span></span>、単純な親子関係だけでは説明できない情報伝達も存在する。それでも、生物の形質が基本的には個体の繁殖と世代交代を通じて受け継がれていくことには変わりない。</p>
+            <p style="margin:0;text-indent:1em">ここで興味深いのは、生物の適応可能性を支えているものの一つが、ある時点に存在する個体や集団の「多様性」だということだ。環境が均質でなければ、ある場所では有利な形質が、別の場所では不利になることもある。異なる形質が同時に存在することで、環境が変化したときにも、系全体として何らかの応答を残しておくことができる。</p>
+            <p style="margin:0;text-indent:1em">そう考えると、生物はある意味で、空間のなかに可能性を分散させているとも言える。（もちろん休眠遺伝子などの、時間軸的な可能性の分散装置も存在するが）</p>
+            <p style="margin:0;text-indent:1em">一方で、人工物の面白さは、必ずしも現在存在している形質だけが次の形質につながるわけではないところにある。コルネットの系統図を見ると、親から子、子から孫へと形が連続的に継承されるだけではなく、別の系統からある特徴が持ち込まれたり、一度姿を消した古い形態が後の時代に再び現れたりする。TemkinとEldredgeがコルネットなどの人工物を分析して示したのも、物質文化の変化には、生物の系統樹をそのまま当てはめるだけでは捉えられない情報伝達が存在するということだった<sup id="ref-t2" onMouseEnter="{{ enter.t2 }}" onMouseLeave="{{ leave }}" onClick="{{ jump.t2 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;text-indent:0;min-width:15px;height:15px;padding:0 3px;box-sizing:border-box;font-size:10px;line-height:1;color:#fff;cursor:pointer;font-variant-numeric:tabular-nums;border-radius:1px;margin:0 2px;vertical-align:4px;background:{{ refBg.t2 }}">2</sup><span id="note-t2" onMouseEnter="{{ enter.t2 }}" onMouseLeave="{{ leave }}" style="float:right;clear:right;width:210px;margin-right:-250px;margin-bottom:16px;text-indent:0;text-align:left;font-size:13px;line-height:1.8;color:var(--color-neutral-800);background:{{ hl.t2 }}"><span style="display:block;color:var(--color-text)"><span onClick="{{ back.t2 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;text-indent:0;min-width:15px;height:15px;padding:0 3px;box-sizing:border-box;font-size:10px;line-height:1;color:#fff;cursor:pointer;font-variant-numeric:tabular-nums;border-radius:1px;margin-right:8px;vertical-align:2px;background:{{ refBg.t2 }}">2</span>人工物の系統とコルネットについて</span><span style="display:block;font-family:var(--font-body);font-size:12px;line-height:1.6;color:var(--color-neutral-700);margin:2px 0 4px">Ilya Tëmkin &amp; Niles Eldredge, “Phylogenetics and Material Cultural Evolution,” Current Anthropology, 2007.</span><span style="display:block;text-align:justify">生物学で用いられる系統解析を、楽器などの人工物の変化に適用しながら、その限界を検討した論文。弦楽器のプサルタリーと金管楽器のコルネットを分析し、人工物では親から子へと連続するような垂直的な継承だけでなく、別系統から特徴が持ち込まれる「水平的な情報伝達」が頻繁に起こることを示している。人工物の歴史を単純な樹形図だけでは表現しきれない、という議論の出発点。</span></span>。</p>
+            <p style="margin:0;text-indent:1em">なかでも面白いのが、一度姿を消したコルネットの形態が後になって復活する「ラザロ・エフェクト」だろう<sup id="ref-t3" onMouseEnter="{{ enter.t3 }}" onMouseLeave="{{ leave }}" onClick="{{ jump.t3 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;text-indent:0;min-width:15px;height:15px;padding:0 3px;box-sizing:border-box;font-size:10px;line-height:1;color:#fff;cursor:pointer;font-variant-numeric:tabular-nums;border-radius:1px;margin:0 2px;vertical-align:4px;background:{{ refBg.t3 }}">3</sup><span id="note-t3" onMouseEnter="{{ enter.t3 }}" onMouseLeave="{{ leave }}" style="float:right;clear:right;width:210px;margin-right:-250px;margin-bottom:16px;text-indent:0;text-align:left;font-size:13px;line-height:1.8;color:var(--color-neutral-800);background:{{ hl.t3 }}"><span style="display:block;color:var(--color-text)"><span onClick="{{ back.t3 }}" style="font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;text-indent:0;min-width:15px;height:15px;padding:0 3px;box-sizing:border-box;font-size:10px;line-height:1;color:#fff;cursor:pointer;font-variant-numeric:tabular-nums;border-radius:1px;margin-right:8px;vertical-align:2px;background:{{ refBg.t3 }}">3</span>コルネットの「ラザロ・エフェクト」について</span><span style="display:block;font-family:var(--font-body);font-size:12px;line-height:1.6;color:var(--color-neutral-700);margin:2px 0 4px">Niles Eldredge, “Paleontology and Cornets: Thoughts on Material Cultural Evolution,” Evolution: Education and Outreach, 2011.</span><span style="display:block;text-align:justify">古生物学者ナイルズ・エルドリッジが、自身のコルネット・コレクションをもとに、生物進化と人工物の変化を比較した論考。19世紀末に一度ほとんど姿を消したコルネットの形態が、後の時代に再び現れる現象を「Lazarus effect（ラザロ・エフェクト）」として紹介している。生物では絶滅した種そのものが再び戻ることはないのに対し、人工物では過去の形態や情報が残っていれば、それを時間を越えて再び呼び戻すことができる、という違いが示されている。</span></span>。ある時代には適応的だったデザインが、時代が変わることで陳腐化する。デザインは、その時代の技術や価値観、社会状況、素材、経済性など、さまざまな関係の束として成立している。その意味では、その時代における一つの固有解でもある。だから空間デザインには、ファッションや流行に近い側面もある。</p>
+            <p style="margin:0;text-indent:1em">しかし、陳腐化することと、可能性が失われることは同じではない。一度使われなくなった形質であっても、実物や図面、写真、記録などが残っていれば、何十年、何百年後に再び取り出すことができる。ある時代には不要になったものが、環境や社会の条件が変わることで、突然もう一度意味を持つこともある。</p>
+            <p style="margin:0;text-indent:1em">だとすると、人工物にとって重要なのは、その時代に何が生き残っているかだけではなく、過去に存在した形質へ再びアクセスできることなのかもしれない。生物が、同時代に存在する形質の多様性によって可能性を保持しているとすれば、人工物は、歴史のなかに蓄積された形質によって可能性を保持することができる。</p>
+            <p style="margin:0;text-indent:1em">言い換えれば、生物が空間的な多様性を一つの適応資源として持つのに対して、人工物にとっては時間的な多様性が大きな適応資源になり得る。もちろん、これは生物と人工物を完全に二分する話ではない。生物にも時間を越えて多様性を保持する仕組みはあるし、人工物にも地域や文化による空間的な多様性がある。ただ人工物の場合、記録さえ残っていれば、現在の系統とは直接つながっていない過去の形質を、時間を飛び越えて意図的に呼び戻すことができる。この自由度はとても大きい。</p>
+            <p style="margin:0;text-indent:1em">そう考えると、「残す」ということの意味も少し変わって見えてくる。AIが何度も冬の時代を経験した先に現在の隆盛があるとするなら、そこでは過去の研究が参照可能なかたちで残されていたことが重要だったはずだ。ある時代には実用化できなかったアイデアでも、論文や書籍として残っていれば、計算能力や周辺技術、社会環境が変わったときに、もう一度取り出すことができる。</p>
+            <p style="margin:0;text-indent:1em">論文は論文を読めばよく、書籍は書籍を開けばいい。しかし、いわゆるインテリアデザインとしての空間は残りにくい。写真や図面は残る。しかし、それらは空間そのものではない。光や音、距離感、身体の動き、視線の変化、素材との距離といった、空間を体験するときの多くの情報は失われてしまう。建物自体も改修され、解体され、やがて消えていく。もちろん経済的なロジックに伴った解体も存在する。建築と比べてインテリアとしての空間は儚さが伴う。</p>
+            <p style="margin:0;text-indent:1em">それと同時に、少しアクロバティックな接続ではあるが、3D Gaussian Splattingのような技術やXRデバイスの進化を見ていると、これまでとは違う空間の残し方が現れ始めているようにも思う。いずれ、空間の幾何形状だけではなく、そのなかを移動し、見回し、スケールを身体的に感じるような体験まで含めて、ゲームエンジンなどの環境に保存できるようになるかもしれない。</p>
+            <p style="margin:0;text-indent:1em">そうなれば、過去の空間に後から遡り、そこに存在した形質を再び発見することができる。ただ、これはこれで別種の問題がある。</p>
+            <p style="margin:0;text-indent:1em">紙に印刷された書籍は、現状、百年前のものでもそのまま読むことができる。一方で、デジタルメディアは移ろいが非常に速い。JPEGのように広く普及した画像形式は比較的ロバストになってきたが、3D Gaussian Splattingのような新しい技術が、十年後にも現在と同じように扱える保証はない。新しい形式に置き換えられ、ソフトウェアやハードウェアが失われれば、データそのものは残っていてもアクセスできなくなるかもしれない。だから空間を「保存する」だけでは、おそらく足りない。未来から再びアクセスできる状態で残すことはいかにして可能か。これはデジタルメディアに囲まれた現代の大きな問いであることには変わりない。</p>
+            <p style="margin:0;text-indent:1em">空間デザインには陳腐化がつきものだという。けれども同時に、その時代固有の要素に呼応した、固有の空間が生まれることも多い。確かにそれは時代が移ろうと魅力が変わってしまう。けれどももし、陳腐化した空間が、何十年、何百年後に再び発見され、そのなかに別の時代にとっての可能性が見出されたらどうだろうか。それは思いもよらないレファレンスになるのではないか。そのためには、空間の形質が時間を越えて参照可能であり続けなければならない。本質的で普遍なものだけを残すのではなくて、関係性の中で生まれ出た固有な解、世俗的な現象それ自体を保存しておくことが、後の世のクリエイションの多様さにつながるはずなのだと思う。</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:72px;padding:14px 0 12px;border-top:1px solid var(--color-divider);font-family:'Zen Old Mincho';font-size:14px;max-width:465px;">
+            <sc-if value="{{ subNotDone }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;height:34px;border:1px solid var(--color-accent);border-radius:0">
+              <input type="email" placeholder="email@example.com　新着記事をメールで受け取る" value="{{ subEmail }}" onChange="{{ subChange }}" onKeyDown="{{ subKey }}" style="flex:1;min-width:0;height:100%;padding:0 12px;font-family:var(--font-body),'Zen Old Mincho',serif;font-size:14px;color:var(--color-text);background:transparent;border:0;border-radius:0;outline:none" style-focus="box-shadow:inset 0 0 0 0.5px var(--color-accent)">
+              <button onClick="{{ subSubmit }}" style="flex:none;display:flex;align-items:center;padding:0 14px;font-family:var(--font-body);font-size:13px;color:#fff;background:var(--color-accent);text-decoration:none;border:0;border-radius:0;cursor:pointer" style-hover="background:var(--color-accent-600)">{{ subBtn }}</button>
+            </div>
+            </sc-if>
+            <sc-if value="{{ subDone }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <div style="display:flex;align-items:center;gap:10px;height:34px;padding:0 12px;border:1px solid var(--color-accent);background:var(--color-accent-100);font-family:var(--font-body);font-size:13px;color:var(--color-accent-700)"><span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:var(--color-accent);color:#fff;font-size:11px;line-height:1">✓</span><span>Subscribed</span></div>
+                <div style="font-size:11.5px;line-height:1.7;color:var(--color-neutral-700)">{{ subMsg }}</div>
+              </div>
+            </sc-if>
+          </div>
+        <div style="max-width:465px;display:grid;grid-template-columns:1fr 1fr;column-gap:24px;margin-top:40px;font-family:'Zen Old Mincho';font-size:13.5px;line-height:1.75"><a href="#" style="display:flex;flex-direction:column;color:var(--color-text);text-decoration:none" style-hover="color:var(--color-accent-700)"><span style="font-family:var(--font-body);font-size:11.5px;color:var(--color-neutral-700)">前の記事</span><span>仮設の倫理</span></a><a href="#" style="display:flex;flex-direction:column;align-items:flex-end;text-align:right;color:var(--color-text);text-decoration:none;" style-hover="color:var(--color-accent-700)"><span style="font-family:var(--font-body);font-size:11.5px;color:var(--color-neutral-700)">次の記事</span><span>床の記憶</span></a></div>
+        <div style="max-width:465px;display:flex;flex-direction:column;margin-top:40px">
+            <div style="font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700);padding-bottom:6px">関連する記事</div>
+            <a href="#" style="display:block;padding:6px 0;font-family:'Zen Old Mincho';font-size:14px;line-height:1.6;color:var(--color-text);text-decoration:none" style-hover="color:var(--color-accent-700)"><span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">展示空間の系譜<span style="margin-left:8px;color:var(--color-neutral-700)">ホワイトキューブ以前と以後</span></span><span style="display:block;font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums">2026.08.04</span></a>
+            <a href="#" style="display:block;padding:6px 0;font-family:'Zen Old Mincho';font-size:14px;line-height:1.6;color:var(--color-text);text-decoration:none" style-hover="color:var(--color-accent-700)"><span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">写真は空間を残せるか</span><span style="display:block;font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums">2026.07.04</span></a>
+            <a href="#" style="display:block;padding:6px 0;font-family:'Zen Old Mincho';font-size:14px;line-height:1.6;color:var(--color-text);text-decoration:none" style-hover="color:var(--color-accent-700)"><span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">廃材のゆくえ<span style="margin-left:8px;color:var(--color-neutral-700)">解体現場からの記録</span></span><span style="display:block;font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums">2026.06.17</span></a>
+          </div>
+        <div style="height:80px"></div><div data-endrule="" style="position:sticky;bottom:0;height:0;border-top:1px solid var(--color-neutral-700)"></div>
+        </div>
+      </div>
+      <div style="max-width:834px;font-family:'Zen Old Mincho';font-size:13px;line-height:1.9;color:var(--color-neutral-800)">左上の「fragments」を押すとトップ（p7）に戻ります。本文は段の中でスクロールし、スクロール中だけ1pxの線が出ます。注はPCと同じく本文の横に置き、幅を210pxに狭めています。本文は1行30字です。</div>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { hl: null, idx: false, tIdx: false, mOpen: { n1: true } };
+  base = [
+    { date: '2026.10.01', title: '空間デザインと時間', sub: '陳腐化と多様性について', lead: '' },
+    { date: '2026.09.28', title: '仮設の倫理', sub: '展示什器はどこへ行くのか', lead: '' },
+    { date: '2026.09.21', title: '床の記憶', sub: '', lead: '' },
+    { date: '2026.09.14', title: '窓辺の厚み', sub: '開口部と滞留について', lead: '' },
+    { date: '2026.09.07', title: '照度のない部屋', sub: '', lead: '' },
+    { date: '2026.09.04', title: 'ショールームの寿命', sub: '商業空間の十年', lead: '' },
+    { date: '2026.08.28', title: '什器と家具のあいだ', sub: '', lead: '' },
+    { date: '2026.08.21', title: 'ノート：素材の経年', sub: '', lead: '' },
+    { date: '2026.08.14', title: '改装される喫茶店', sub: '残すもの、剥がすもの', lead: '' },
+    { date: '2026.08.11', title: '図面に描かれない音', sub: '', lead: '' },
+    { date: '2026.08.04', title: '展示空間の系譜', sub: 'ホワイトキューブ以前と以後', lead: '' },
+    { date: '2026.07.28', title: '手すりについて', sub: '', lead: '' },
+    { date: '2026.07.21', title: 'ポップアップの時間', sub: '一週間だけの建築', lead: '' },
+    { date: '2026.07.18', title: '天井高をめぐるメモ', sub: '', lead: '' },
+    { date: '2026.07.11', title: '看板建築を歩く', sub: 'ファサードの表と裏', lead: '' },
+    { date: '2026.07.04', title: '写真は空間を残せるか', sub: '', lead: '' },
+    { date: '2026.06.27', title: '店舗設計のテンプレート', sub: '反復と固有性', lead: '' },
+    { date: '2026.06.24', title: '階段の踊り場', sub: '', lead: '' },
+    { date: '2026.06.17', title: '廃材のゆくえ', sub: '解体現場からの記録', lead: '' },
+    { date: '2026.06.10', title: '光の色温度', sub: '', lead: '' },
+    { date: '2026.06.03', title: 'ノート：寸法の慣習', sub: '', lead: '' },
+    { date: '2026.05.31', title: '回遊と滞留', sub: '動線計画の再読', lead: '' },
+    { date: '2026.05.24', title: '白い壁の政治', sub: '', lead: '' },
+    { date: '2026.05.17', title: 'リノベーションの文法', sub: '', lead: '' },
+    { date: '2026.05.10', title: '空間の引用', sub: '参照と模倣のあいだ', lead: '' },
+    { date: '2026.05.07', title: '仕上げの薄さ', sub: '', lead: '' },
+    { date: '2026.04.30', title: '展示替えの夜', sub: '', lead: '' },
+    { date: '2026.04.23', title: 'ディテールの寿命', sub: '納まりは何年もつか', lead: '' },
+    { date: '2026.04.16', title: '居心地という指標', sub: '', lead: '' },
+    { date: '2026.04.13', title: 'インテリアの歴史叙述', sub: '', lead: '' },
+    { date: '2026.04.06', title: '仮囲いの風景', sub: '工事中の都市', lead: '' },
+    { date: '2026.03.30', title: 'ノート：3Dスキャンの試行', sub: '', lead: '' },
+    { date: '2026.03.23', title: '什器の転用', sub: '別の場所で生き直す', lead: '' },
+    { date: '2026.03.20', title: '匂いの設計', sub: '', lead: '' },
+    { date: '2026.03.13', title: '開店前の空間', sub: '', lead: '' },
+    { date: '2026.03.06', title: '規格と逸脱', sub: '既製品で組むということ', lead: '' },
+    { date: '2026.02.27', title: '建築でもデザインでもなく', sub: '', lead: '' }
+  ];
+  applyColors(c) {
+    const r = document.documentElement.style, mix = (a, b, p) => 'color-mix(in srgb, ' + a + ' ' + p + '%, ' + b + ')';
+    r.setProperty('--color-bg', c.bg); r.setProperty('--color-text', c.text);
+    r.setProperty('--color-divider', mix(c.text, 'transparent', 16));
+    [[400, 30], [500, 42], [600, 55], [700, 65], [800, 80]].forEach(([k, p]) => r.setProperty('--color-neutral-' + k, mix(c.text, c.bg, p)));
+    r.setProperty('--color-accent', c.ac); r.setProperty('--color-accent-500', c.ac); r.setProperty('--color-accent-700', c.ac);
+    r.setProperty('--color-accent-100', mix(c.ac, c.bg, 10)); r.setProperty('--color-accent-200', mix(c.ac, c.bg, 20)); r.setProperty('--color-accent-300', mix(c.ac, c.bg, 40));
+    r.setProperty('--color-accent-600', mix(c.ac, '#000', 85)); r.setProperty('--color-accent-800', mix(c.ac, '#000', 70)); r.setProperty('--color-accent-900', mix(c.ac, '#000', 50));
+    r.setProperty('--sel-bg', c.selBg || c.ac); r.setProperty('--sel-fg', c.selFg || '#ffffff');
+    try { localStorage.setItem('fragments-test-colors', JSON.stringify(c)); } catch (e) {}
+  }
+  applyFont(fs) {
+    let el = document.getElementById('fragments-test-font');
+    if (!el) { el = document.createElement('style'); el.id = 'fragments-test-font'; document.head.appendChild(el); }
+    const L = '[data-screen-label]', sel = {
+      index: L + ' > [data-scroll]:first-child, ' + L + ' > [data-scroll]:first-child *',
+      body: L + ' p, ' + L + ' p *',
+      note: L + ' p [id^="note-"], ' + L + ' p [id^="note-"] *',
+      title: L + ' h1, ' + L + ' h1 ~ div',
+      sub: L + ' h1 + div, ' + L + ' [data-f="sub"][data-f="sub"][data-f="sub"]',
+      site: L + ' > [data-scroll]:first-child [data-f="site"][data-f="site"], ' + L + ' [data-f="site"][data-f="site"]'
+    };
+    fs = fs || {};
+    el.textContent = ['index', 'body', 'note', 'title', 'sub', 'site'].filter(k => fs[k]).map(k => sel[k] + ' { font-family: ' + fs[k] + ' !important; }').join('\n');
+    try { localStorage.setItem('fragments-test-font', JSON.stringify(fs)); } catch (e) {}
+  }
+  clearColors() {
+    const r = document.documentElement.style;
+    ['--sel-bg', '--sel-fg', '--color-bg', '--color-text', '--color-divider', '--color-accent', '--color-accent-100', '--color-accent-200', '--color-accent-300', '--color-accent-500', '--color-accent-600', '--color-accent-700', '--color-accent-800', '--color-accent-900', '--color-neutral-400', '--color-neutral-500', '--color-neutral-600', '--color-neutral-700', '--color-neutral-800'].forEach(k => r.removeProperty(k));
+    try { localStorage.removeItem('fragments-test-colors'); } catch (e) {}
+  }
+  componentDidMount() {
+    try { const fv = JSON.parse(localStorage.getItem('fragments-test-font') || 'null'); if (fv && typeof fv === 'object') { this.setState({ fonts: fv }); this.applyFont(fv); } } catch (e) {}
+    try { const c = JSON.parse(localStorage.getItem('fragments-test-colors') || 'null'); if (c) { this.setState({ colors: c }); this.applyColors(c); } } catch (e) {}
+    this.thumbs = new Map();
+    const place = sc => {
+      let th = this.thumbs.get(sc);
+      const host = sc.parentElement;
+      if (!th) {
+        th = document.createElement('div');
+        th.style.cssText = 'position:absolute;width:1px;background:var(--color-neutral-500);opacity:0;transition:opacity .45s ease;pointer-events:none;z-index:2';
+        if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+        host.appendChild(th); this.thumbs.set(sc, th);
+      }
+      const ratio = sc.clientHeight / sc.scrollHeight;
+      th.style.display = ratio >= 1 ? 'none' : 'block';
+      const head = sc.firstElementChild, off = head ? head.offsetHeight + 10 : 0;
+      const track = sc.clientHeight - off - 10;
+      const h = Math.max(24, track * ratio);
+      th.style.height = h + 'px';
+      th.style.left = (sc.offsetLeft + sc.offsetWidth - 1) + 'px';
+      th.style.top = (sc.offsetTop + off + (track - h) * (sc.scrollTop / Math.max(1, sc.scrollHeight - sc.clientHeight))) + 'px';
+      return th;
+    };
+    this.onScroll = e => {
+      const t = e.target; if (!t || !t.hasAttribute || !t.hasAttribute('data-scroll')) return;
+      if (t.scrollTop + t.clientHeight >= t.scrollHeight - 2) t.setAttribute('data-atend', ''); else t.removeAttribute('data-atend');
+      const th = place(t); th.style.transition = 'opacity .2s ease'; th.style.opacity = '1';
+      if (!t.querySelector('[data-endrule]')) {
+        this.ends = this.ends || new Map();
+        let er = this.ends.get(t);
+        if (!er) { er = document.createElement('div'); er.style.cssText = 'position:absolute;height:0;border-top:1px solid var(--color-neutral-700);opacity:0;transition:opacity .5s ease;pointer-events:none;z-index:2'; t.parentElement.appendChild(er); this.ends.set(t, er); }
+        er.style.left = t.offsetLeft + 'px'; er.style.width = t.clientWidth + 'px'; er.style.top = (t.offsetTop + t.clientHeight) + 'px';
+        er.style.opacity = t.hasAttribute('data-atend') ? '1' : '0';
+      }
+      clearTimeout(t._h); t._h = setTimeout(() => { th.style.transition = 'opacity .6s ease'; th.style.opacity = '0'; }, 700);
+    };
+    document.addEventListener('scroll', this.onScroll, true);
+  }
+  doSub() {
+    if (this.state.subSending || !(this.state.subEmail || '').includes('@')) return;
+    this.setState({ subSending: true });
+    setTimeout(() => this.setState({ subSending: false, subDone: true }), 800);
+  }
+  componentWillUnmount() { document.removeEventListener('scroll', this.onScroll, true); this.thumbs && this.thumbs.forEach(t => t.remove()); }
+  catOf(i) { return i === 0 ? 'essay' : ['spaces', 'days', 'books', 'essay', 'days', 'spaces', 'books'][i % 7]; }
+  mk(cur) {
+    const cat = this.state.cat || 'all';
+    return this.base.map((p, i) => { const on = cat === 'all' || this.catOf(i) === cat; return { ...p, cat: this.catOf(i), color: !on ? 'var(--color-neutral-400)' : i === cur ? 'var(--color-accent-700)' : 'var(--color-text)', subColor: on ? 'var(--color-neutral-700)' : 'var(--color-neutral-400)' }; });
+  }
+  cats() { const cat = this.state.cat || 'all'; return ['all', 'essay', 'days', 'books', 'spaces'].map(n => ({ name: n, color: n === cat ? 'var(--color-accent-700)' : 'var(--color-text)', line: n === cat ? 'var(--color-accent)' : 'transparent', pick: () => this.setState({ cat: n }) })); }
+  go(id, k) {
+    const el = document.getElementById(id);
+    if (el) { const r = el.getBoundingClientRect(), sc = el.closest('[data-scroll]'); if (sc) { const sr = sc.getBoundingClientRect(); sc.scrollTo({ top: sc.scrollTop + r.top - sr.top - sr.height / 3, behavior: 'smooth' }); } else window.scrollTo({ top: window.scrollY + r.top - window.innerHeight / 3, behavior: 'smooth' }); }
+    this.setState({ hl: k }); clearTimeout(this.t);
+    this.t = setTimeout(() => this.setState({ hl: null }), 1600);
+  }
+  renderVals() {
+    const hl = {}, enter = {}, jump = {}, back = {}, refBg = {};
+    ['n1', 'n2', 'n3', 't1', 't2', 't3', 'm1', 'm2', 'm3', 'x1'].forEach(k => {
+      hl[k] = this.state.hl === k ? 'var(--color-accent-100)' : 'transparent';
+      refBg[k] = this.state.hl === k ? 'var(--color-accent-900)' : 'var(--color-accent)';
+      enter[k] = () => { clearTimeout(this.t); this.setState({ hl: k }); };
+      jump[k] = e => { e.preventDefault(); this.go('note-' + k, k); };
+      back[k] = e => { e.stopPropagation(); this.go('ref-' + k, k); };
+    });
+    const tg = k => () => this.setState(s => ({ [k]: !s[k] }));
+    const COLORS0 = { bg: '#f3f2f2', text: '#201f1d', ac: '#0000ff', selBg: '#0000ff', selFg: '#ffffff' };
+    const cs = { ...COLORS0, ...(this.state.colors || {}) };
+    const setC = key => e => { const c = { ...cs, [key]: e.target.value }; if (key === 'ac' && cs.selBg === cs.ac) c.selBg = e.target.value; this.setState({ colors: c }); this.applyColors(c); };
+    const colorCtl = [{ label: '背景', value: cs.bg, set: setC('bg') }, { label: '文字', value: cs.text, set: setC('text') }, { label: '差し色', value: cs.ac, set: setC('ac') }, { label: '選択背景', value: cs.selBg, set: setC('selBg') }, { label: '選択文字', value: cs.selFg, set: setC('selFg') }];
+    const resetColors = () => { this.setState({ colors: null, fonts: {} }); this.clearColors(); this.applyFont({}); };
+    const fontOpts = [
+      { v: '', label: '既定' },
+      { v: "'Zen Old Mincho', serif", label: 'Zen Old Mincho（明朝）' },
+      { v: "'Shippori Mincho', serif", label: 'しっぽり明朝' },
+      { v: "'Noto Serif JP', serif", label: 'Noto Serif JP（明朝）' },
+      { v: "'Zen Kaku Gothic New', sans-serif", label: 'Zen Kaku Gothic New（ゴシック）' },
+      { v: "'Noto Sans JP', sans-serif", label: 'Noto Sans JP（ゴシック）' },
+      { v: "'BIZ UDPGothic', sans-serif", label: 'BIZ UDPゴシック' }
+    ];
+    const fsNow = this.state.fonts || {};
+    const fontCtl = [['site', 'サイト名'], ['title', '見出し'], ['sub', 'サブタイトル'], ['body', '本文'], ['note', '注'], ['index', '索引']].map(([k, label]) => ({ label, value: fsNow[k] || '', set: e => { const n = { ...fsNow, [k]: e.target.value }; this.setState({ fonts: n }); this.applyFont(n); } }));
+    return {
+      mOpen: { n1: !!(this.state.mOpen || {}).n1, n2: !!(this.state.mOpen || {}).n2, n3: !!(this.state.mOpen || {}).n3 },
+      mTog: { n1: () => this.setState(s => ({ mOpen: { ...s.mOpen, n1: !(s.mOpen || {}).n1 } })), n2: () => this.setState(s => ({ mOpen: { ...s.mOpen, n2: !(s.mOpen || {}).n2 } })), n3: () => this.setState(s => ({ mOpen: { ...s.mOpen, n3: !(s.mOpen || {}).n3 } })) },
+      tIdx: this.state.tIdx, tIdxLabel: this.state.tIdx ? '閉じる' : '目次', toggleTIdx: tg('tIdx'),
+      subEmail: this.state.subEmail || '', subDone: !!this.state.subDone, subNotDone: !this.state.subDone,
+      subMsg: (this.state.subEmail || '') + ' に確認メールを送りました。メール内のリンクを押すと登録が完了します。',
+      subChange: e => this.setState({ subEmail: e.target.value }),
+      subSubmit: () => this.doSub(),
+      subKey: e => { if (e.key === 'Enter') this.doSub(); },
+      subBtn: this.state.subSending ? 'Sending…' : 'Subscribe',
+      colorCtl, resetColors, fontOpts, fontCtl, hl, refBg, enter, jump, back, leave: () => this.setState({ hl: null }),
+      cats: this.cats(), listTop: this.mk(-1).slice(0, this.state.limit || 20), listArticle: this.mk(0).slice(0, this.state.limit || 20),
+      hasMore: (this.state.limit || 20) < this.base.length,
+      moreLabel: this.state.loading ? '読み込み中…' : 'さらに読み込む',
+      loadMore: () => { if (this.state.loading) return; this.setState({ loading: true }); setTimeout(() => this.setState(s => ({ loading: false, limit: (s.limit || 20) + 20 })), 600); }, posts: this.base,
+      idx: this.state.idx, idxLabel: this.state.idx ? '閉じる' : '目次',
+      openM: this.state.openM, open1: this.state.open1,
+      toggleIdx: tg('idx'), toggleM: tg('openM'), toggle1: tg('open1')
+    };
+  }
+}
+</script>
+</body>
+</html>

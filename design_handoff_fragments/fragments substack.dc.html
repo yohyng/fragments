@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Old+Mincho:wght@400;600&display=swap">
+<style>
+:root{--color-accent:#0000ff;--color-accent-100:#e8e8ff;--color-accent-600:#0000d8;--color-accent-700:#0000ff;--color-accent-900:#000080}
+body{background:var(--color-neutral-300);margin:0}
+a{color:var(--color-accent-700);text-underline-offset:3px;text-decoration-thickness:1px}
+a:hover{color:var(--color-accent-600)}
+::selection{background:var(--color-accent);color:#fff}
+</style>
+</helmet>
+<section style="padding:64px;display:flex;flex-direction:column;gap:40px;color:var(--color-text)">
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:900px">
+    <div style="font-family:var(--font-heading);font-size:14px;letter-spacing:0.12em;color:var(--color-neutral-700)">STUDY — SUBSTACK</div>
+    <div style="font-family:'Shippori Mincho';font-size:34px">fragments × Substack の組み合わせ方</div>
+    <div style="font-family:'Zen Old Mincho';font-size:14px;line-height:1.9;color:var(--color-neutral-800)">本番の画面（<a href="fragments v2.dc.html">fragments v2</a>）には手を入れず、検討用にこの画面を分けています。</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:20px;padding-bottom:40px;border-bottom:1px solid var(--color-neutral-500)">
+    <div style="display:flex;flex-direction:column;gap:6px;max-width:900px">
+      <div style="font-family:'Shippori Mincho';font-size:24px">方針：自前の購読ページ → Substack へ移動</div>
+      <div style="font-family:'Zen Old Mincho';font-size:13.5px;line-height:1.9;color:var(--color-neutral-800)">購読の案内はこのサイトのデザインで作り、ボタンを押すと Substack の購読ページ（publication名.substack.com/subscribe）が開きます。メールアドレスの入力から確認メールまでは Substack 側で行うので、壊れる部分がありません。</div>
+    </div>
+    <div style="display:flex;gap:56px;align-items:flex-start;flex-wrap:wrap">
+
+      <div id="s4" style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:var(--font-heading);font-size:15px;color:var(--color-accent-700);border:1px solid var(--color-accent);border-radius:var(--radius-sm);padding:1px 8px">s4</span><span style="font-family:'Shippori Mincho';font-size:16px">PC：購読ページ（Subscribe）</span></div>
+        <div style="width:1100px;height:720px;background:var(--color-bg);box-shadow:var(--shadow-sm);padding:48px 32px 32px;display:grid;grid-template-columns:360px minmax(0,1fr);column-gap:56px">
+          <div style="display:flex;flex-direction:column;gap:22px">
+            <div style="font-family:var(--font-heading);font-size:30px;line-height:1.2;padding-bottom:6px;border-bottom:1px solid var(--color-neutral-700)">fragments</div>
+            <div style="display:flex;flex-direction:column;gap:4px;padding-top:34px;font-size:13px;line-height:1.75;color:var(--color-neutral-800)"><span style="font-family:'Zen Old Mincho'">建築・空間・デザインをめぐる思索、試論 /</span><span style="font-family:var(--font-body);font-style:italic">Explorations and Abductive Speculations on Architecture, Space, and Design.</span></div>
+            <div style="display:flex;flex-direction:column;font-family:'Zen Old Mincho';font-size:13px;line-height:1.75;margin-top:auto">
+              <a href="#" style="color:var(--color-text);text-decoration:none">About</a>
+              <a href="#" style="color:var(--color-text);text-decoration:none">RSS</a>
+              <a href="#s4" style="color:var(--color-accent-700);text-decoration:none">Subscribe</a>
+            </div>
+          </div>
+          <div>
+            <div style="height:36px;padding-bottom:6px;box-sizing:content-box;border-bottom:1px solid var(--color-neutral-700)"></div>
+            <div style="display:grid;grid-template-columns:minmax(0,34em) 300px;column-gap:88px;padding-top:56px">
+              <div style="display:flex;flex-direction:column;gap:22px">
+                <h1 style="font-family:'Shippori Mincho';font-weight:500;font-size:30px;line-height:1.4;margin:0">Subscribe</h1>
+                <p style="margin:0;font-family:'Zen Old Mincho';font-size:16px;line-height:1.9;text-align:justify">新しい記事をメールで受け取れます。配信は Substack を通じて行います。下のボタンから Substack の登録ページに移り、メールアドレスを入力してください。</p>
+                <a href="#" style="align-self:flex-start;display:flex;align-items:center;gap:10px;margin-top:10px;padding:12px 22px;font-family:'Zen Old Mincho';font-size:15px;color:var(--color-accent-700);text-decoration:none;border:1px solid var(--color-accent);border-radius:var(--radius-sm)" style-hover="background:var(--color-accent);color:#fff">Substack で購読する<span style="font-family:var(--font-body)">↗</span></a>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:14px;padding-top:58px;font-family:'Zen Old Mincho';font-size:13px;line-height:1.8;color:var(--color-neutral-800)">
+                <div style="display:flex;flex-direction:column"><span style="font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700)">配信</span><span>記事の公開ごとに全文</span></div>
+                <div style="display:flex;flex-direction:column"><span style="font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700)">料金</span><span>無料</span></div>
+                <div style="display:flex;flex-direction:column"><span style="font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700)">メールを使わない場合</span><a href="#">RSS で読む</a></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="max-width:1100px;font-family:'Zen Old Mincho';font-size:13px;line-height:1.9;color:var(--color-neutral-800)">About と同じ組み方で、本文の位置に案内とボタン、注の位置に配信の条件を置きました。ボタンは差し色の線だけで、カーソルを乗せると青く塗りつぶされます。右の「配信」「料金」の内容は仮です。</div>
+      </div>
+
+      <div id="s5" style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:var(--font-heading);font-size:15px;color:var(--color-accent-700);border:1px solid var(--color-accent);border-radius:var(--radius-sm);padding:1px 8px">s5</span><span style="font-family:'Shippori Mincho';font-size:16px">記事の末尾からの導線</span></div>
+        <div style="width:620px;background:var(--color-bg);box-shadow:var(--shadow-sm);padding:40px 40px 56px;display:flex;flex-direction:column">
+          <div style="font-family:'Zen Old Mincho';font-size:16px;line-height:1.9;color:var(--color-neutral-700)">……後の世のクリエイションの多様さにつながるはずなのだと思う。</div>
+          <a href="#s4" style="display:flex;justify-content:space-between;align-items:baseline;margin-top:64px;padding:14px 0;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);font-family:'Zen Old Mincho';font-size:14px;color:var(--color-text);text-decoration:none" style-hover="color:var(--color-accent-700)"><span>新しい記事をメールで受け取る</span><span style="font-family:var(--font-body);color:var(--color-accent-700)">Subscribe →</span></a>
+          <a href="#" style="display:flex;flex-direction:column;padding:14px 0;border-bottom:1px solid var(--color-divider);font-family:'Zen Old Mincho';font-size:14px;color:var(--color-text);text-decoration:none"><span style="font-family:var(--font-body);font-size:11px;color:var(--color-neutral-700)">前の記事</span><span>仮設の倫理</span></a>
+        </div>
+        <div style="max-width:620px;font-family:'Zen Old Mincho';font-size:13px;line-height:1.9;color:var(--color-neutral-800)">記事の終わりには、前の記事へのリンクと同じ形の1行だけを置きます。押すと購読ページ（s4）に移ります。記事の中でフォームを主張させない形です。</div>
+      </div>
+
+      <div id="s6" style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:var(--font-heading);font-size:15px;color:var(--color-accent-700);border:1px solid var(--color-accent);border-radius:var(--radius-sm);padding:1px 8px">s6</span><span style="font-family:'Shippori Mincho';font-size:16px">モバイル：購読ページ</span></div>
+        <div style="width:390px;height:844px;background:var(--color-bg);box-shadow:var(--shadow-sm);border-radius:var(--radius-lg);padding:32px 20px 44px;display:flex;flex-direction:column;gap:18px">
+          <div style="font-family:var(--font-heading);font-size:22px;line-height:1.2;padding-bottom:6px;border-bottom:1px solid var(--color-neutral-700)">fragments</div>
+          <h1 style="font-family:'Shippori Mincho';font-weight:500;font-size:26px;line-height:1.4;margin:22px 0 0">Subscribe</h1>
+          <p style="margin:0;font-family:'Zen Old Mincho';font-size:15.5px;line-height:1.9;text-align:justify">新しい記事をメールで受け取れます。配信は Substack を通じて行います。下のボタンから Substack の登録ページに移り、メールアドレスを入力してください。</p>
+          <a href="#" style="display:flex;justify-content:center;align-items:center;gap:10px;height:48px;margin-top:8px;font-family:'Zen Old Mincho';font-size:15px;color:var(--color-accent-700);text-decoration:none;border:1px solid var(--color-accent);border-radius:var(--radius-sm)">Substack で購読する<span style="font-family:var(--font-body)">↗</span></a>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:20px;padding-top:16px;border-top:1px solid var(--color-divider);font-family:'Zen Old Mincho';font-size:13px;line-height:1.8;color:var(--color-neutral-800)">
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--color-neutral-700)">配信</span><span>記事の公開ごとに全文</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--color-neutral-700)">料金</span><span>無料</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--color-neutral-700)">メールを使わない場合</span><a href="#">RSS で読む</a></div>
+          </div>
+        </div>
+        <div style="max-width:390px;font-family:'Zen Old Mincho';font-size:13px;line-height:1.9;color:var(--color-neutral-800)">ボタンは横幅いっぱい、高さ48pxにして押しやすくしました。配信の条件はボタンの下に並べています。</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="font-family:'Shippori Mincho';font-size:20px;color:var(--color-neutral-800)">参考：最初に比べた3つの方法</div>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,300px));gap:24px">
+    <sc-for list="{{ ways }}" as="w" hint-placeholder-count="3">
+      <div style="display:flex;flex-direction:column;gap:10px;padding:20px 22px;background:var(--color-bg);border:1px solid var(--color-divider)">
+        <div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:var(--font-heading);font-size:15px;color:var(--color-accent-700);border:1px solid var(--color-accent);border-radius:var(--radius-sm);padding:0 7px">{{ w.id }}</span><span style="font-family:'Shippori Mincho';font-size:17px">{{ w.title }}</span></div>
+        <div style="font-family:'Zen Old Mincho';font-size:13px;line-height:1.85;color:var(--color-neutral-800)">{{ w.desc }}</div>
+        <div style="font-family:'Zen Old Mincho';font-size:12px;line-height:1.8;color:var(--color-neutral-700);padding-top:8px;border-top:1px solid var(--color-divider)">{{ w.note }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:flex;gap:56px;align-items:flex-start;flex-wrap:wrap">
+    <div id="s1" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:var(--font-heading);font-size:15px;color:var(--color-accent-700);border:1px solid var(--color-accent);border-radius:var(--radius-sm);padding:1px 8px">s1</span><span style="font-family:'Shippori Mincho';font-size:16px">PC記事の末尾：購読フォーム（自前デザイン）</span></div>
+      <div style="width:1100px;background:var(--color-bg);box-shadow:var(--shadow-sm);padding:48px 32px 64px;display:grid;grid-template-columns:360px minmax(0,1fr);column-gap:56px">
+        <div style="display:flex;flex-direction:column;gap:22px">
+          <div style="font-family:var(--font-heading);font-size:30px;line-height:1.2;padding-bottom:6px;border-bottom:1px solid var(--color-neutral-700)">fragments</div>
+          <div style="display:flex;flex-direction:column;font-family:'Zen Old Mincho';font-size:13px;line-height:1.75;margin-top:auto">
+            <a href="#" style="color:var(--color-text);text-decoration:none">About</a>
+            <a href="#" style="color:var(--color-text);text-decoration:none">RSS</a>
+            <a href="#s1" style="color:var(--color-accent-700);text-decoration:none">Subscribe</a>
+          </div>
+        </div>
+        <div>
+          <div style="height:36px;padding-bottom:6px;box-sizing:content-box;border-bottom:1px solid var(--color-neutral-700)"></div>
+          <div style="max-width:34em;padding-top:40px;font-family:'Zen Old Mincho';font-size:16px;line-height:1.9;text-align:justify;color:var(--color-neutral-700)">
+            <p style="margin:0;text-indent:1em">……本質的で普遍なものだけを残すのではなくて、関係性の中で生まれ出た固有な解、世俗的な現象それ自体を保存しておくことが、後の世のクリエイションの多様さにつながるはずなのだと思う。</p>
+          </div>
+          <div style="max-width:34em;display:flex;flex-direction:column;gap:14px;margin-top:72px;padding-top:18px;border-top:1px solid var(--color-text)">
+            <div style="font-family:'Shippori Mincho';font-size:18px">新しい記事をメールで受け取る</div>
+            <div style="font-family:'Zen Old Mincho';font-size:13px;line-height:1.8;color:var(--color-neutral-800)">更新のたびに全文をお届けします。配信は Substack を通じて行います。</div>
+            <div style="display:flex;gap:10px;margin-top:4px">
+              <input type="email" placeholder="mail@example.com" value="{{ email }}" onChange="{{ setEmail }}" style="flex:1;min-width:0;height:40px;padding:0 12px;font-family:var(--font-body);font-size:14px;color:var(--color-text);background:transparent;border:1px solid var(--color-neutral-500);border-radius:var(--radius-sm)">
+              <button onClick="{{ submit }}" style="height:40px;padding:0 20px;font-family:'Zen Old Mincho';font-size:14px;color:var(--color-accent-700);background:transparent;border:1px solid var(--color-accent);border-radius:var(--radius-sm);cursor:pointer;white-space:nowrap" style-hover="background:var(--color-accent-100)">登録する</button>
+            </div>
+            <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}"><div style="font-family:'Zen Old Mincho';font-size:13px;color:var(--color-accent-700)">確認メールを送りました。メール内のリンクで登録が完了します。</div></sc-if>
+          </div>
+        </div>
+      </div>
+      <div style="max-width:1100px;font-family:'Zen Old Mincho';font-size:13px;line-height:1.9;color:var(--color-neutral-800)">本文の最後（区切り線の上）に、罫線と同じ扱いでフォームを置く案です。左の索引にも「Subscribe」を足し、押すとこのフォームまで移ります。フォームはデザインに合わせて自前で作り、送信先だけ Substack にします（方法B）。</div>
+    </div>
+
+    <div id="s2" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:var(--font-heading);font-size:15px;color:var(--color-accent-700);border:1px solid var(--color-accent);border-radius:var(--radius-sm);padding:1px 8px">s2</span><span style="font-family:'Shippori Mincho';font-size:16px">公式の埋め込み（iframe）を置いた場合</span></div>
+      <div style="width:620px;background:var(--color-bg);box-shadow:var(--shadow-sm);padding:40px 40px 56px;display:flex;flex-direction:column;gap:16px">
+        <div style="font-family:'Zen Old Mincho';font-size:16px;line-height:1.9;color:var(--color-neutral-700)">……後の世のクリエイションの多様さにつながるはずなのだと思う。</div>
+        <div style="height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border:1px solid #e5e5e5;background:#fff;border-radius:8px;font-family:system-ui,sans-serif">
+          <div style="font-size:14px;font-weight:600;color:#111">Subscribe to fragments</div>
+          <div style="display:flex;gap:0;border:1px solid #ddd;border-radius:6px;overflow:hidden"><span style="padding:9px 14px;font-size:13px;color:#999;width:200px">Type your email...</span><span style="padding:9px 16px;font-size:13px;font-weight:600;color:#fff;background:#ff6719">Subscribe</span></div>
+          <div style="font-size:11px;color:#888">Substack が用意する枠（中身は Substack 側のデザイン）</div>
+        </div>
+      </div>
+      <div style="max-width:620px;font-family:'Zen Old Mincho';font-size:13px;line-height:1.9;color:var(--color-neutral-800)">Substack の管理画面から取れる埋め込みコードを貼るだけで動きます（方法A）。いちばん手軽ですが、書体・色・ボタンの形は Substack 側のもので、背景色やアクセントは少ししか合わせられません。枠の中だけ別のサイトに見えるのが難点です。</div>
+    </div>
+
+    <div id="s2b" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:var(--font-heading);font-size:15px;color:var(--color-accent-700);border:1px solid var(--color-accent);border-radius:var(--radius-sm);padding:1px 8px">s2b</span><span style="font-family:'Shippori Mincho';font-size:16px">公式の埋め込み：Substack 側の色を fragments に合わせた場合</span></div>
+      <div style="width:620px;background:var(--color-bg);box-shadow:var(--shadow-sm);padding:40px 40px 56px;display:flex;flex-direction:column;gap:28px">
+        <div style="font-family:'Zen Old Mincho';font-size:16px;line-height:1.9;color:var(--color-neutral-700)">……後の世のクリエイションの多様さにつながるはずなのだと思う。</div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:8px 0 4px;font-family:system-ui,sans-serif;color:var(--color-text)">
+          <div style="width:56px;height:56px;border-radius:12px;background:#fff;border:1px solid var(--color-divider);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:22px">f</div>
+          <div style="font-size:24px;font-weight:600;text-decoration:underline;text-underline-offset:4px">fragments</div>
+          <div style="max-width:400px;text-align:center;font-size:14px;line-height:1.6">建築・空間・デザインをめぐる思索、試論 /<br>Explorations and Abductive Speculations on Architecture, Space, and Design.</div>
+          <div style="display:flex;width:420px;margin-top:6px;border:1px solid var(--color-accent);border-radius:8px;overflow:hidden"><span style="flex:1;padding:12px 14px;font-size:15px;color:var(--color-neutral-500)">Type your email...</span><span style="padding:12px 22px;font-size:15px;font-weight:600;color:#fff;background:var(--color-accent)">Subscribe</span></div>
+          <div style="max-width:420px;text-align:center;font-size:12px;line-height:1.6;color:var(--color-neutral-700)">By subscribing you agree to <span style="text-decoration:underline">Substack's Terms of Use</span>, <span style="text-decoration:underline">our Privacy Policy</span> and <span style="text-decoration:underline">our Information collection notice</span></div>
+          <div style="align-self:flex-end;font-size:14px;color:var(--color-neutral-500)">substack</div>
+        </div>
+      </div>
+      <div style="max-width:620px;font-family:'Zen Old Mincho';font-size:13px;line-height:1.9;color:var(--color-neutral-800)">参考画像の構成（ロゴ・名前・紹介文・入力欄とボタン・規約の文言・substack の印）をそのまま、fragments の色に置き換えたイメージです。ロゴ「f」は仮です。中の書体は Substack 側のゴシックのまま変わりません。</div>
+    </div>
+
+    <div id="s3" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:var(--font-heading);font-size:15px;color:var(--color-accent-700);border:1px solid var(--color-accent);border-radius:var(--radius-sm);padding:1px 8px">s3</span><span style="font-family:'Shippori Mincho';font-size:16px">モバイル：記事の末尾</span></div>
+      <div style="width:390px;background:var(--color-bg);box-shadow:var(--shadow-sm);border-radius:var(--radius-lg);padding:32px 20px 44px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-family:var(--font-heading);font-size:22px;line-height:1.2;padding-bottom:6px;border-bottom:1px solid var(--color-neutral-700)">fragments</div>
+        <div style="font-family:'Zen Old Mincho';font-size:15.5px;line-height:1.9;color:var(--color-neutral-700);padding-top:20px">……後の世のクリエイションの多様さにつながるはずなのだと思う。</div>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:40px;padding-top:16px;border-top:1px solid var(--color-text)">
+          <div style="font-family:'Shippori Mincho';font-size:17px">新しい記事をメールで受け取る</div>
+          <input type="email" placeholder="mail@example.com" style="height:44px;padding:0 12px;font-family:var(--font-body);font-size:16px;background:transparent;border:1px solid var(--color-neutral-500);border-radius:var(--radius-sm)">
+          <button style="height:44px;font-family:'Zen Old Mincho';font-size:15px;color:var(--color-accent-700);background:transparent;border:1px solid var(--color-accent);border-radius:var(--radius-sm)">登録する</button>
+        </div>
+        <div style="display:flex;flex-direction:column;margin-top:24px;border-top:1px solid var(--color-divider);font-family:'Zen Old Mincho';font-size:14px">
+          <span style="padding:14px 0;border-bottom:1px solid var(--color-divider)">註 1〜3</span>
+          <span style="padding:14px 0">記事一覧へ</span>
+        </div>
+      </div>
+      <div style="max-width:390px;font-family:'Zen Old Mincho';font-size:13px;line-height:1.9;color:var(--color-neutral-800)">入力欄とボタンは縦に並べ、どちらも高さ44pxにしました。入力欄の文字を16pxにしているのは、iPhone で入力時に画面が勝手に拡大されるのを防ぐためです。</div>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { email: '', sent: false };
+  renderVals() {
+    return {
+      email: this.state.email,
+      sent: this.state.sent,
+      setEmail: e => this.setState({ email: e.target.value, sent: false }),
+      submit: () => this.setState({ sent: true }),
+      ways: [
+        { id: 'A', title: '公式の埋め込みを貼る', desc: 'Substack の購読フォームを iframe でそのまま置く。コードを貼るだけで動き、確認メールや配信停止も Substack が受け持つ。', note: '手間：小／見た目の自由度：低い' },
+        { id: 'B', title: 'フォームだけ自前で作る', desc: '入力欄とボタンはこのサイトのデザインで作り、入力されたアドレスを Substack に送る。送り先は公式に公開された API ではないので、仕様が変わると動かなくなる恐れがある。', note: '手間：中／見た目の自由度：高い／壊れるリスクあり' },
+        { id: 'C', title: '記事も Substack から読み込む', desc: '執筆と配信は Substack で行い、このサイトは RSS（publication名.substack.com/feed）で記事を取り込んで、本文と注をこのレイアウトで表示する。購読は A か B と組み合わせる。', note: '手間：大／書くのは1か所で済む／注の変換に作り込みが必要' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
