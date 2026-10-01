@@ -134,10 +134,19 @@ import { site } from '../lib/site';
     display: none;
   }
 
+  /* Compact 3 columns, narrow end: contact in the 210px note position
+     (from 1300px the PC grid fits; its text column gives way) */
+  @media (min-width: 1160px) and (max-width: 1299px) {
+    .grid {
+      grid-template-columns: minmax(0, calc(30 * clamp(15px, 0.8rem + 0.2vw, 16px))) 210px;
+      column-gap: 40px;
+    }
+  }
+
   /* Not in the design: follows the tablet / phone article (p6 / p5) —
      site name in the header, contact where the notes go (tablet) or
      after the text (phone). */
-  @media (max-width: 1199px) {
+  @media (max-width: 1159px) {
     .rule {
       z-index: 2;
       height: auto;

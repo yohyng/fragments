@@ -29,7 +29,8 @@ const { title, subtitle, date } = Astro.props;
 </main>
 
 <style>
-  /* ≥1200px: PC (p2/p8). ≤1199px: tablet (p6). ≤759px: phone (p5). */
+  /* ≥1400px: PC (p2/p8). 1160–1399px: compact 3 columns (see below).
+     ≤1159px: tablet (p6). ≤759px: phone (p5). */
 
   .column {
     height: 100%;
@@ -232,8 +233,26 @@ const { title, subtitle, date } = Astro.props;
     margin: 0;
   }
 
+  /* ── Compact 3 columns (not in the design) ──
+     1300–1399px: PC body and notes; the body gives way if the column is short.
+     1160–1299px: the tablet's 30em body and 210px notes. */
+  @media (min-width: 1300px) and (max-width: 1399px) {
+    .body {
+      max-width: min(34em, 100% - 388px);
+    }
+  }
+  @media (min-width: 1160px) and (max-width: 1299px) {
+    .body {
+      max-width: 30em;
+    }
+    .body :global(.sidenote) {
+      width: 210px;
+      margin-right: -250px;
+    }
+  }
+
   /* ── Tablet (p6): no index; body 30em, notes 210px at 40px ── */
-  @media (max-width: 1199px) {
+  @media (max-width: 1159px) {
     .rule {
       z-index: 2;
       height: auto;
