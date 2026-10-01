@@ -29,3 +29,7 @@ a:hover { color: var(--color-accent-600); }
 
 [data-noscrollbar] { scrollbar-width: none; }
 [data-noscrollbar]::-webkit-scrollbar { display: none; }
+
+/* Bottom rule of a scroll column: shown only when scrolled to the end */
+[data-endrule] { opacity: 0; transition: opacity .5s ease; }
+[data-atend] [data-endrule] { opacity: 1; }
