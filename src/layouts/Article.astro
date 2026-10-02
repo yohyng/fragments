@@ -31,7 +31,7 @@ const { title, subtitle, date } = Astro.props;
 
 <style>
   /* ≥1400px: PC (p2/p8). 1160–1399px: compact 3 columns (see below).
-     ≤1159px: tablet (p6). ≤759px: phone (p5). */
+     ≤1159px: tablet (p6). ≤759px: phone (p5); 656–759px: phone with sidenotes. */
 
   .column {
     height: 100%;
@@ -296,7 +296,8 @@ const { title, subtitle, date } = Astro.props;
       margin-top: 8px;
     }
     .body {
-      max-width: 30em;
+      /* 30em, giving way below ~787px so the 210px notes still fit */
+      max-width: min(30em, 100% - 250px);
       font-size: 15.5px;
     }
     .body :global(.sidenote) {
@@ -362,6 +363,22 @@ const { title, subtitle, date } = Astro.props;
     }
     .end-space {
       height: 48px;
+    }
+  }
+
+  /* ── Wide phone, e.g. an unfolded foldable (not in the design): phone
+     layout, but the notes go beside the body again (180px at 32px) ── */
+  @media (min-width: 656px) and (max-width: 759px) {
+    .body {
+      max-width: min(30em, 100% - 212px);
+    }
+    .body :global(.sidenote) {
+      display: inline;
+      width: 180px;
+      margin-right: -212px;
+    }
+    .body :global(.notes-list) {
+      display: none;
     }
   }
 </style>

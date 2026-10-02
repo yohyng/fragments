@@ -3,13 +3,12 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 /* The page is a fixed frame whose columns scroll on their own: the document
-   itself never scrolls, bounces or zooms (phones and tablets). */
+   itself never scrolls or bounces (phones and tablets). */
 html, body {
   height: 100%;
   overflow: hidden;
   overscroll-behavior: none;
 }
-html { touch-action: pan-x pan-y; }
 
 body {
   margin: 0;
@@ -39,7 +38,7 @@ a:hover { color: var(--color-accent-600); }
 /* A column may bounce at its bottom end but never spills over to the page.
    (Its top end is held in place by the touchmove handler in Base.astro:
    pulling there would drag the sticky header down.) */
-[data-scroll] { overscroll-behavior: contain; touch-action: pan-x pan-y; }
+[data-scroll] { overscroll-behavior: contain; }
 [data-noscrollbar] { scrollbar-width: none; }
 [data-noscrollbar]::-webkit-scrollbar { display: none; }
 

@@ -165,7 +165,7 @@ const related = posts.filter((p) => p.category === post.category && p.slug !== p
     .sub,
     .pager,
     .related {
-      max-width: 465px;
+      max-width: min(465px, 100% - 250px);
     }
     .sub {
       margin-top: 72px;
@@ -218,6 +218,12 @@ const related = posts.filter((p) => p.category === post.category && p.slug !== p
     }
     .related {
       margin-top: 28px;
+    }
+  }
+  /* Wide phone: as wide as the body */
+  @media (min-width: 656px) and (max-width: 759px) {
+    .end {
+      max-width: min(465px, 100% - 212px);
     }
   }
 </style>
