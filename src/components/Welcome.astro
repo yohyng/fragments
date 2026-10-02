@@ -1,0 +1,164 @@
+---
+// "fragments folio": the subscribe screen. Shown full-screen over the top
+// page on a first visit (mode="overlay", once per browser), and as the
+// /subscribe/ page (mode="page"). Not in the design handoff: modelled on a
+// Substack welcome page, in fragments' type and colours.
+import Subscribe from './Subscribe.astro';
+import { site } from '../lib/site';
+
+interface Props {
+  mode: 'overlay' | 'page';
+}
+const { mode } = Astro.props;
+---
+
+<div
+  class:list={['welcome', `welcome--${mode}`]}
+  data-welcome={mode}
+  role={mode === 'overlay' ? 'dialog' : undefined}
+  aria-modal={mode === 'overlay' ? 'true' : undefined}
+  aria-labelledby="welcome-title"
+>
+  <div class="inner">
+    <div class="logo" aria-hidden={mode === 'overlay' ? 'true' : undefined}>{site.name}</div>
+    <h1 id="welcome-title" class="title">fragments folio</h1>
+    <p class="lead">{site.catchJa.replace(/\s*\/$/, '')}。<br />新しい記事を、メールでお届けします。</p>
+    <p class="lead-en">{site.catchEn}</p>
+    <div class="form">
+      <Subscribe />
+    </div>
+    {
+      mode === 'overlay' ? (
+        <button type="button" class="skip" data-welcome-close>
+          No thanks <span aria-hidden="true">→</span>
+        </button>
+      ) : (
+        <a class="skip" href="/">
+          記事を読む <span aria-hidden="true">→</span>
+        </a>
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .welcome {
+    display: flex;
+    background: var(--color-bg);
+    color: var(--color-text);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  /* The overlay only appears when the head script sets data-welcome="show"
+     (top page, first visit, JavaScript on). */
+  .welcome--overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    transition: opacity 0.4s ease;
+  }
+  :global(html[data-welcome='show']) .welcome--overlay {
+    display: flex;
+  }
+  .welcome--overlay.is-leaving {
+    opacity: 0;
+  }
+  .welcome--page {
+    position: fixed;
+    inset: 0;
+  }
+  .inner {
+    margin: auto;
+    width: 100%;
+    max-width: 560px;
+    padding: 48px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .logo {
+    font-family: var(--font-heading);
+    font-size: clamp(64px, 11vw, 128px);
+    line-height: 1;
+  }
+  .title {
+    margin: clamp(56px, 12vh, 128px) 0 0;
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 1.2;
+    letter-spacing: normal;
+  }
+  .lead {
+    margin: 16px 0 0;
+    font-family: var(--font-mincho);
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--color-neutral-800);
+  }
+  .lead-en {
+    margin: 6px 0 0;
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--color-neutral-700);
+  }
+  .form {
+    width: 100%;
+    max-width: 440px;
+    margin-top: 32px;
+    text-align: left;
+    font-family: var(--font-mincho);
+    font-size: 14px;
+  }
+  .skip {
+    margin-top: 28px;
+    padding: 8px 4px;
+    border: 0;
+    background: none;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--color-neutral-700);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .skip:hover {
+    color: var(--color-text);
+  }
+</style>
+
+<script>
+  // Overlay: "No thanks", Escape, or a finished subscription close it for
+  // good (remembered in localStorage).
+  const box = document.querySelector<HTMLElement>('[data-welcome="overlay"]');
+  if (box && document.documentElement.dataset.welcome === 'show') {
+    const KEY = 'fragments-welcome';
+    const close = () => {
+      try {
+        localStorage.setItem(KEY, 'done');
+      } catch {}
+      box.classList.add('is-leaving');
+      setTimeout(() => delete document.documentElement.dataset.welcome, 400);
+      removeEventListener('keydown', onKey);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close();
+    };
+    addEventListener('keydown', onKey);
+    box.querySelector('[data-welcome-close]')?.addEventListener('click', close);
+    // once subscribed, don't show again; the button now leads into the site
+    new MutationObserver(() => {
+      const done = box.querySelector<HTMLElement>('.done');
+      if (done && !done.hidden) {
+        try {
+          localStorage.setItem(KEY, 'done');
+        } catch {}
+        const skip = box.querySelector('[data-welcome-close]');
+        if (skip) skip.innerHTML = '記事を読む <span aria-hidden="true">→</span>';
+      }
+    }).observe(box, { subtree: true, attributes: true, attributeFilter: ['hidden'] });
+  }
+</script>

@@ -1,0 +1,10 @@
+---
+// /subscribe/: the "fragments folio" screen as its own page (index link).
+import Base from '../layouts/Base.astro';
+import Welcome from '../components/Welcome.astro';
+import { site } from '../lib/site';
+---
+
+<Base title={`fragments folio — ${site.name}`} description={`${site.name} の新しい記事を、メールでお届けします。${site.catchJa} ${site.catchEn}`}>
+  <Welcome mode="page" />
+</Base>

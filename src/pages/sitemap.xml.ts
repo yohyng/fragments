@@ -9,6 +9,7 @@ export const GET: APIRoute = async ({ site: astroSite }) => {
   const urls = [
     { loc: '/', lastmod: posts[0] && isoDate(posts[0].updated ?? posts[0].date) },
     { loc: '/about/' },
+    { loc: '/subscribe/' },
     ...posts.map((p) => ({ loc: `/posts/${p.slug}/`, lastmod: isoDate(p.updated ?? p.date) })),
   ];
   const body =

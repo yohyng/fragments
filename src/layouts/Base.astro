@@ -18,6 +18,13 @@ const { title } = Astro.props;
     <Seo {...Astro.props} />
     <script is:inline>
       document.documentElement.classList.add('js');
+      // First visit to the top page: show the "fragments folio" overlay
+      // (Welcome.astro). Decided here so the page never flashes first.
+      try {
+        if (location.pathname === '/' && localStorage.getItem('fragments-welcome') !== 'done') {
+          document.documentElement.dataset.welcome = 'show';
+        }
+      } catch {}
       // The height actually visible (iPad browsers can lay the page out for
       // a taller area than they show). Unzoomed CSS px; kept up to date.
       const setFrameH = () => {
@@ -47,7 +54,7 @@ const { title } = Astro.props;
         'touchmove',
         (e) => {
           if (e.touches.length > 1) return; // pinch-zoom stays free
-          const col = e.target instanceof Element ? e.target.closest('[data-scroll]') : null;
+          const col = e.target instanceof Element ? e.target.closest('[data-scroll], [data-welcome]') : null;
           if (!col) return e.preventDefault();
           const { clientX: x, clientY: y } = e.touches[0];
           const dx = x - lastX;
