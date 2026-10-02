@@ -1,7 +1,8 @@
 /**
  * Site-wide text, links and metadata.
- * TODO(before launch): `url`, `author` and `ogImage` are placeholders.
- * `url` must also be set as `site` in astro.config.mjs.
+ * TODO(before launch): `author`, `ogImage` and `contact` are placeholders.
+ * The site's URL comes from astro.config.mjs (`Astro.site`); `url` here is
+ * only a fallback.
  */
 export const site = {
   name: 'fragments',
