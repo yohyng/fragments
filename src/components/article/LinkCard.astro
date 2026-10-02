@@ -10,42 +10,9 @@ const { url, title, description } = Astro.props;
 const domain = new URL(url).hostname.replace(/^www\./, '');
 ---
 
-<a class="link" href={url} target="_blank" rel="noopener">
-  <span class="domain">{domain}</span>
-  <span class="title">{title}</span>
-  {description && <span class="desc">{description}</span>}
+<a class="el-link" href={url} target="_blank" rel="noopener">
+  <span class="el-domain">{domain}</span>
+  <span class="el-title">{title}</span>
+  {description && <span class="el-desc">{description}</span>}
 </a>
 
-<style>
-  .link {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    margin: 2em 0;
-    padding: 12px 14px;
-    border: 1px solid var(--color-divider);
-    text-decoration: none;
-    color: var(--color-text);
-    text-indent: 0;
-    text-align: left;
-  }
-  .link:hover {
-    color: var(--color-text);
-    border-color: var(--color-accent);
-  }
-  .domain {
-    font-family: var(--font-body);
-    font-size: 11px;
-    color: var(--color-neutral-700);
-  }
-  .title {
-    font-family: var(--font-mincho-heading);
-    font-size: 15px;
-    line-height: 1.5;
-  }
-  .desc {
-    font-size: 12px;
-    line-height: 1.6;
-    color: var(--color-neutral-700);
-  }
-</style>

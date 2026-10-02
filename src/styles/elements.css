@@ -1,0 +1,118 @@
+/* Article elements (p8): figure, book card, link card. Shared by the MDX
+   components in src/components/article/ and the HTML converted from Supabase
+   (src/lib/supabase-content.mjs), so both look the same. */
+
+.el-figure {
+  margin: 2.2em 0;
+}
+.el-figure img,
+.el-figure .el-placeholder {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  border: 6px solid var(--color-surface);
+  outline: 1px solid var(--color-divider);
+}
+.el-figure img {
+  object-fit: cover;
+}
+/* photos from the editor keep their own proportions and set width */
+.el-figure--natural img {
+  aspect-ratio: auto;
+  height: auto;
+  max-width: 100%;
+}
+.el-figure .el-placeholder {
+  background: var(--color-neutral-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-neutral-600);
+}
+.el-figure figcaption {
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--color-neutral-700);
+  text-align: left;
+}
+
+.el-book {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  column-gap: 16px;
+  margin: 2em 0;
+  padding: 14px;
+  border: 1px solid var(--color-divider);
+  text-decoration: none;
+  color: var(--color-text);
+  text-indent: 0;
+  text-align: left;
+}
+.el-book:hover {
+  color: var(--color-text);
+  border-color: var(--color-accent);
+}
+.el-book .el-cover {
+  display: block;
+  width: 72px;
+  height: 104px;
+  object-fit: cover;
+}
+.el-book .el-placeholder {
+  background: var(--color-neutral-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: var(--color-neutral-600);
+}
+.el-book .el-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.el-book .el-title,
+.el-link .el-title {
+  font-family: var(--font-mincho-heading);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.el-book .el-meta,
+.el-link .el-desc {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--color-neutral-700);
+}
+.el-book .el-store {
+  margin-top: auto;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-accent-700);
+}
+
+.el-link {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 2em 0;
+  padding: 12px 14px;
+  border: 1px solid var(--color-divider);
+  text-decoration: none;
+  color: var(--color-text);
+  text-indent: 0;
+  text-align: left;
+}
+.el-link:hover {
+  color: var(--color-text);
+  border-color: var(--color-accent);
+}
+.el-link .el-domain {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--color-neutral-700);
+}

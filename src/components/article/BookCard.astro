@@ -15,67 +15,12 @@ const { title, author, publisher, year, url, cover, store = 'Amazon' } = Astro.p
 const meta = `${author}（著）` + (publisher ? `／${publisher}` : '') + (year ? `、${year}年` : '');
 ---
 
-<a class="book" href={url} target="_blank" rel="noopener">
-  {cover ? <img class="cover" src={cover} alt="" loading="lazy" decoding="async" /> : <div class="cover placeholder">cover</div>}
-  <div class="info">
-    <span class="title">{title}</span>
-    <span class="meta">{meta}</span>
-    <span class="store">{store} ↗</span>
+<a class="el-book" href={url} target="_blank" rel="noopener">
+  {cover ? <img class="el-cover" src={cover} alt="" loading="lazy" decoding="async" /> : <div class="el-cover el-placeholder">cover</div>}
+  <div class="el-info">
+    <span class="el-title">{title}</span>
+    <span class="el-meta">{meta}</span>
+    <span class="el-store">{store} ↗</span>
   </div>
 </a>
 
-<style>
-  .book {
-    display: grid;
-    grid-template-columns: 72px minmax(0, 1fr);
-    column-gap: 16px;
-    margin: 2em 0;
-    padding: 14px;
-    border: 1px solid var(--color-divider);
-    text-decoration: none;
-    color: var(--color-text);
-    text-indent: 0;
-    text-align: left;
-  }
-  .book:hover {
-    color: var(--color-text);
-    border-color: var(--color-accent);
-  }
-  .cover {
-    display: block;
-    width: 72px;
-    height: 104px;
-    object-fit: cover;
-  }
-  .placeholder {
-    background: var(--color-neutral-200);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--font-body);
-    font-size: 10px;
-    color: var(--color-neutral-600);
-  }
-  .info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-  }
-  .title {
-    font-family: var(--font-mincho-heading);
-    font-size: 15px;
-    line-height: 1.5;
-  }
-  .meta {
-    font-size: 12px;
-    line-height: 1.6;
-    color: var(--color-neutral-700);
-  }
-  .store {
-    margin-top: auto;
-    font-family: var(--font-body);
-    font-size: 12px;
-    color: var(--color-accent-700);
-  }
-</style>

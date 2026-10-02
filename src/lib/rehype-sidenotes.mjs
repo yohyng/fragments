@@ -14,8 +14,33 @@
 
 const MARK = /\[\^([\w-]+)\]/g;
 
-const el = (tagName, properties, children) => ({ type: 'element', tagName, properties, children });
-const text = (value) => ({ type: 'text', value });
+export const el = (tagName, properties, children) => ({ type: 'element', tagName, properties, children });
+export const text = (value) => ({ type: 'text', value });
+
+/**
+ * The three pieces of note `num` (id `id`): the number in the text, the
+ * floated sidenote, and its entry in the list after the body.
+ * note = { title?, cite?, body }
+ */
+export function buildNote(id, num, note) {
+  const ref = el('sup', { id: `ref-${id}`, className: ['note-ref'], dataNote: id }, [
+    el('a', { href: `#note-${id}`, ariaLabel: `注${num}` }, [text(String(num))]),
+  ]);
+  const content = () => [
+    el('span', { className: ['sidenote-head'] }, [
+      el('a', { href: `#ref-${id}`, className: ['note-num'], ariaLabel: `本文の注${num}へ戻る` }, [text(String(num))]),
+      ...(note.title ? [text(note.title)] : []),
+    ]),
+    ...(note.cite ? [el('span', { className: ['sidenote-cite'] }, [text(note.cite)])] : []),
+    el('span', { className: ['sidenote-body'] }, [text(note.body)]),
+  ];
+  const aside = el('aside', { id: `note-${id}`, className: ['sidenote'], dataNote: id }, content());
+  const item = el('div', { id: `notes-${id}`, className: ['notes-item'], dataNote: id }, content());
+  return { ref, aside, item };
+}
+
+/** The notes gathered after the body (what phones show). */
+export const notesList = (items) => el('section', { className: ['notes-list'], ariaLabel: '注' }, items);
 
 export default function rehypeSidenotes() {
   return (tree, file) => {
@@ -27,20 +52,8 @@ export default function rehypeSidenotes() {
     const build = (id) => {
       const note = byId.get(id);
       if (!note) throw new Error(`[sidenotes] note "${id}" is not defined in frontmatter (${file.path})`);
-      const num = String(++count);
-      const ref = el('sup', { id: `ref-${id}`, className: ['note-ref'], dataNote: id }, [
-        el('a', { href: `#note-${id}`, ariaLabel: `注${num}` }, [text(num)]),
-      ]);
-      const content = () => [
-        el('span', { className: ['sidenote-head'] }, [
-          el('a', { href: `#ref-${id}`, className: ['note-num'], ariaLabel: `本文の注${num}へ戻る` }, [text(num)]),
-          text(note.title),
-        ]),
-        ...(note.cite ? [el('span', { className: ['sidenote-cite'] }, [text(note.cite)])] : []),
-        el('span', { className: ['sidenote-body'] }, [text(note.body)]),
-      ];
-      const aside = el('aside', { id: `note-${id}`, className: ['sidenote'], dataNote: id }, content());
-      listed.push(el('div', { id: `notes-${id}`, className: ['notes-item'], dataNote: id }, content()));
+      const { ref, aside, item } = buildNote(id, ++count, note);
+      listed.push(item);
       return [ref, aside];
     };
 
@@ -72,7 +85,7 @@ export default function rehypeSidenotes() {
     };
     walk(tree);
     if (listed.length) {
-      tree.children.push(el('section', { className: ['notes-list'], ariaLabel: '注' }, listed));
+      tree.children.push(notesList(listed));
     }
   };
 }

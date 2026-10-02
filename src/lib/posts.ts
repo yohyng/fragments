@@ -35,7 +35,8 @@ export async function getPosts(): Promise<Post[]> {
       body: entry.body ?? '',
       entry,
     }))
-    .sort((a, b) => b.date.getTime() - a.date.getTime());
+    // newest first; on the same day, the later-made (higher id) first
+    .sort((a, b) => b.date.getTime() - a.date.getTime() || b.slug.localeCompare(a.slug, 'en', { numeric: true }));
 }
 
 /** "2026.10.01" */
