@@ -60,7 +60,7 @@ import '../../styles/tokens.css';
       </div>
       <div class="edit">
         <div class="main">
-          <input class="title" data-f="title" placeholder="タイトル" />
+          <textarea class="title" data-f="title" placeholder="タイトル" rows="1"></textarea>
           <input class="subtitle" data-f="subtitle" placeholder="サブタイトル（なくても可）" />
           <div class="toolbar" data-toolbar>
             <button type="button" data-cmd="p" title="本文">本文</button>
@@ -180,10 +180,17 @@ import '../../styles/tokens.css';
 
   .edit-head { display: flex; align-items: baseline; margin-bottom: 18px; }
   .edit { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 40px; align-items: start; }
-  .main { min-width: 0; max-width: 760px; }
+  /* The article as it is set on the site (Article.astro): body 34em of
+     clamp(15px…16px), line-height 1.9, 0.02em tracking, justified, first-line
+     indent, no gap between paragraphs; the title wraps at the body's width. */
+  .main {
+    --body-size: clamp(15px, 0.8rem + 0.2vw, 16px);
+    min-width: 0;
+    max-width: calc(34 * var(--body-size));
+  }
   .title, .subtitle { width: 100%; border: 0; border-bottom: 1px solid var(--color-divider); background: transparent; padding: 6px 0; font-family: var(--font-mincho-heading); }
-  .title { font-size: 26px; font-weight: 500; }
-  .subtitle { font-size: 16px; margin-top: 6px; color: var(--color-neutral-800); }
+  .title { display: block; resize: none; overflow: hidden; font-size: clamp(26px, 1.4rem + 0.6vw, 32px); font-weight: 500; line-height: 1.4; letter-spacing: 0.02em; }
+  .subtitle { font-size: 17px; line-height: 1.6; margin-top: 4px; color: var(--color-neutral-800); }
   .title:focus, .subtitle:focus { box-shadow: none; border-bottom-color: var(--color-accent); }
   .toolbar {
     position: sticky; top: 56px; z-index: 4;
@@ -196,23 +203,34 @@ import '../../styles/tokens.css';
   .toolbar button.accent { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
   .toolbar .sep { width: 10px; }
 
-  /* the article as it is written: fragments' body type */
   .editor .ProseMirror {
-    min-height: 60vh; padding: 20px 0 80px; outline: none;
-    font-family: var(--font-mincho); font-size: 16px; line-height: 1.9; letter-spacing: 0.02em;
+    min-height: 60vh; padding: 24px 0 80px; outline: none;
+    font-family: var(--font-mincho); font-size: var(--body-size); line-height: 1.9;
+    letter-spacing: 0.02em; text-align: justify;
   }
-  .editor .ProseMirror p { margin: 0; }
-  .editor .ProseMirror h2 { font-family: var(--font-mincho-heading); font-weight: 500; font-size: 22px; margin: 1.6em 0 0.6em; }
-  .editor .ProseMirror h3 { font-family: var(--font-mincho-heading); font-weight: 500; font-size: 17px; margin: 1.4em 0 0.4em; }
-  .editor .ProseMirror blockquote { margin: 1.4em 0; padding: 2px 0 2px 1.5em; border-left: 1px solid var(--color-accent); color: var(--color-neutral-800); }
-  .editor .ProseMirror img { max-width: 100%; height: auto; }
+  .editor .ProseMirror p { margin: 0; text-indent: 1em; }
+  /* blank lines from the old editor: the site drops them, so they show here
+     only as a thin dotted line */
+  .editor .ProseMirror p.is-blank {
+    height: 0.9em; line-height: 0.9em; overflow: hidden;
+    background: linear-gradient(var(--color-divider), var(--color-divider)) center / 100% 1px no-repeat;
+    background-image: repeating-linear-gradient(90deg, var(--color-neutral-300) 0 3px, transparent 3px 7px);
+    background-size: 100% 1px;
+  }
+  .editor .ProseMirror h2 { font-family: var(--font-mincho-heading); font-weight: 500; font-size: 22px; line-height: 1.5; letter-spacing: 0.02em; margin: 2.2em 0 0.8em; text-indent: 0; }
+  .editor .ProseMirror h3 { font-family: var(--font-mincho-heading); font-weight: 500; font-size: 17px; line-height: 1.6; letter-spacing: -0.015em; margin: 1.8em 0 0.4em; text-indent: 0; }
+  .editor .ProseMirror blockquote { margin: 2em 0; padding: 2px 0 2px 1.5em; border-left: 1px solid var(--color-accent); color: var(--color-neutral-800); }
+  .editor .ProseMirror ul, .editor .ProseMirror ol { margin: 1.6em 0; padding-left: 1.4em; }
+  .editor .ProseMirror li p { text-indent: 0; }
+  .editor .ProseMirror img { max-width: 100%; height: auto; border: 6px solid var(--color-surface); outline: 1px solid var(--color-divider); vertical-align: top; }
   .editor .ProseMirror img.ProseMirror-selectednode { outline: 2px solid var(--color-accent); }
   .editor .ProseMirror sup.footnote-ref {
-    display: inline-flex; align-items: center; justify-content: center;
+    display: inline-flex; align-items: center; justify-content: center; text-indent: 0;
     min-width: 15px; height: 15px; padding: 0 3px; margin: 0 2px; vertical-align: 4px;
-    background: var(--color-accent); color: #fff; font-family: var(--font-body); font-size: 10px; line-height: 1; cursor: pointer;
+    background: var(--color-accent); color: #fff; font-family: var(--font-body); font-size: 10px; line-height: 1; letter-spacing: 0; cursor: pointer;
   }
   .editor .ProseMirror a { color: var(--color-accent-700); }
+  .editor .ProseMirror a.book-link-card { text-indent: 0; }
 
   .side { position: sticky; top: 72px; display: flex; flex-direction: column; gap: 20px; max-height: calc(100vh - 90px); overflow: auto; }
   .box { display: flex; flex-direction: column; gap: 12px; padding: 16px; border: 1px solid var(--color-divider); }

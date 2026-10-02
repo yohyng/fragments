@@ -5,6 +5,8 @@
 // screens read and write exactly the same content.
 
 import { createClient, type Session } from '@supabase/supabase-js';
+import { Plugin } from '@tiptap/pm/state';
+import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../lib/supabase-config.mjs';
 import {
   createEditor,
@@ -159,6 +161,7 @@ async function openEditor(id: number | null) {
     msg(out, '');
   }
   field('title').value = current.title;
+  fitTitle();
   field('subtitle').value = current.subtitle ?? '';
   field('date').value = toInputDate(current.date);
   const cat = field<HTMLSelectElement>('category');
@@ -181,11 +184,44 @@ async function openEditor(id: number | null) {
         renderNotes();
       },
     } as any);
+    editor.registerPlugin(blankLines);
   } else setHtml(editor, current.content);
   renumberFootnotes(editor);
   renderNotes(true);
   dirty = false;
 }
+
+// Blank paragraphs (old spacing lines) are dropped on the site, so the editor
+// shows them as a thin dotted row instead of a full empty line.
+const blankLines = new Plugin({
+  props: {
+    decorations(state) {
+      const marks: Decoration[] = [];
+      state.doc.descendants((node, pos) => {
+        if (node.type.name !== 'paragraph') return;
+        let blank = true;
+        node.forEach((c) => { if (c.type.name !== 'hardBreak' && !(c.isText && !c.text!.trim())) blank = false; });
+        if (blank) marks.push(Decoration.node(pos, pos + node.nodeSize, { class: 'is-blank' }));
+        return false;
+      });
+      return DecorationSet.create(state.doc, marks);
+    },
+  },
+});
+
+// The title is a textarea so it wraps at the body's width like on the site;
+// it grows with its text and Enter does not add a line.
+const titleBox = field<HTMLTextAreaElement>('title');
+function fitTitle() {
+  titleBox.style.height = 'auto';
+  titleBox.style.height = titleBox.scrollHeight + 'px';
+}
+titleBox.addEventListener('input', () => {
+  if (/\n/.test(titleBox.value)) titleBox.value = titleBox.value.replace(/\s*\n\s*/g, ' ');
+  fitTitle();
+});
+titleBox.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.isComposing) e.preventDefault(); });
+window.addEventListener('resize', fitTitle);
 
 for (const name of ['title', 'subtitle', 'date', 'category', 'status', 'scheduled_at'])
   field(name).addEventListener('input', () => (dirty = true));
