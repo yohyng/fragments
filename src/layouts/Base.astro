@@ -18,6 +18,15 @@ const { title } = Astro.props;
     <Seo {...Astro.props} />
     <script is:inline>
       document.documentElement.classList.add('js');
+      // Keep the page hidden until its web fonts have arrived, so the
+      // fallback (gothic) face never shows and swaps (at most 3s).
+      document.documentElement.classList.add('fonts-wait');
+      const showPage = () => document.documentElement.classList.remove('fonts-wait');
+      setTimeout(showPage, 3000);
+      document.addEventListener('DOMContentLoaded', () =>
+        // after the first layout, so the fonts the page uses are loading
+        requestAnimationFrame(() => document.fonts.ready.then(showPage)),
+      );
       // First visit to the top page: show the "fragments folio" overlay
       // (Welcome.astro). Decided here so the page never flashes first.
       try {

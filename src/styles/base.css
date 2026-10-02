@@ -40,6 +40,11 @@ a:hover { color: var(--color-accent-600); }
    pulling there would drag the sticky header down.) */
 [data-scroll] { overscroll-behavior: contain; }
 [data-noscrollbar] { scrollbar-width: none; }
+
+/* Until the web fonts are in (see Base.astro), nothing shows; then a short
+   fade. Without JavaScript the class is never set. */
+body { transition: opacity 0.2s ease; }
+html.fonts-wait body { opacity: 0; }
 [data-noscrollbar]::-webkit-scrollbar { display: none; }
 
 /* Bottom rule of a scroll column: shown only when scrolled to the end */
