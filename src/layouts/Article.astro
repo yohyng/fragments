@@ -65,6 +65,8 @@ const { title, subtitle, date } = Astro.props;
     padding-top: 56px;
     min-height: 220px;
     box-sizing: border-box;
+    /* the title wraps at the body's width (34em of the body text) */
+    max-width: calc(34 * clamp(15px, 0.8rem + 0.2vw, 16px));
   }
   h1 {
     font-family: var(--font-mincho-heading);
@@ -242,10 +244,16 @@ const { title, subtitle, date } = Astro.props;
     .body {
       max-width: min(34em, 100% - 388px);
     }
+    .head {
+      max-width: min(calc(34 * clamp(15px, 0.8rem + 0.2vw, 16px)), 100% - 388px);
+    }
   }
   @media (min-width: 1160px) and (max-width: 1299px) {
     .body {
       max-width: 30em;
+    }
+    .head {
+      max-width: calc(30 * clamp(15px, 0.8rem + 0.2vw, 16px));
     }
     .body :global(.sidenote) {
       width: 210px;
@@ -284,6 +292,7 @@ const { title, subtitle, date } = Astro.props;
     .head {
       min-height: 0;
       padding: 56px 0 40px;
+      max-width: min(465px, 100% - 250px); /* = the 30em × 15.5px body */
     }
     h1 {
       font-size: 28px;
@@ -321,6 +330,7 @@ const { title, subtitle, date } = Astro.props;
     }
     .head {
       padding: 40px 0 36px;
+      max-width: none;
     }
     h1 {
       font-size: 24px;
@@ -372,6 +382,9 @@ const { title, subtitle, date } = Astro.props;
   @media (min-width: 656px) and (max-width: 759px) {
     .body {
       max-width: min(30em, 100% - 212px);
+    }
+    .head {
+      max-width: min(465px, 100% - 212px);
     }
     .body :global(.sidenote) {
       display: inline;
