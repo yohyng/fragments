@@ -65,6 +65,9 @@ html.fonts-wait body { opacity: 0; }
     z-index: 1;
     height: var(--inset-bottom);
     background: var(--color-bg);
+    /* also cover the side margins: an image's frame line sits 1px outside
+       the text width and would show beside the strip */
+    box-shadow: calc(-1 * var(--inset-x)) 0 var(--color-bg), var(--inset-x) 0 var(--color-bg);
   }
 }
 @media (max-width: 759px) {

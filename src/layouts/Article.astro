@@ -338,6 +338,8 @@ const { title, subtitle, date } = Astro.props;
     .rule {
       padding-top: var(--inset-top);
       z-index: 2;
+      /* the header covers the side margins too (see .scroll-foot) */
+      box-shadow: calc(-1 * var(--inset-x)) 0 var(--color-bg), var(--inset-x) 0 var(--color-bg);
       height: auto;
       box-sizing: border-box;
       display: flex;
