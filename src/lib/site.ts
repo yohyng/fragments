@@ -1,12 +1,12 @@
 /**
  * Site-wide text, links and metadata.
- * TODO(before launch): `author`, `ogImage` and `contact` are placeholders.
+ * TODO(before launch): the author's name, `ogImage` and `contact` are placeholders.
  * The site's URL comes from astro.config.mjs (`Astro.site`); `url` here is
  * only a fallback.
  */
 export const site = {
   name: 'fragments',
-  url: 'https://example.com',
+  url: 'https://fragments-of.space',
   lang: 'ja',
   locale: 'ja_JP',
   catchJa: '建築・空間・デザインをめぐる思索、試論 /',
@@ -17,7 +17,7 @@ export const site = {
   about: 'メディアについての説明文（運営者、更新の方針など）がここに入ります。',
   author: {
     name: '著者名',
-    url: 'https://example.com/about/',
+    url: 'https://fragments-of.space/about/',
   },
   /** absolute or root-relative URL of the default OGP image (1200×630); empty = none */
   ogImage: '',

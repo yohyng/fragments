@@ -3,7 +3,7 @@ import { render } from 'astro:content';
 import Page from '../../layouts/Page.astro';
 import Article from '../../layouts/Article.astro';
 import ArticleEnd from '../../components/ArticleEnd.astro';
-import { getPosts, excerpt, isoDate, type Post } from '../../lib/posts';
+import { getPosts, excerpt, isoDate, lastModified, type Post } from '../../lib/posts';
 import { site } from '../../lib/site';
 
 export async function getStaticPaths() {
@@ -21,7 +21,7 @@ const { Content } = await render(post.entry);
 const base = Astro.site ?? new URL(site.url);
 const url = new URL(Astro.url.pathname, base).href;
 const description = excerpt(post);
-const modified = post.updated ?? post.date;
+const modified = lastModified(post);
 const keywords = post.tags.length ? post.tags : [post.category];
 const articleLd = {
   '@type': 'Article',

@@ -5,13 +5,8 @@ import { unified } from '@astrojs/markdown-remark';
 import rehypeSidenotes from './src/lib/rehype-sidenotes.mjs';
 
 // The site's own URL (canonical, OGP, sitemap, RSS, robots.txt, llms.txt).
-// SITE_URL wins when set (e.g. a custom domain); on Vercel it otherwise
-// follows the project's production domain, so previews link to production.
-const site =
-  process.env.SITE_URL ||
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : 'https://example.com');
+// SITE_URL overrides it; previews link to production on purpose.
+const site = process.env.SITE_URL || 'https://fragments-of.space';
 
 // https://astro.build/config
 export default defineConfig({

@@ -64,3 +64,8 @@ export function excerpt(post: Post, length = 120): string {
 export function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
+
+/** Last modified: the later of the date and `updated` (never before the date). */
+export function lastModified(post: Post): Date {
+  return post.updated && post.updated > post.date ? post.updated : post.date;
+}

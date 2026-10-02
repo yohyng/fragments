@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getPosts, isoDate } from '../lib/posts';
+import { getPosts, isoDate, lastModified } from '../lib/posts';
 import { site } from '../lib/site';
 
 // /elements/ (the element sample) is left out: it is noindex.
@@ -7,10 +7,10 @@ export const GET: APIRoute = async ({ site: astroSite }) => {
   const base = astroSite ?? new URL(site.url);
   const posts = await getPosts();
   const urls = [
-    { loc: '/', lastmod: posts[0] && isoDate(posts[0].updated ?? posts[0].date) },
+    { loc: '/', lastmod: posts[0] && isoDate(lastModified(posts[0])) },
     { loc: '/about/' },
     { loc: '/subscribe/' },
-    ...posts.map((p) => ({ loc: `/posts/${p.slug}/`, lastmod: isoDate(p.updated ?? p.date) })),
+    ...posts.map((p) => ({ loc: `/posts/${p.slug}/`, lastmod: isoDate(lastModified(p)) })),
   ];
   const body =
     '<?xml version="1.0" encoding="UTF-8"?>\n' +
