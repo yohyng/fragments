@@ -63,7 +63,7 @@ const related = posts.filter((p) => p.category === post.category && p.slug !== p
   .sub,
   .pager,
   .related {
-    max-width: calc(34 * clamp(15px, 0.8rem + 0.2vw, 16px));
+    max-width: calc(34 * var(--body-size));
   }
   .sub {
     display: flex;
@@ -144,19 +144,19 @@ const related = posts.filter((p) => p.category === post.category && p.slug !== p
     font-variant-numeric: tabular-nums;
   }
 
-  /* ── Compact 3 columns: widths follow the body ── */
-  @media (min-width: 1300px) and (max-width: 1399px) {
+  /* ── PC and compact 3 columns: widths follow the body ── */
+  @media (min-width: 1300px) {
     .sub,
     .pager,
     .related {
-      max-width: min(calc(34 * clamp(15px, 0.8rem + 0.2vw, 16px)), 100% - 388px);
+      max-width: min(calc(34 * var(--body-size)), 100% - 388px);
     }
   }
   @media (min-width: 1160px) and (max-width: 1299px) {
     .sub,
     .pager,
     .related {
-      max-width: calc(30 * clamp(15px, 0.8rem + 0.2vw, 16px));
+      max-width: calc(30 * var(--body-size));
     }
   }
 
