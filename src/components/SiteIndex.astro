@@ -54,6 +54,87 @@ const onAbout = Astro.url.pathname.startsWith('/about');
   </div>
   <div class="scroll-foot" aria-hidden="true"></div>
 </nav>
+<script is:inline>{
+  // Runs inline, right after the index, so its state (category, length,
+  // scroll) is in place before the first paint and the page transition.
+  // Category filter (dims non-matching posts, never hides them) and
+  // "さらに読み込む" (20 more per press, after ~600ms of 「読み込み中…」).
+  // State lives in sessionStorage so it survives moving between articles,
+  // as it would in the single-page prototype.
+  const KEY = 'fragments-index';
+  const load = () => {
+    try {
+      return JSON.parse(sessionStorage.getItem(KEY) || '{}');
+    } catch {
+      return {};
+    }
+  };
+  const save = (patch) => {
+    try {
+      sessionStorage.setItem(KEY, JSON.stringify({ ...load(), ...patch }));
+    } catch {}
+  };
+
+  const nav = document.currentScript.previousElementSibling;
+  if (nav) {
+    const cats = [...nav.querySelectorAll('.cat')];
+    const items = [...nav.querySelectorAll('.item')];
+    const more = nav.querySelector('.more');
+    const step = Number(more?.dataset.step ?? 20);
+    const state = load();
+
+    const setCat = (cat) => {
+      cats.forEach((b) => {
+        const on = b.dataset.cat === cat;
+        b.classList.toggle('is-active', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+      items.forEach((a) => a.classList.toggle('is-dim', cat !== 'all' && a.dataset.cat !== cat));
+    };
+    const setLimit = (limit) => {
+      items.forEach((a, i) => a.toggleAttribute('data-more', i >= limit));
+      if (more) more.hidden = limit >= items.length;
+    };
+
+    let cat = state.cat && cats.some((b) => b.dataset.cat === state.cat) ? state.cat : 'all';
+    // Always list the article being read.
+    const cur = items.findIndex((a) => a.classList.contains('is-current'));
+    let limit = Math.max(state.limit ?? step, cur >= 0 ? Math.ceil((cur + 1) / step) * step : 0);
+    setCat(cat);
+    setLimit(limit);
+    if (state.scroll) {
+      // restoring the position is not the reader scrolling: no thumb flash
+      nav.dataset.restoring = '';
+      nav.scrollTop = state.scroll;
+      requestAnimationFrame(() => requestAnimationFrame(() => delete nav.dataset.restoring));
+    }
+
+    cats.forEach((b) =>
+      b.addEventListener('click', () => {
+        cat = b.dataset.cat;
+        setCat(cat);
+        save({ cat });
+      }),
+    );
+
+    let loading = false;
+    more?.addEventListener('click', () => {
+      if (loading) return;
+      loading = true;
+      more.textContent = '読み込み中…';
+      setTimeout(() => {
+        loading = false;
+        more.textContent = 'さらに読み込む';
+        limit += step;
+        setLimit(limit);
+        save({ limit });
+      }, 600);
+    });
+
+    addEventListener('pagehide', () => save({ scroll: nav.scrollTop }));
+  }
+}
+</script>
 
 <style>
   .index {
@@ -253,83 +334,3 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     .links a { padding: 12px 0; }
   }
 </style>
-
-<script>
-  // Category filter (dims non-matching posts, never hides them) and
-  // "さらに読み込む" (20 more per press, after ~600ms of 「読み込み中…」).
-  // State lives in sessionStorage so it survives moving between articles,
-  // as it would in the single-page prototype.
-  const KEY = 'fragments-index';
-  type State = { cat?: string; limit?: number; scroll?: number };
-  const load = (): State => {
-    try {
-      return JSON.parse(sessionStorage.getItem(KEY) || '{}');
-    } catch {
-      return {};
-    }
-  };
-  const save = (patch: State) => {
-    try {
-      sessionStorage.setItem(KEY, JSON.stringify({ ...load(), ...patch }));
-    } catch {}
-  };
-
-  const nav = document.querySelector<HTMLElement>('[data-index]');
-  if (nav) {
-    const cats = [...nav.querySelectorAll<HTMLButtonElement>('.cat')];
-    const items = [...nav.querySelectorAll<HTMLAnchorElement>('.item')];
-    const more = nav.querySelector<HTMLButtonElement>('.more');
-    const step = Number(more?.dataset.step ?? 20);
-    const state = load();
-
-    const setCat = (cat: string) => {
-      cats.forEach((b) => {
-        const on = b.dataset.cat === cat;
-        b.classList.toggle('is-active', on);
-        b.setAttribute('aria-pressed', String(on));
-      });
-      items.forEach((a) => a.classList.toggle('is-dim', cat !== 'all' && a.dataset.cat !== cat));
-    };
-    const setLimit = (limit: number) => {
-      items.forEach((a, i) => a.toggleAttribute('data-more', i >= limit));
-      if (more) more.hidden = limit >= items.length;
-    };
-
-    let cat = state.cat && cats.some((b) => b.dataset.cat === state.cat) ? state.cat : 'all';
-    // Always list the article being read.
-    const cur = items.findIndex((a) => a.classList.contains('is-current'));
-    let limit = Math.max(state.limit ?? step, cur >= 0 ? Math.ceil((cur + 1) / step) * step : 0);
-    setCat(cat);
-    setLimit(limit);
-    if (state.scroll) {
-      // restoring the position is not the reader scrolling: no thumb flash
-      nav.dataset.restoring = '';
-      nav.scrollTop = state.scroll;
-      requestAnimationFrame(() => requestAnimationFrame(() => delete nav.dataset.restoring));
-    }
-
-    cats.forEach((b) =>
-      b.addEventListener('click', () => {
-        cat = b.dataset.cat!;
-        setCat(cat);
-        save({ cat });
-      }),
-    );
-
-    let loading = false;
-    more?.addEventListener('click', () => {
-      if (loading) return;
-      loading = true;
-      more.textContent = '読み込み中…';
-      setTimeout(() => {
-        loading = false;
-        more.textContent = 'さらに読み込む';
-        limit += step;
-        setLimit(limit);
-        save({ limit });
-      }, 600);
-    });
-
-    addEventListener('pagehide', () => save({ scroll: nav.scrollTop }));
-  }
-</script>
