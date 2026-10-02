@@ -25,14 +25,23 @@ const posts = await getPosts();
 
 <style>
   .page {
-    /* html and body are 100% of the window's displayed area; vh/dvh can be
-       taller than that (browser bars), which hid the bottom of the columns */
-    height: 100%;
+    height: 100%; /* html and body are 100% of the window */
     overflow: hidden;
     display: grid;
     grid-template-columns: 360px minmax(0, 1fr);
     column-gap: 56px;
     padding: 48px 32px 32px;
+  }
+  /* Touch devices: pinned to the edges of what the browser actually shows.
+     100vh/dvh, and even 100% on iPad (split view, browser bars), can be
+     taller than that, which hid the bottom of the columns. (Not on desktop:
+     a fixed frame changes how desktop browsers anti-alias the text.) */
+  @media (pointer: coarse) {
+    .page {
+      position: fixed;
+      inset: 0;
+      height: auto;
+    }
   }
   /* Compact 3 columns (not in the design): the PC grid with the tablet's
      340px index and 40px gap, so that index + body + notes fit from 1160px */
