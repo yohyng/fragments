@@ -18,6 +18,16 @@ const { title } = Astro.props;
     <Seo {...Astro.props} />
     <script is:inline>
       document.documentElement.classList.add('js');
+      // The height actually visible (iPad browsers can lay the page out for
+      // a taller area than they show). Unzoomed CSS px; kept up to date.
+      const setFrameH = () => {
+        const v = window.visualViewport;
+        const h = v ? v.height * v.scale : window.innerHeight;
+        document.documentElement.style.setProperty('--frame-h', Math.round(h) + 'px');
+      };
+      setFrameH();
+      (window.visualViewport || window).addEventListener('resize', setFrameH);
+      window.addEventListener('orientationchange', setFrameH);
       // A swipe that starts outside every column (gaps, margins) must not
       // drag the page. A column pulled down past its top must not bounce
       // (that would drag the sticky header down and show the space above);

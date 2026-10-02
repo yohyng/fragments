@@ -32,15 +32,15 @@ const posts = await getPosts();
     column-gap: 56px;
     padding: 48px 32px 32px;
   }
-  /* Touch devices: pinned to the edges of what the browser actually shows.
-     100vh/dvh, and even 100% on iPad (split view, browser bars), can be
-     taller than that, which hid the bottom of the columns. (Not on desktop:
+  /* Touch devices: pinned to the top of what the browser shows, as tall as
+     what is actually visible. 100vh/dvh, 100% and even inset: 0 could be
+     taller on iPad (browser bars), which hid the bottom of the columns. (Not on desktop:
      a fixed frame changes how desktop browsers anti-alias the text.) */
   @media (pointer: coarse) {
     .page {
       position: fixed;
-      inset: 0;
-      height: auto;
+      inset: 0 0 auto;
+      height: var(--frame-h, 100%); /* measured in Base.astro */
     }
   }
   /* Compact 3 columns (not in the design): the PC grid with the tablet's
