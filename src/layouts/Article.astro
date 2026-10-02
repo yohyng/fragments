@@ -181,6 +181,23 @@ const { title, subtitle, date } = Astro.props;
     display: block;
     text-align: justify;
   }
+  /* long URLs (and other unbroken runs) break anywhere instead of pushing
+     the note wide or stretching the justified line before them */
+  .body :global(.sidenote),
+  .body :global(.notes-item) {
+    overflow-wrap: anywhere;
+  }
+  .body :global(.sidenote-body a) {
+    /* a URL continues the line it starts on, so the line before it is not
+       stretched by justification */
+    word-break: break-all;
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--color-divider);
+  }
+  .body :global(.sidenote-body a:hover) {
+    color: var(--color-accent-700);
+  }
 
   /* Hover / jump highlight */
   .body :global(.note-ref.is-hl),

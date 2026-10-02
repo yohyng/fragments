@@ -32,11 +32,24 @@ export function buildNote(id, num, note) {
       ...(note.title ? [text(note.title)] : []),
     ]),
     ...(note.cite ? [el('span', { className: ['sidenote-cite'] }, [text(note.cite)])] : []),
-    el('span', { className: ['sidenote-body'] }, [text(note.body)]),
+    el('span', { className: ['sidenote-body'] }, linkify(note.body)),
   ];
   const aside = el('aside', { id: `note-${id}`, className: ['sidenote'], dataNote: id }, content());
   const item = el('div', { id: `notes-${id}`, className: ['notes-item'], dataNote: id }, content());
   return { ref, aside, item };
+}
+
+/** Note text with its URLs as links. */
+function linkify(value) {
+  const out = [];
+  let last = 0;
+  for (const m of String(value).matchAll(/https?:\/\/[^\s<>"'）)」』]+/g)) {
+    if (m.index > last) out.push(text(value.slice(last, m.index)));
+    out.push(el('a', { href: m[0], target: '_blank', rel: 'noopener' }, [text(m[0])]));
+    last = m.index + m[0].length;
+  }
+  if (last < value.length) out.push(text(value.slice(last)));
+  return out;
 }
 
 /** The notes gathered after the body (what phones show). */

@@ -205,7 +205,21 @@ export function convert(html, bookLinks = []) {
     if (isEl(n, 'a') && cls(n).includes('book-link-card')) return [editorCard(n)];
     if (isEl(n, 'h2', 'h3')) return [el(n.tagName, {}, n.children.flatMap(inline))];
     if (isEl(n, 'blockquote')) return [el('blockquote', {}, n.children.flatMap(block))];
-    if (isEl(n, 'ul', 'ol')) return [el(n.tagName, {}, n.children.filter((c) => isEl(c, 'li')).map((li) => el('li', {}, li.children.flatMap(inline))))];
+    if (isEl(n, 'ul', 'ol')) {
+      // the editor wraps each item's text in <p>: unwrap it (a note's <aside>
+      // inside a <p> would cut the item short); several <p> → line breaks
+      const item = (li) => {
+        const kids = [];
+        for (const c of li.children) {
+          if (isEl(c, 'p')) {
+            if (kids.length) kids.push(el('br', {}, []));
+            kids.push(...c.children);
+          } else kids.push(c);
+        }
+        return el('li', {}, kids.flatMap(inline));
+      };
+      return [el(n.tagName, {}, n.children.filter((c) => isEl(c, 'li')).map(item))];
+    }
     return paragraph(n);
   };
 
