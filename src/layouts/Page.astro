@@ -25,8 +25,9 @@ const posts = await getPosts();
 
 <style>
   .page {
-    height: 100vh;
-    height: 100dvh; /* the visible height, with mobile browser bars */
+    /* html and body are 100% of the window's displayed area; vh/dvh can be
+       taller than that (browser bars), which hid the bottom of the columns */
+    height: 100%;
     overflow: hidden;
     display: grid;
     grid-template-columns: 360px minmax(0, 1fr);
