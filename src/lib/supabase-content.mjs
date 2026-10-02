@@ -18,12 +18,7 @@ import { toHtml } from 'hast-util-to-html';
 import { toText } from 'hast-util-to-text';
 import { el, text, buildNote, notesList } from './rehype-sidenotes.mjs';
 
-export const SUPABASE_URL = process.env.SUPABASE_URL || 'https://eiyzlawmcyybchxzyozr.supabase.co';
-// The public (anon) key: read access to published articles only, by the
-// table's row-level security. It is already public in studieslog's pages.
-export const SUPABASE_ANON_KEY =
-  process.env.SUPABASE_ANON_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpeXpsYXdtY3l5YmNoeHp5b3pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwMDI2MjQsImV4cCI6MjA5NTU3ODYyNH0.SZVwqWKkk31npqdiiG5m3HdkF4JnQ7SgEzThaFfZ4q4';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabase-config.mjs';
 
 /** Published articles, plus scheduled ones whose time has come (RLS decides). */
 export async function fetchArticles() {

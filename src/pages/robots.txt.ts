@@ -28,6 +28,7 @@ export const GET: APIRoute = ({ site: astroSite }) => {
   const body = [
     'User-agent: *',
     'Allow: /',
+    'Disallow: /admin/',
     '',
     ...aiBots.map((b) => `User-agent: ${b}`),
     'Allow: /',
