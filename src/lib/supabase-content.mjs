@@ -9,7 +9,8 @@
 //   text holds 見出し / 書誌 / 本文 on separate lines (or just a 本文)
 //   → number + floated sidenote + entry in the list after the body
 // - images (bare, in a paragraph, or <figure class="image-figure">) keep the
-//   width the editor gave them (50% / 75%) → .el-figure--natural
+//   width the editor gave them (50% / 75%) → .el-figure--natural, centred
+//   or aligned left / right as chosen (align-left / align-right on the img)
 // - <a class="book-link-card"> and the book_links column → .el-book / .el-link
 // - inline styles and editor classes are dropped
 
@@ -59,7 +60,10 @@ function figure(img, caption) {
     decoding: 'async',
     ...(width ? { style: `width: ${width}` } : {}),
   }, []);
-  return el('figure', { className: ['el-figure', 'el-figure--natural'] }, [
+  // alignment chosen in the admin (class on the <img>); centred by default
+  const cls = [].concat(img.properties?.className ?? []);
+  const align = cls.includes('align-left') ? ['el-figure--left'] : cls.includes('align-right') ? ['el-figure--right'] : [];
+  return el('figure', { className: ['el-figure', 'el-figure--natural', ...align] }, [
     image,
     ...(caption ? [el('figcaption', {}, caption)] : []),
   ]);

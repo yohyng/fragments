@@ -83,7 +83,13 @@ import '../../styles/tokens.css';
             <button type="button" data-cmd="redo" title="やり直す">↷</button>
             <input type="file" accept="image/*" data-image-file hidden />
           </div>
-          <div class="editor" data-editor></div>
+          <div class="editor" data-editor>
+            <div class="image-bar" data-image-bar hidden>
+              <button type="button" data-align="left" title="左揃え">左</button>
+              <button type="button" data-align="center" title="中央揃え">中央</button>
+              <button type="button" data-align="right" title="右揃え">右</button>
+            </div>
+          </div>
         </div>
         <aside class="side">
           <div class="box">
@@ -290,7 +296,17 @@ import '../../styles/tokens.css';
   .editor .ProseMirror blockquote { margin: 2em 0; padding: 2px 0 2px 1.5em; border-left: 1px solid var(--color-accent); color: var(--color-neutral-800); }
   .editor .ProseMirror ul, .editor .ProseMirror ol { margin: 1.6em 0; padding-left: 1.4em; }
   .editor .ProseMirror li p { text-indent: 0; }
-  .editor .ProseMirror img { max-width: 100%; height: auto; border: 6px solid var(--color-surface); outline: 1px solid var(--color-divider); vertical-align: top; }
+  .editor { position: relative; }
+  /* images sit on their own line, centred unless aligned left or right (as on the site) */
+  .editor .ProseMirror img:not(.ProseMirror-separator) { display: block; margin: 0 auto; max-width: 100%; height: auto; border: 6px solid var(--color-surface); outline: 1px solid var(--color-divider); }
+  .editor .ProseMirror img.align-left { margin-left: 0; }
+  .editor .ProseMirror img.align-right { margin-right: 0; }
+  .editor .ProseMirror figure { margin: 2.2em 0; }
+  .image-bar { position: absolute; z-index: 3; display: flex; transform: translateX(-50%); background: var(--color-bg); border: 1px solid var(--color-text); }
+  .image-bar button { padding: 5px 12px; border: 0; background: none; cursor: pointer; font-family: var(--font-mincho); font-size: 12px; color: var(--color-text); }
+  .image-bar button + button { border-left: 1px solid var(--color-divider); }
+  .image-bar button:hover { color: var(--color-accent-700); }
+  .image-bar button.is-active { background: var(--color-text); color: var(--color-bg); }
   .editor .ProseMirror img.ProseMirror-selectednode { outline: 2px solid var(--color-accent); }
   .editor .ProseMirror sup.footnote-ref {
     display: inline-flex; align-items: center; justify-content: center; text-indent: 0;

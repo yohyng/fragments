@@ -5,7 +5,7 @@
 // screens read and write exactly the same content.
 
 import { createClient, type Session } from '@supabase/supabase-js';
-import { Plugin } from '@tiptap/pm/state';
+import { Plugin, NodeSelection } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../lib/supabase-config.mjs';
 import { initSettings, openSettings } from './settings';
@@ -195,6 +195,9 @@ async function openEditor(id: number | null) {
       },
     } as any);
     editor.registerPlugin(blankLines);
+    editor.on('selectionUpdate', placeImageBar);
+    editor.on('update', placeImageBar);
+    editor.on('blur', () => setTimeout(placeImageBar));
   } else setHtml(editor, current.content);
   renumberFootnotes(editor);
   renderNotes(true);
@@ -218,6 +221,46 @@ const blankLines = new Plugin({
     },
   },
 });
+
+// Image alignment: click an image → 左 / 中央 / 右. Stored as a class on the
+// <img> (align-left / align-right; none = centred, the default), which the
+// site turns into the figure's alignment (src/lib/supabase-content.mjs).
+type Align = 'left' | 'center' | 'right';
+const imageBar = $('[data-image-bar]');
+function selectedImage(): { node: any; pos: number } | null {
+  const sel = editor?.state.selection;
+  const node = sel instanceof NodeSelection ? sel.node : null;
+  return node && (node.type.name === 'image' || node.type.name === 'imageFigure') ? { node, pos: sel.from } : null;
+}
+const alignOf = (cls: string | null): Align => (/\balign-left\b/.test(cls ?? '') ? 'left' : /\balign-right\b/.test(cls ?? '') ? 'right' : 'center');
+function placeImageBar() {
+  const s = selectedImage();
+  if (!s || !editor.isFocused) return void (imageBar.hidden = true);
+  const dom = editor.view.nodeDOM(s.pos) as HTMLElement | null;
+  const img = dom?.tagName === 'IMG' ? dom : dom?.querySelector('img');
+  if (!img) return void (imageBar.hidden = true);
+  const r = img.getBoundingClientRect();
+  const box = $('[data-editor]').getBoundingClientRect();
+  imageBar.hidden = false;
+  imageBar.style.top = `${r.top - box.top + 10}px`;
+  imageBar.style.left = `${r.left - box.left + r.width / 2}px`;
+  const current = alignOf(s.node.attrs.class);
+  imageBar.querySelectorAll<HTMLButtonElement>('[data-align]').forEach((b) => b.classList.toggle('is-active', b.dataset.align === current));
+}
+imageBar.addEventListener('mousedown', (e) => e.preventDefault()); // keep the image selected
+imageBar.querySelectorAll<HTMLButtonElement>('[data-align]').forEach((b) =>
+  b.addEventListener('click', () => {
+    const s = selectedImage();
+    if (!s) return;
+    const classes = String(s.node.attrs.class ?? '')
+      .split(/\s+/)
+      .filter((c) => c && !/^align-(left|right)$/.test(c));
+    if (b.dataset.align !== 'center') classes.push('align-' + b.dataset.align);
+    const tr = editor.state.tr.setNodeMarkup(s.pos, undefined, { ...s.node.attrs, class: classes.join(' ') || null });
+    editor.view.dispatch(tr.setSelection(NodeSelection.create(tr.doc, s.pos)));
+    placeImageBar();
+  }),
+);
 
 // The title is a textarea so it wraps at the body's width like on the site;
 // it grows with its text and Enter does not add a line.

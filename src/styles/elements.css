@@ -16,11 +16,28 @@
 .el-figure img {
   object-fit: cover;
 }
-/* photos from the editor keep their own proportions and set width */
+/* photos from the editor keep their own proportions and set width; centred
+   unless the admin aligned them left or right (the caption follows) */
 .el-figure--natural img {
   aspect-ratio: auto;
   height: auto;
   max-width: 100%;
+  margin-inline: auto;
+}
+.el-figure--natural figcaption {
+  text-align: center;
+}
+.el-figure--left img {
+  margin-left: 0;
+}
+.el-figure--right img {
+  margin-right: 0;
+}
+.el-figure--left figcaption {
+  text-align: left;
+}
+.el-figure--right figcaption {
+  text-align: right;
 }
 .el-figure .el-placeholder {
   background: var(--color-neutral-200);
