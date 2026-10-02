@@ -20,9 +20,19 @@ const { title, subtitle, date } = Astro.props;
       {subtitle && <div class="subtitle">{subtitle}</div>}
       <time class="date" datetime={isoDate(date)}>{formatDate(date)}</time>
     </header>
-    <div class="body">
+    <div class="body" data-fade-imgs>
       <slot />
     </div>
+    <script is:inline>
+      // Images arrive a moment after the text: each fades in once it has
+      // loaded instead of popping in (see elements.css).
+      document.currentScript.previousElementSibling.querySelectorAll('img').forEach((img) => {
+        const show = () => img.classList.add('is-loaded');
+        if (img.complete) return show();
+        img.addEventListener('load', show);
+        img.addEventListener('error', show);
+      });
+    </script>
   </article>
   <slot name="end" />
   <div class="end-space"></div>

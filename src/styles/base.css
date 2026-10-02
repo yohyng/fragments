@@ -78,7 +78,7 @@ html.fonts-wait body { opacity: 0; }
 }
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 0.35s;
+  animation-duration: 0.5s;
   animation-timing-function: ease;
 }
 /* Side by side (≥1160px), moving between pages keeps the index as it is and
@@ -103,10 +103,10 @@ html.fonts-wait body { opacity: 0; }
   animation: none;
 }
 ::view-transition-old(pane) {
-  animation: vt-out 0.15s ease both;
+  animation: vt-out 0.2s ease both;
 }
 ::view-transition-new(pane) {
-  animation: vt-in 0.45s ease 0.05s both;
+  animation: vt-in 0.8s ease 0.1s both;
 }
 @keyframes vt-out {
   to { opacity: 0; }
