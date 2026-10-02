@@ -1,33 +1,29 @@
 /**
- * Site-wide text, links and metadata.
- * TODO(before launch): the author's name, `ogImage` and `contact` are placeholders.
+ * Site-wide text, links and metadata. The editable parts (name, catch copy,
+ * about, author, contact, OGP image, X handle) come from the display
+ * settings (/admin/ → 表示設定; src/lib/settings.ts).
  * The site's URL comes from astro.config.mjs (`Astro.site`); `url` here is
  * only a fallback.
  */
+import { settings } from './settings';
+
 export const site = {
-  name: 'fragments',
+  name: settings.name,
   url: 'https://fragments-of.space',
   lang: 'ja',
   locale: 'ja_JP',
-  catchJa: '建築・空間・デザインをめぐる思索、試論 /',
-  catchEn: 'Explorations and Abductive Speculations on Architecture, Space, and Design.',
+  catchJa: settings.catchJa,
+  catchEn: settings.catchEn,
   /** meta description of the site */
-  description:
-    '建築・空間・デザインをめぐる思索、試論。批評・エッセイ・論考を中心とした個人メディア。Explorations and Abductive Speculations on Architecture, Space, and Design.',
-  about: 'メディアについての説明文（運営者、更新の方針など）がここに入ります。',
+  description: settings.description,
+  about: settings.about,
   author: {
-    name: '著者名',
+    name: settings.authorName,
     url: 'https://fragments-of.space/about/',
   },
   /** absolute or root-relative URL of the default OGP image (1200×630); empty = none */
-  ogImage: '',
+  ogImage: settings.ogImage,
   /** X (Twitter) handle for twitter:site, e.g. '@fragments'; empty = none */
-  twitter: '',
-  contact: [
-    { label: 'mail@example.com', href: 'mailto:mail@example.com' },
-    { label: 'Twitter', href: '#' },
-    { label: 'Instagram', href: '#' },
-    { label: 'Facebook', href: '#' },
-    { label: 'Website', href: '#' },
-  ],
+  twitter: settings.twitter,
+  contact: settings.contact,
 };

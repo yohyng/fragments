@@ -5,11 +5,15 @@
 // Substack welcome page, in fragments' type and colours.
 import Subscribe from './Subscribe.astro';
 import { site } from '../lib/site';
+import { settings } from '../lib/settings';
 
 interface Props {
   mode: 'overlay' | 'page';
 }
 const { mode } = Astro.props;
+// the lead is the Japanese catch copy and the newsletter line unless set
+const lead = (settings.welcomeLead || `${site.catchJa.replace(/\s*\/$/, '')}。\n新しい記事を、メールでお届けします。`).split('\n');
+const leadEn = settings.welcomeLeadEn || site.catchEn;
 ---
 
 <div
@@ -21,9 +25,9 @@ const { mode } = Astro.props;
 >
   <div class="inner">
     <div class="logo" aria-hidden={mode === 'overlay' ? 'true' : undefined}>{site.name}</div>
-    <h1 id="welcome-title" class="title">fragments folio</h1>
-    <p class="lead">{site.catchJa.replace(/\s*\/$/, '')}。<br />新しい記事を、メールでお届けします。</p>
-    <p class="lead-en">{site.catchEn}</p>
+    <h1 id="welcome-title" class="title">{settings.welcomeTitle}</h1>
+    <p class="lead">{lead.map((line, i) => (i ? [<br />, line] : line))}</p>
+    {leadEn && <p class="lead-en">{leadEn}</p>}
     <div class="form">
       <Subscribe />
     </div>

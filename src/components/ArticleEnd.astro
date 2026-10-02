@@ -149,7 +149,7 @@ const related = posts.filter((p) => p.category === post.category && p.slug !== p
     .sub,
     .pager,
     .related {
-      max-width: min(calc(34 * var(--body-size)), 100% - 388px);
+      max-width: min(calc(var(--s-measure, 34) * var(--body-size)), 100% - 388px);
     }
   }
   @media (min-width: 1160px) and (max-width: 1299px) {
@@ -165,7 +165,7 @@ const related = posts.filter((p) => p.category === post.category && p.slug !== p
     .sub,
     .pager,
     .related {
-      max-width: min(465px, 100% - 250px);
+      max-width: min(calc(30 * var(--s-body-tab, 15.5) * 1px), 100% - 250px);
     }
     .sub {
       margin-top: 72px;
@@ -223,7 +223,7 @@ const related = posts.filter((p) => p.category === post.category && p.slug !== p
   /* Wide phone: as wide as the body */
   @media (min-width: 656px) and (max-width: 759px) {
     .end {
-      max-width: min(465px, 100% - 212px);
+      max-width: min(calc(30 * var(--s-body-tab, 15.5) * 1px), 100% - 212px);
     }
   }
 </style>

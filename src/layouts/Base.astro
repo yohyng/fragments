@@ -2,13 +2,14 @@
 import '../styles/tokens.css';
 import '../styles/base.css';
 import Seo, { type Props as SeoProps } from '../components/Seo.astro';
+import { settings, settingsStyle, fontsStylesheet } from '../lib/settings';
 
 type Props = SeoProps;
 const { title } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="ja">
+<html lang="ja" data-welcome-off={settings.welcomeOn ? undefined : ''}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -45,7 +46,11 @@ const { title } = Astro.props;
       // First visit to the top page: show the "fragments folio" overlay
       // (Welcome.astro). Decided here so the page never flashes first.
       try {
-        if (location.pathname === '/' && localStorage.getItem('fragments-welcome') !== 'done') {
+        if (
+          location.pathname === '/' &&
+          !document.documentElement.hasAttribute('data-welcome-off') &&
+          localStorage.getItem('fragments-welcome') !== 'done'
+        ) {
           document.documentElement.dataset.welcome = 'show';
         }
       } catch {}
@@ -92,10 +97,8 @@ const { title } = Astro.props;
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond&family=Lora:ital@0;1&family=Shippori+Mincho:wght@400;500&family=Zen+Old+Mincho&display=swap"
-    />
+    <link rel="stylesheet" href={fontsStylesheet} />
+    {settingsStyle && <style is:inline data-settings set:html={settingsStyle} />}
   </head>
   <body>
     <slot />

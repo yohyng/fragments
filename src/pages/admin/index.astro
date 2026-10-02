@@ -23,6 +23,10 @@ import '../../styles/tokens.css';
     <header class="bar">
       <a class="site" href="/">fragments</a>
       <span class="where">管理画面</span>
+      <nav class="nav">
+        <a href="#/" data-nav="list" hidden>記事</a>
+        <a href="#/settings" data-nav="settings" hidden>表示設定</a>
+      </nav>
       <span class="spacer"></span>
       <span class="who" data-who></span>
       <button type="button" class="link" data-signout hidden>ログアウト</button>
@@ -110,6 +114,58 @@ import '../../styles/tokens.css';
             <ol data-notes></ol>
           </div>
         </aside>
+      </div>
+    </section>
+
+    <!-- display settings -->
+    <section class="view set-view" data-view="settings" hidden>
+      <div class="set">
+        <div class="set-form">
+          <h1>表示設定</h1>
+          <p class="hint">サイト全体の見た目と文章です。右のプレビューにすぐ映り、「保存」で 1〜2 分後にサイトに反映されます。</p>
+          <div class="box set-missing" data-set-missing hidden>
+            <h2>はじめに一度だけ</h2>
+            <p class="hint">表示設定をしまっておくテーブルが、Supabase にまだありません。Supabase の「SQL Editor」で次を実行してから、このページを開き直してください（旧サイトの設定には触れません）。</p>
+            <pre data-set-sql></pre>
+            <button type="button" class="link" data-set-sql-copy>SQL をコピー</button>
+          </div>
+          <div class="box set-presets">
+            <label>テンプレート
+              <div class="set-line">
+                <select data-set-preset></select>
+                <button type="button" class="ghost" data-set-preset-apply>当てはめる</button>
+                <button type="button" class="ghost danger" data-set-preset-delete>削除</button>
+              </div>
+            </label>
+            <div class="set-line">
+              <input type="text" data-set-preset-name placeholder="新しいテンプレートの名前" />
+              <button type="button" class="ghost" data-set-preset-save>いまの設定を保存</button>
+            </div>
+            <p class="hint">当てはめても、「保存」を押すまでサイトは変わりません。</p>
+          </div>
+          <nav class="set-tabs" data-set-tabs></nav>
+          <div class="set-fields" data-set-fields></div>
+          <div class="set-save">
+            <button type="button" class="primary" data-set-save>保存</button>
+            <button type="button" class="link" data-set-reset-all>すべて既定に戻す</button>
+            <p class="msg" data-set-msg></p>
+          </div>
+        </div>
+        <div class="set-preview">
+          <div class="pv-bar">
+            <select data-pv-page>
+              <option value="top">トップ</option>
+              <option value="article">記事</option>
+              <option value="about">About</option>
+              <option value="welcome">はじめの案内</option>
+            </select>
+            <span class="spacer"></span>
+            <button type="button" class="pv-device" data-pv-device="pc">PC</button>
+            <button type="button" class="pv-device" data-pv-device="tablet">タブレット</button>
+            <button type="button" class="pv-device" data-pv-device="phone">スマホ</button>
+          </div>
+          <div class="pv-pane" data-pv-pane><iframe data-pv title="プレビュー"></iframe></div>
+        </div>
       </div>
     </section>
 
@@ -205,10 +261,10 @@ import '../../styles/tokens.css';
 
   .editor .ProseMirror {
     min-height: 60vh; padding: 24px 0 80px; outline: none;
-    font-family: var(--font-mincho); font-size: var(--body-size); line-height: 1.9;
-    letter-spacing: 0.02em; text-align: justify;
+    font-family: var(--font-mincho); font-size: var(--body-size); line-height: var(--s-lh, 1.9);
+    letter-spacing: calc(var(--s-ls, 0.02) * 1em); text-align: var(--s-align, justify);
   }
-  .editor .ProseMirror p { margin: 0; text-indent: 1em; }
+  .editor .ProseMirror p { margin: 0; text-indent: var(--s-indent, 1em); }
   /* blank lines from the old editor: the site drops them, so they show here
      only as a thin dotted line */
   .editor .ProseMirror p.is-blank {
@@ -219,10 +275,14 @@ import '../../styles/tokens.css';
   }
   .editor .ProseMirror h2 { font-family: var(--font-mincho-heading); font-weight: 500; font-size: 22px; line-height: 1.5; letter-spacing: 0.02em; margin: 2.2em 0 0.8em; text-indent: 0; }
   .editor .ProseMirror h3 { font-family: var(--font-mincho-heading); font-weight: 500; font-size: 17px; line-height: 1.6; letter-spacing: -0.015em; margin: 1.8em 0 0.4em; text-indent: 0; }
-  /* PC: the article page's larger size (Article.astro, ≥1400px) */
+  /* PC: the article page's larger size (Article.astro, ≥1400px), following
+     the display settings (--s-*, set from 表示設定) */
   @media (min-width: 1400px) {
-    .main { --body-size: clamp(16.5px, 0.4rem + 0.75vw, 18px); }
-    .title { font-size: clamp(30px, 1rem + 1.2vw, 36px); }
+    .main {
+      --body-size: clamp(calc((var(--s-body-pc, 18) - 1.5) * 1px), calc((var(--s-body-pc, 18) - 11.6) * 1px + 0.75vw), calc(var(--s-body-pc, 18) * 1px));
+      max-width: calc(var(--s-measure, 34) * var(--body-size));
+    }
+    .title { font-size: clamp(calc((var(--s-title-pc, 36) - 6) * 1px), calc((var(--s-title-pc, 36) - 20) * 1px + 1.2vw), calc(var(--s-title-pc, 36) * 1px)); }
     .subtitle { font-size: 19px; }
     .editor .ProseMirror h2 { font-size: 24px; }
     .editor .ProseMirror h3 { font-size: 19px; }
@@ -252,7 +312,56 @@ import '../../styles/tokens.css';
   .notes textarea { min-height: 70px; resize: vertical; font-family: var(--font-mincho); font-size: 13px; line-height: 1.7; }
   .notes input { font-size: 13px; }
 
+  .nav { display: flex; gap: 16px; margin-left: 12px; font-family: var(--font-mincho); font-size: 13px; }
+  .nav a { color: var(--color-neutral-700); text-decoration: none; padding-bottom: 2px; border-bottom: 1px solid transparent; }
+  .nav a:hover { color: var(--color-accent-700); }
+  .nav a.is-current { color: var(--color-text); border-bottom-color: var(--color-text); }
+  .ghost { padding: 7px 12px; border: 1px solid var(--color-divider); background: transparent; cursor: pointer; font-family: var(--font-mincho); font-size: 12px; white-space: nowrap; }
+  .ghost:hover { border-color: var(--color-accent); color: var(--color-accent-700); }
+  .ghost.danger:hover { border-color: #b3261e; color: #b3261e; }
+
+  /* 表示設定: form on the left, the live preview on the right */
+  .set-view { padding: 0; }
+  .set { display: grid; grid-template-columns: 420px minmax(0, 1fr); height: calc(100vh - 57px); }
+  .set-form { overflow-y: auto; padding: 28px 28px 0; border-right: 1px solid var(--color-divider); display: flex; flex-direction: column; gap: 16px; }
+  .set-form > .hint { margin-top: -8px; }
+  .set-missing pre { margin: 0; padding: 10px; max-height: 220px; overflow: auto; background: var(--color-surface); font-size: 11px; line-height: 1.5; white-space: pre-wrap; }
+  .set-missing .link { align-self: flex-start; }
+  .set-line { display: flex; gap: 6px; }
+  .set-line select, .set-line input { flex: 1; min-width: 0; }
+  .set-tabs { display: flex; flex-wrap: wrap; gap: 2px 16px; border-bottom: 1px solid var(--color-divider); font-family: var(--font-mincho); font-size: 13px; }
+  .set-tabs button { padding: 6px 0; border: 0; border-bottom: 1px solid transparent; margin-bottom: -1px; background: none; cursor: pointer; color: var(--color-neutral-700); }
+  .set-tabs button:hover { color: var(--color-accent-700); }
+  .set-tabs button.is-active { color: var(--color-text); border-bottom-color: var(--color-text); }
+  .set-fields { display: flex; flex-direction: column; gap: 18px; }
+  .set-row { display: flex; flex-direction: column; gap: 6px; }
+  .set-label { display: flex; align-items: baseline; gap: 10px; font-family: var(--font-mincho); font-size: 12px; color: var(--color-neutral-700); }
+  .set-reset { margin-left: auto; font-size: 11px; }
+  .set-row textarea { resize: vertical; font-family: var(--font-mincho); font-size: 13px; line-height: 1.7; }
+  .set-color { display: flex; align-items: center; gap: 8px; }
+  .set-color input[type='color'] { width: 40px; height: 32px; padding: 2px; background: transparent; cursor: pointer; }
+  .set-color .hex { width: 96px; font-family: var(--font-body); font-size: 13px; }
+  .set-range { display: flex; align-items: center; gap: 8px; }
+  .set-range input[type='range'] { flex: 1; padding: 0; border: 0; background: none; accent-color: var(--color-accent); }
+  .set-range input[type='number'] { width: 72px; font-family: var(--font-body); font-size: 13px; }
+  .set-range .unit { width: 24px; font-family: var(--font-body); font-size: 12px; color: var(--color-neutral-700); }
+  .set-inline { flex-direction: row; align-items: center; gap: 8px; font-size: 13px; color: var(--color-text); cursor: pointer; }
+  .set-inline input { accent-color: var(--color-accent); }
+  .set-row > .set-inline + .set-reset { align-self: flex-start; margin-left: 0; }
+  .set-save { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 14px 0 16px; margin-top: auto; background: var(--color-bg); border-top: 1px solid var(--color-divider); }
+  .set-save .msg { flex-basis: 100%; }
+  .set-preview { display: flex; flex-direction: column; min-width: 0; background: var(--color-surface); }
+  .pv-bar { display: flex; align-items: center; gap: 6px; padding: 10px 16px; border-bottom: 1px solid var(--color-divider); background: var(--color-bg); }
+  .pv-bar select { font-size: 13px; padding: 5px 8px; }
+  .pv-device { padding: 5px 10px; border: 1px solid transparent; background: none; cursor: pointer; font-family: var(--font-mincho); font-size: 12px; color: var(--color-neutral-700); }
+  .pv-device.is-active { border-color: var(--color-text); color: var(--color-text); }
+  .pv-pane { position: relative; flex: 1; overflow: hidden; }
+  .pv-pane iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; background: var(--color-bg); }
+
   @media (max-width: 900px) {
+    .set { grid-template-columns: 1fr; height: auto; }
+    .set-form { overflow: visible; border-right: 0; }
+    .set-preview { height: 70vh; }
     .view { padding: 20px; }
     .bar { padding: 12px 20px 8px; }
     .edit { grid-template-columns: 1fr; }

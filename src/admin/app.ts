@@ -8,6 +8,7 @@ import { createClient, type Session } from '@supabase/supabase-js';
 import { Plugin } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../lib/supabase-config.mjs';
+import { initSettings, openSettings } from './settings';
 import {
   createEditor,
   getHtml,
@@ -38,9 +39,14 @@ const IMAGE_BUCKET = 'article-images';
 const STATUS_LABEL: Record<string, string> = { draft: '下書き', published: '公開', scheduled: '予約', private: '非公開' };
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
-const views = ['login', 'list', 'edit'] as const;
-const show = (name: (typeof views)[number]) =>
+const views = ['login', 'list', 'edit', 'settings'] as const;
+const show = (name: (typeof views)[number]) => {
   views.forEach((v) => ($(`[data-view="${v}"]`).hidden = v !== name));
+  document.querySelectorAll<HTMLAnchorElement>('[data-nav]').forEach((a) => {
+    a.hidden = name === 'login';
+    a.classList.toggle('is-current', a.dataset.nav === (name === 'edit' ? 'list' : name));
+  });
+};
 const field = <T extends HTMLElement = HTMLInputElement>(name: string) => $<T>(`[data-f="${name}"]`);
 
 const msg = (el: HTMLElement, text: string, error = false) => {
@@ -82,9 +88,13 @@ $<HTMLFormElement>('[data-login]').addEventListener('submit', async (e) => {
 });
 $('[data-signout]').addEventListener('click', () => sb.auth.signOut());
 
-// #/ → list, #/new → new article, #/41 → article 41
+// #/ → list, #/new → new article, #/41 → article 41, #/settings → 表示設定
 addEventListener('hashchange', () => session && openFromHash());
 function openFromHash() {
+  if (location.hash === '#/settings') {
+    show('settings');
+    return openSettings();
+  }
   const m = /^#\/(new|\d+)$/.exec(location.hash);
   if (!m) return openList();
   return openEditor(m[1] === 'new' ? null : Number(m[1]));
@@ -402,4 +412,7 @@ $('[data-delete]').addEventListener('click', async () => {
   location.hash = '#/';
 });
 
+// the saved display settings are public: apply them (the editor shows the
+// article's type) whether or not anyone is signed in
+initSettings(sb, rebuild);
 start();
