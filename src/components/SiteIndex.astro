@@ -52,8 +52,8 @@ const onAbout = Astro.url.pathname.startsWith('/about');
   </div>
   {posts.length > LIMIT && <button class="more" type="button" data-step={LIMIT}>さらに読み込む</button>}
   <div class="links">
-    <a class:list={['about', { 'is-current': onAbout }]} href="/about/" aria-current={onAbout ? 'page' : undefined}>about</a>
-    <a class="subscribe" href="/subscribe/">subscribe</a>
+    <a class:list={['about', { 'is-current': onAbout }]} href="/about/" aria-current={onAbout ? 'page' : undefined}>about<span class="arrow" aria-hidden="true">↗</span></a>
+    <a class="subscribe" href="/subscribe/">subscribe<span class="arrow" aria-hidden="true">↗</span></a>
   </div>
   <div class="scroll-foot" aria-hidden="true"></div>
 </nav>
@@ -299,6 +299,11 @@ const onAbout = Astro.url.pathname.startsWith('/about');
   }
   .about,
   .subscribe { text-decoration: none; }
+  /* a pointer that these lead to a page of their own */
+  .arrow {
+    margin-left: 0.3em;
+    font-size: 0.9em;
+  }
   .about,
   .about:hover { color: var(--color-text); }
   .about.is-current { color: var(--color-accent-700); }
