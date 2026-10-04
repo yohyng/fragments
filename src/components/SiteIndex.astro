@@ -167,10 +167,11 @@ const onAbout = Astro.url.pathname.startsWith('/about');
   .intro {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    min-height: 222px;
+    /* gaps: 表示設定 → トップ・記事一覧 (the index's own 22px gap counted in) */
+    gap: calc(var(--s-ix-b, 4) * 1px);
+    min-height: var(--s-ix-c-minh, 222px);
     box-sizing: border-box;
-    padding-top: 34px;
+    padding-top: calc(var(--s-ix-a, 56) * 1px - 22px);
     font-size: 13px;
     line-height: 1.75;
     color: var(--color-neutral-800);
@@ -181,7 +182,7 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     display: flex;
     flex-wrap: wrap;
     gap: 4px 14px;
-    margin-top: auto;
+    margin-top: var(--s-ix-c-pc, auto); /* auto: the list starts level with the article */
     padding-top: 14px;
     font-family: var(--font-body);
   }
@@ -203,6 +204,7 @@ const onAbout = Astro.url.pathname.startsWith('/about');
   .list {
     display: flex;
     flex-direction: column;
+    margin-top: calc(var(--s-ix-d, 22) * 1px - 22px);
   }
   .item {
     display: block;
@@ -286,14 +288,14 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     }
     .cats {
       gap: 0 16px;
-      margin-top: 58px;
+      margin-top: calc(var(--s-ix-c, 62) * 1px - var(--s-ix-b, 4) * 1px); /* the gap from the English line */
       padding-top: 0;
     }
     .cat {
       font-size: 14px;
       padding: 10px 0 6px;
     }
-    .list { margin-top: -10px; }
+    .list { margin-top: calc(var(--s-ix-d, 12) * 1px - 22px); }
     .item {
       padding: 9px 0;
       font-size: calc(var(--s-index, 13) * 14px / 13); /* 14px by default */
@@ -322,11 +324,14 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     .intro-en { font-size: calc(var(--s-catch-en-sp, var(--s-catch-en, 13)) * 1px); }
     .item { font-size: calc(var(--s-index-sp, var(--s-index, 13) * 14 / 13) * 1px); }
     .scroll-foot { margin-top: calc(48px - 20px); }
-    .intro { padding-top: 20px; }
+    .intro {
+      padding-top: calc(var(--s-ix-a-sp, 40) * 1px - 20px);
+      gap: calc(var(--s-ix-b-sp, 4) * 1px);
+    }
     .cats {
       flex-wrap: nowrap;
       gap: 0 18px;
-      margin-top: 36px;
+      margin-top: calc(var(--s-ix-c-sp, 40) * 1px - var(--s-ix-b-sp, 4) * 1px);
       overflow-x: auto;
       scrollbar-width: none;
     }
@@ -335,7 +340,7 @@ const onAbout = Astro.url.pathname.startsWith('/about');
       flex: none;
       padding: 12px 0 8px;
     }
-    .list { margin-top: -20px; }
+    .list { margin-top: calc(var(--s-ix-d-sp, 0) * 1px - 20px); }
     .links a { padding: 12px 0; }
   }
 

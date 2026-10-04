@@ -51,6 +51,15 @@ export interface Settings {
   catchEnSizeSp: number;
   indexSizeSp: number;
   indexSize: number;
+  /** index gaps, px: header → catch, Japanese → English, catch → categories, categories → list (PC/tablet, then phones) */
+  ixHeadGap: number;
+  ixCatchGap: number;
+  ixCatsGap: number;
+  ixListGap: number;
+  ixHeadGapSp: number;
+  ixCatchGapSp: number;
+  ixCatsGapSp: number;
+  ixListGapSp: number;
   pageSize: number;
   // About・SNS
   about: string;
@@ -131,6 +140,14 @@ export const defaults: Settings = {
   catchEnSizeSp: 13,
   indexSizeSp: 14,
   indexSize: 13,
+  ixHeadGap: 56,
+  ixCatchGap: 4,
+  ixCatsGap: 62,
+  ixListGap: 22,
+  ixHeadGapSp: 40,
+  ixCatchGapSp: 4,
+  ixCatsGapSp: 40,
+  ixListGapSp: 0,
   pageSize: 20,
   about: 'メディアについての説明文（運営者、更新の方針など）がここに入ります。',
   authorName: '著者名',
@@ -325,6 +342,14 @@ export function settingsCss(s: Settings): string {
     ['titleSizePc', '--s-title-pc'],
     ['noteSize', '--s-note'],
     ['siteNameSize', '--s-site-name'],
+    ['ixHeadGap', '--s-ix-a'],
+    ['ixCatchGap', '--s-ix-b'],
+    ['ixCatsGap', '--s-ix-c'],
+    ['ixListGap', '--s-ix-d'],
+    ['ixHeadGapSp', '--s-ix-a-sp'],
+    ['ixCatchGapSp', '--s-ix-b-sp'],
+    ['ixCatsGapSp', '--s-ix-c-sp'],
+    ['ixListGapSp', '--s-ix-d-sp'],
     ['welcomeLogoSize', '--s-wl-logo'],
     ['welcomeTitleSize', '--s-wl-title'],
     ['welcomeLeadSize', '--s-wl-lead'],
@@ -355,6 +380,11 @@ export function settingsCss(s: Settings): string {
     ['indexSize', '--s-index'],
   ];
   for (const [k, name] of num) if (s[k] !== d[k]) v[name] = String(s[k]);
+  // the PC index sets its categories by its height (auto) until a gap is set
+  if (s.ixCatsGap !== d.ixCatsGap) {
+    v['--s-ix-c-pc'] = `${s.ixCatsGap - 14 - s.ixCatchGap}px`; // less the categories' padding and the catch gap
+    v['--s-ix-c-minh'] = '0px';
+  }
   if (!s.indent) v['--s-indent'] = '0';
   if (!s.justify) v['--s-align'] = 'left';
   const body = Object.entries(v)

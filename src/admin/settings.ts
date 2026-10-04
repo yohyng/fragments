@@ -91,12 +91,20 @@ const tabs: Tab[] = [
       { key: 'catchEnSize', label: 'キャッチコピー（英語）の文字サイズ', type: 'range', min: 11, max: 20, step: 0.5, unit: 'px' },
       { key: 'fontIndex', label: '記事一覧（記事タイトル）のフォント', type: 'font-ja', sameAs: '本文と同じ' },
       { key: 'indexSize', label: '記事一覧の文字サイズ', type: 'range', min: 12, max: 17, step: 0.5, unit: 'px', hint: 'PC での大きさです。タブレット・スマホでは同じ比率で少し大きくなります。' },
+      { key: 'ixHeadGap', label: '間隔：ヘッダー（サイト名の線）とキャッチコピー', type: 'range', min: 0, max: 160, step: 2, unit: 'px', hint: 'PC・タブレットの値です。' },
+      { key: 'ixCatchGap', label: '間隔：キャッチコピーの日本語と英語', type: 'range', min: 0, max: 60, step: 1, unit: 'px' },
+      { key: 'ixCatsGap', label: '間隔：キャッチコピーとカテゴリ（all / essay …）', type: 'range', min: 0, max: 200, step: 2, unit: 'px', hint: '初期値のままなら、PC では記事一覧の書き出しを右の記事本文の高さにそろえます（タブレットは 62px）。動かすと PC・タブレットともこの間隔になります。' },
+      { key: 'ixListGap', label: '間隔：カテゴリと記事一覧', type: 'range', min: 0, max: 80, step: 1, unit: 'px', hint: '初期値のままなら PC 22px・タブレット 12px です。' },
       { key: 'pageSize', label: '一度に表示する記事の数', type: 'range', min: 10, max: 60, step: 5, unit: '件', hint: '「さらに読み込む」で増える数も同じです。', later: true },
       { key: 'welcomeOn', label: 'スマホ（画面幅 759px 以下）', type: 'heading', hint: 'スマホでの文字サイズです。動かすまでは PC の値から決まる大きさで表示します。プレビューを「スマホ」にすると確かめられます。' },
       { key: 'siteNameSizeSp', label: 'スマホ：サイト名の文字サイズ', type: 'range', min: 16, max: 44, step: 1, unit: 'px', hint: '記事ページ・About 上部のサイト名も同じ大きさです。' },
       { key: 'catchJaSizeSp', label: 'スマホ：キャッチコピー（日本語）の文字サイズ', type: 'range', min: 10, max: 20, step: 0.5, unit: 'px' },
       { key: 'catchEnSizeSp', label: 'スマホ：キャッチコピー（英語）の文字サイズ', type: 'range', min: 10, max: 20, step: 0.5, unit: 'px' },
       { key: 'indexSizeSp', label: 'スマホ：記事一覧の文字サイズ', type: 'range', min: 11, max: 20, step: 0.5, unit: 'px' },
+      { key: 'ixHeadGapSp', label: 'スマホ：間隔：ヘッダーとキャッチコピー', type: 'range', min: 0, max: 120, step: 2, unit: 'px' },
+      { key: 'ixCatchGapSp', label: 'スマホ：間隔：キャッチコピーの日本語と英語', type: 'range', min: 0, max: 60, step: 1, unit: 'px' },
+      { key: 'ixCatsGapSp', label: 'スマホ：間隔：キャッチコピーとカテゴリ', type: 'range', min: 0, max: 160, step: 2, unit: 'px' },
+      { key: 'ixListGapSp', label: 'スマホ：間隔：カテゴリと記事一覧', type: 'range', min: -10, max: 80, step: 1, unit: 'px' },
     ],
   },
   {
@@ -319,7 +327,8 @@ function fieldRow(f: Field): HTMLElement {
   // a phone value left as it is follows the PC one: show what is in effect
   let value = state[f.key];
   const pcKey = f.key.endsWith('Sp') ? (f.key.slice(0, -2) as Key) : null;
-  if (pcKey && pcKey in defaults && value === defaults[f.key])
+  // (the index gaps on phones have their own defaults and follow nothing)
+  if (pcKey && pcKey in defaults && !pcKey.startsWith('ix') && value === defaults[f.key])
     value = (Math.round((state[pcKey] as number) * (phoneScale[pcKey] ?? 1) * 2) / 2) as never;
   const ph = typeof f.placeholder === 'function' ? f.placeholder() : (f.placeholder ?? '');
 
