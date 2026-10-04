@@ -29,6 +29,8 @@ export interface Settings {
   bodySizePc: number;
   bodySizeTablet: number;
   lineHeight: number;
+  /** space between paragraphs, in lines */
+  paragraphGap: number;
   letterSpacing: number;
   measure: number;
   indent: boolean;
@@ -72,6 +74,7 @@ export const defaults: Settings = {
   bodySizePc: 18,
   bodySizeTablet: 15.5,
   lineHeight: 1.9,
+  paragraphGap: 1,
   letterSpacing: 0.02,
   measure: 34,
   indent: true,
@@ -235,6 +238,7 @@ export function settingsCss(s: Settings): string {
     ['bodySizePc', '--s-body-pc'],
     ['bodySizeTablet', '--s-body-tab'],
     ['lineHeight', '--s-lh'],
+    ['paragraphGap', '--s-para'],
     ['letterSpacing', '--s-ls'],
     ['measure', '--s-measure'],
     ['titleSizePc', '--s-title-pc'],

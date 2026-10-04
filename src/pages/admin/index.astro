@@ -129,6 +129,7 @@ import '../../styles/tokens.css';
         <div class="set-form">
           <h1>表示設定</h1>
           <p class="hint">サイト全体の見た目と文章です。右のプレビューにすぐ映り、「保存」で 1〜2 分後にサイトに反映されます。</p>
+          <p class="set-status" data-set-status></p>
           <div class="box set-missing" data-set-missing hidden>
             <h2>はじめに一度だけ</h2>
             <p class="hint">表示設定をしまっておくテーブルが、Supabase にまだありません。Supabase の「SQL Editor」で次を実行してから、このページを開き直してください（旧サイトの設定には触れません）。</p>
@@ -271,10 +272,16 @@ import '../../styles/tokens.css';
     letter-spacing: calc(var(--s-ls, 0.02) * 1em); text-align: var(--s-align, justify);
   }
   .editor .ProseMirror p { margin: 0; text-indent: var(--s-indent, 1em); }
+  /* the space between paragraphs, as on the site (表示設定 → 段落の間) */
+  .editor .ProseMirror { --para-gap: calc(var(--s-para, 1) * var(--s-lh, 1.9) * 1em); }
+  .editor .ProseMirror p + p { margin-top: var(--para-gap); }
+  .editor .ProseMirror p.is-blank,
+  .editor .ProseMirror p.is-blank + p { margin-top: 0; }
   /* blank lines from the old editor: the site drops them, so they show here
      only as a thin dotted line */
+  /* an old blank line (dropped on the site): a dotted row as tall as the gap */
   .editor .ProseMirror p.is-blank {
-    height: 0.9em; line-height: 0.9em; overflow: hidden;
+    height: max(var(--para-gap), 0.9em); line-height: 0.9em; overflow: hidden;
     background: linear-gradient(var(--color-divider), var(--color-divider)) center / 100% 1px no-repeat;
     background-image: repeating-linear-gradient(90deg, var(--color-neutral-300) 0 3px, transparent 3px 7px);
     background-size: 100% 1px;
@@ -341,6 +348,9 @@ import '../../styles/tokens.css';
   .set { display: grid; grid-template-columns: 420px minmax(0, 1fr); height: calc(100vh - 57px); }
   .set-form { overflow-y: auto; padding: 28px 28px 0; border-right: 1px solid var(--color-divider); display: flex; flex-direction: column; gap: 16px; }
   .set-form > .hint { margin-top: -8px; }
+  .set-status { margin: -8px 0 0; font-family: var(--font-mincho); font-size: 12px; color: var(--color-neutral-700); }
+  .set-status.is-behind { color: #b3261e; }
+  .set-status.is-done { color: var(--color-accent-700); }
   .set-missing pre { margin: 0; padding: 10px; max-height: 220px; overflow: auto; background: var(--color-surface); font-size: 11px; line-height: 1.5; white-space: pre-wrap; }
   .set-missing .link { align-self: flex-start; }
   .set-line { display: flex; gap: 6px; }

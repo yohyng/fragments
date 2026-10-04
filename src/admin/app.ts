@@ -420,12 +420,20 @@ async function addCard() {
 }
 
 // ── save / delete ──────────────────────────────────────────────────────────
-async function rebuild() {
+/** Ask Vercel to rebuild the site. null when it started, else why not (for the message). */
+async function rebuild(): Promise<string | null> {
   try {
     const res = await fetch('/api/rebuild', { method: 'POST', headers: { Authorization: `Bearer ${session?.access_token}` } });
-    return res.ok;
+    if (res.ok) return null;
+    const body = await res.json().catch(() => ({}));
+    if (res.status === 500 && /VERCEL_DEPLOY_HOOK/.test(body.error ?? ''))
+      return 'Vercel の環境変数 VERCEL_DEPLOY_HOOK が設定されていません（Settings → Environment Variables に Deploy Hook の URL を入れて、再デプロイしてください）';
+    if (res.status === 401) return 'ログインを確かめられませんでした。ログインし直してから、もう一度保存してください';
+    if (res.status === 502) return 'Deploy Hook に断られました（VERCEL_DEPLOY_HOOK の URL が正しいか、そのフックが消されていないか確かめてください）';
+    if (res.status === 404) return '再ビルドの窓口（/api/rebuild）が見つかりません。Vercel 以外で開いていませんか';
+    return `再ビルドを始められませんでした（${res.status}）`;
   } catch {
-    return false;
+    return '再ビルドの窓口につながりませんでした';
   }
 }
 
@@ -467,8 +475,8 @@ $('[data-save]').addEventListener('click', async () => {
   const visible = status === 'published' || status === 'scheduled';
   if (visible || wasVisible) {
     msg(out, '保存しました。サイトに反映しています…');
-    const ok = await rebuild();
-    msg(out, ok ? '保存しました。1〜2分でサイトに反映されます。' : '保存しました。ただ、サイトへの反映を始められませんでした（VERCEL_DEPLOY_HOOK の設定を確かめてください）。', !ok);
+    const why = await rebuild();
+    msg(out, why ? `保存しました。ただ、サイトに反映できませんでした: ${why}。` : '保存しました。1〜2分でサイトに反映されます。', !!why);
   } else msg(out, '保存しました（下書き・非公開なので、サイトには出ません）。');
   if (isNew) history.replaceState(null, '', `#/${current.id}`);
   $('[data-delete]').hidden = false;

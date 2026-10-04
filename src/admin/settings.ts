@@ -68,6 +68,7 @@ const tabs: Tab[] = [
       { key: 'bodySizePc', label: '本文の文字サイズ（PC）', type: 'range', min: 15, max: 22, step: 0.5, unit: 'px', hint: '画面幅 1400px 以上。それより狭い PC では少し小さくなります。' },
       { key: 'bodySizeTablet', label: '本文の文字サイズ（タブレット・スマホ）', type: 'range', min: 14, max: 19, step: 0.5, unit: 'px', hint: 'スマホと狭いタブレットでの大きさです。広いタブレットでは画面に合わせて最大 2.5px 大きくなります。' },
       { key: 'lineHeight', label: '行間', type: 'range', min: 1.5, max: 2.4, step: 0.05, unit: '' },
+      { key: 'paragraphGap', label: '段落の間', type: 'range', min: 0, max: 1.5, step: 0.25, unit: '行', hint: '0 にすると、段落の間をあけずに字下げだけで区切ります。' },
       { key: 'letterSpacing', label: '字間', type: 'range', min: 0, max: 0.15, step: 0.01, unit: 'em' },
       { key: 'measure', label: '1行の字数（PC）', type: 'range', min: 26, max: 42, step: 1, unit: '字' },
       { key: 'indent', label: '段落の頭を1字下げる', type: 'check' },
@@ -127,7 +128,7 @@ interface Preset {
 }
 
 let sb: SupabaseClient;
-let rebuild: () => Promise<boolean>;
+let rebuild: () => Promise<string | null>;
 let state: Settings = merge(null);
 let saved: Settings = merge(null);
 let presets: Preset[] = [];
@@ -170,7 +171,7 @@ function setFonts(doc: Document, s: Settings, id: string) {
 
 /** Load the saved settings (public) and apply them to the admin. */
 let ensureSignedIn: () => Promise<boolean> = async () => true;
-export async function initSettings(client: SupabaseClient, rebuildSite: () => Promise<boolean>, signedIn?: () => Promise<boolean>) {
+export async function initSettings(client: SupabaseClient, rebuildSite: () => Promise<string | null>, signedIn?: () => Promise<boolean>) {
   if (signedIn) ensureSignedIn = signedIn;
   sb = client;
   rebuild = rebuildSite;
@@ -178,8 +179,10 @@ export async function initSettings(client: SupabaseClient, rebuildSite: () => Pr
   applyToAdmin(saved);
 }
 
+let savedAt = '';
 async function load() {
-  const { data, error } = await sb.from('fragments_settings').select('data,presets').eq('id', 1).maybeSingle();
+  const { data, error } = await sb.from('fragments_settings').select('data,presets,updated_at').eq('id', 1).maybeSingle();
+  savedAt = data?.updated_at ?? '';
   tableMissing = isMissing(error);
   if (error && !tableMissing) msg('設定を読み込めませんでした: ' + error.message, true);
   saved = merge(data?.data);
@@ -197,6 +200,7 @@ export async function openSettings() {
   renderTabs();
   renderFields();
   renderPresets();
+  checkBuild();
   dirty = false;
   const { data } = await sb.from('articles').select('id').eq('status', 'published').order('date', { ascending: false }).limit(1);
   articlePath = data?.[0] ? `/posts/${data[0].id}/` : '/';
@@ -425,8 +429,10 @@ $('[data-set-save]').addEventListener('click', async () => {
   saved = structuredClone(state);
   dirty = false;
   applyToAdmin(saved);
-  const ok = await rebuild();
-  msg(ok ? '保存しました。1〜2分でサイトに反映されます。' : '保存しました。サイトへの反映（再ビルド）を始められなかったので、Vercel で再デプロイしてください。', !ok);
+  await load();
+  const why = await rebuild();
+  msg(why ? `保存しました。ただ、サイトに反映できませんでした: ${why}。` : '保存しました。1〜2分でサイトに反映されます。', !!why);
+  if (!why) watchBuild();
 });
 $('[data-set-reset-all]').addEventListener('click', () => {
   if (!confirm('すべての項目を既定（デザインどおり）に戻しますか？「保存」を押すまでサイトは変わりません。')) return;
@@ -439,6 +445,48 @@ $('[data-set-sql-copy]').addEventListener('click', async () => {
   await navigator.clipboard.writeText(setupSql.trim());
   $('[data-set-sql-copy]').textContent = 'コピーしました';
 });
+
+// ── has the live site caught up? ──
+// Every page carries when it was built and which saved settings it used
+// (Base.astro); compare that with the last save.
+
+const fmt = (iso: string) => new Date(iso).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+async function checkBuild(): Promise<boolean> {
+  const out = $('[data-set-status]');
+  out.className = 'set-status';
+  if (tableMissing || !savedAt) return void (out.textContent = ''), true;
+  try {
+    const html = await (await fetch('/?build-check=' + Date.now(), { cache: 'no-store' })).text();
+    const tag = /<meta name="fragments-build"[^>]*>/.exec(html)?.[0] ?? '';
+    const built = /content="([^"]+)"/.exec(tag)?.[1] ?? '';
+    const used = /data-settings-saved="([^"]*)"/.exec(tag)?.[1] ?? '';
+    if (!built) return void (out.textContent = ''), true;
+    const done = !!used && new Date(used).getTime() >= new Date(savedAt).getTime() - 1000;
+    out.textContent = done
+      ? `サイトは最新の設定で表示されています（サイトのビルド ${fmt(built)}）。`
+      : `サイトはまだ前の設定のままです（最後の保存 ${fmt(savedAt)}／サイトのビルド ${fmt(built)}）。`;
+    out.classList.add(done ? 'is-done' : 'is-behind');
+    return done;
+  } catch {
+    out.textContent = '';
+    return true;
+  }
+}
+
+let watching = 0;
+function watchBuild() {
+  const id = ++watching;
+  const started = Date.now();
+  const tick = async () => {
+    if (id !== watching) return;
+    const done = await checkBuild();
+    if (!done && Date.now() - started < 6 * 60_000) setTimeout(tick, 15_000);
+    else if (!done)
+      msg('6分たってもサイトが新しい設定になりません。Vercel の Deployments でビルドが失敗していないか確かめてください。', true);
+  };
+  setTimeout(tick, 20_000);
+}
 
 // ── preview ──
 

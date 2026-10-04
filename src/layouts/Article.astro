@@ -115,6 +115,10 @@ const { title, subtitle, date } = Astro.props;
     margin: 0;
     text-indent: var(--s-indent, 1em);
   }
+  /* space between paragraphs: one line by default (表示設定 → 段落の間) */
+  .body :global(:is(p, .p) + :is(p, .p)) {
+    margin-top: calc(var(--s-para, 1) * var(--s-lh, 1.9) * 1em);
+  }
 
   /* Note number square — in the text */
   .body :global(.note-ref) {

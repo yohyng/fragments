@@ -2,7 +2,9 @@
 import '../styles/tokens.css';
 import '../styles/base.css';
 import Seo, { type Props as SeoProps } from '../components/Seo.astro';
-import { settings, settingsStyle, fontsStylesheet } from '../lib/settings';
+import { settings, settingsStyle, fontsStylesheet, settingsSavedAt } from '../lib/settings';
+// read by the admin (表示設定) to tell whether the site has caught up
+const builtAt = new Date().toISOString();
 
 type Props = SeoProps;
 const { title } = Astro.props;
@@ -16,6 +18,7 @@ const { title } = Astro.props;
     <title>{title}</title>
     <!-- no icon in the design; an empty one stops the /favicon.ico 404 -->
     <link rel="icon" href="data:," />
+    <meta name="fragments-build" content={builtAt} data-settings-saved={settingsSavedAt} />
     <Seo {...Astro.props} />
     <script is:inline>
       document.documentElement.classList.add('js');
