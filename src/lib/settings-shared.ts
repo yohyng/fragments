@@ -56,6 +56,9 @@ export interface Settings {
   ixCatchGap: number;
   ixCatsGap: number;
   ixListGap: number;
+  /** the thin rule under the catch copy: length (0 = none) and distance below the English, px */
+  ixRuleLength: number;
+  ixRuleGap: number;
   ixHeadGapSp: number;
   ixCatchGapSp: number;
   ixCatsGapSp: number;
@@ -144,6 +147,8 @@ export const defaults: Settings = {
   ixCatchGap: 4,
   ixCatsGap: 62,
   ixListGap: 22,
+  ixRuleLength: 40,
+  ixRuleGap: 16,
   ixHeadGapSp: 40,
   ixCatchGapSp: 4,
   ixCatsGapSp: 40,
@@ -346,6 +351,8 @@ export function settingsCss(s: Settings): string {
     ['ixCatchGap', '--s-ix-b'],
     ['ixCatsGap', '--s-ix-c'],
     ['ixListGap', '--s-ix-d'],
+    ['ixRuleLength', '--s-ix-rule'],
+    ['ixRuleGap', '--s-ix-rule-gap'],
     ['ixHeadGapSp', '--s-ix-a-sp'],
     ['ixCatchGapSp', '--s-ix-b-sp'],
     ['ixCatsGapSp', '--s-ix-c-sp'],

@@ -94,6 +94,8 @@ const tabs: Tab[] = [
       { key: 'ixHeadGap', label: '間隔：ヘッダー（サイト名の線）とキャッチコピー', type: 'range', min: 0, max: 160, step: 2, unit: 'px', hint: 'PC・タブレットの値です。' },
       { key: 'ixCatchGap', label: '間隔：キャッチコピーの日本語と英語', type: 'range', min: 0, max: 60, step: 1, unit: 'px' },
       { key: 'ixCatsGap', label: '間隔：キャッチコピーとカテゴリ（all / essay …）', type: 'range', min: 0, max: 200, step: 2, unit: 'px', hint: '初期値のままなら、PC では記事一覧の書き出しを右の記事本文の高さにそろえます（タブレットは 62px）。動かすと PC・タブレットともこの間隔になります。' },
+      { key: 'ixRuleLength', label: 'キャッチコピーの下の区切り線：長さ', type: 'range', min: 0, max: 340, step: 4, unit: 'px', hint: '左揃えの細く薄い線です。0 にすると線なしになります。' },
+      { key: 'ixRuleGap', label: 'キャッチコピーの下の区切り線：英文からの距離', type: 'range', min: 0, max: 120, step: 1, unit: 'px', hint: '線は間隔の中に重ねて引くので、カテゴリの位置は変わりません。' },
       { key: 'ixListGap', label: '間隔：カテゴリと記事一覧', type: 'range', min: 0, max: 80, step: 1, unit: 'px', hint: '初期値のままなら PC 22px・タブレット 12px です。' },
       { key: 'pageSize', label: '一度に表示する記事の数', type: 'range', min: 10, max: 60, step: 5, unit: '件', hint: '「さらに読み込む」で増える数も同じです。', later: true },
       { key: 'welcomeOn', label: 'スマホ（画面幅 759px 以下）', type: 'heading', hint: 'スマホでの文字サイズです。動かすまでは PC の値から決まる大きさで表示します。プレビューを「スマホ」にすると確かめられます。' },
