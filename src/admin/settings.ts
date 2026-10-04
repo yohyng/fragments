@@ -139,7 +139,7 @@ const tabs: Tab[] = [
         hint: '空欄なら、キャッチコピーと「新しい記事を、メールでお届けします。」になります。',
         placeholder: () => `${state.catchJa.replace(/\s*\/$/, '')}。\n新しい記事を、メールでお届けします。`,
       },
-      { key: 'welcomeLeadEn', label: '説明文（英語）', type: 'textarea', rows: 2, hint: '空欄なら英語のキャッチコピーになります。', placeholder: () => state.catchEn },
+      { key: 'welcomeLeadEn', label: '説明文（英語）', type: 'textarea', rows: 2, hint: '空欄なら英語のキャッチコピーになります。改行や空行はつなげて、一続きの文にします。', placeholder: () => state.catchEn },
       { key: 'welcomeReadJa', label: '「記事を読む」の文言（日本語）', type: 'text' },
       { key: 'welcomeReadEn', label: '「記事を読む」の文言（英語）', type: 'text', hint: '空欄なら日本語だけになります。' },
       { key: 'welcomeWidth', label: '説明文と登録欄の幅', type: 'range', min: 280, max: 960, step: 10, unit: 'px', hint: '日本語・英語の説明文とメール登録欄が、この幅にそろいます。狭い画面では画面幅に合わせます。' },
@@ -617,11 +617,11 @@ function refresh(changed?: Key) {
   text('.desc', s.about);
   text('#welcome-title', s.welcomeTitle);
   // the leads as Welcome.astro sets them: paragraphs at blank lines, <br> within
-  const setLead = (sel: string, t: string) => {
+  const setLead = (sel: string, t: string, join = false) => {
     const el = doc.querySelector(sel);
     if (!el) return;
     el.replaceChildren(
-      ...leadParagraphs(t).map((lines) => {
+      ...leadParagraphs(t, join).map((lines) => {
         const para = doc.createElement('span');
         para.className = el.querySelector('.para')?.className || 'para';
         para.append(...lines.flatMap((l, i) => (i ? [doc.createElement('br'), l] : [l])));
@@ -630,7 +630,7 @@ function refresh(changed?: Key) {
     );
   };
   setLead('.welcome .lead', s.welcomeLead || `${s.catchJa.replace(/\s*\/$/, '')}。\n新しい記事を、メールでお届けします。`);
-  setLead('.welcome .lead-en', s.welcomeLeadEn || s.catchEn);
+  setLead('.welcome .lead-en', s.welcomeLeadEn || s.catchEn, true);
   // placeholders that follow other fields
   if (changed === 'catchJa' || changed === 'catchEn' || !changed)
     document.querySelectorAll<HTMLTextAreaElement>('[data-set-fields] textarea').forEach((t) => {

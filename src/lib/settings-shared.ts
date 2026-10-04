@@ -205,12 +205,15 @@ export const defaults: Settings = {
   welcomeWidthSp: 520,
 };
 
-/** A welcome lead's text → paragraphs (split at blank lines) of lines. */
-export const leadParagraphs = (text: string): string[][] =>
-  text
+/** A welcome lead's text → paragraphs (split at blank lines) of lines. With
+ *  `join` (the English lead), every line break is a space: one run of text. */
+export const leadParagraphs = (text: string, join = false): string[][] => {
+  const paras = text
     .split(/\n\s*\n/)
     .map((p) => p.split('\n').map((l) => l.trim()).filter(Boolean))
     .filter((p) => p.length);
+  return join && paras.length ? [[paras.flat().join(' ')]] : paras;
+};
 
 /** Saved overrides on top of the defaults; unknown or mistyped keys are dropped. */
 export function merge(saved: unknown): Settings {

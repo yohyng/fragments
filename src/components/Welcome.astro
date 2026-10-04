@@ -15,7 +15,7 @@ const { mode } = Astro.props;
 // the lead is the Japanese catch copy and the newsletter line unless set
 // (blank lines part paragraphs; their gap is a setting)
 const lead = leadParagraphs(settings.welcomeLead || `${site.catchJa.replace(/\s*\/$/, '')}。\n新しい記事を、メールでお届けします。`);
-const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn);
+const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn, true);
 ---
 
 <div
