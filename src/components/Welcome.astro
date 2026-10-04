@@ -52,6 +52,15 @@ const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn);
 
 <style>
   .welcome {
+    /* sizes and gaps from 表示設定 → はじめの案内 (defaults as designed) */
+    --wl-title: var(--s-wl-title, 32);
+    --wl-lead: var(--s-wl-lead, 15);
+    --wl-lead-en: var(--s-wl-lead-en, 13);
+    --wl-rule: var(--s-wl-rule, 64);
+    --wl-gap-title: var(--s-wl-gap-title, 22);
+    --wl-gap-rule: var(--s-wl-gap-rule, 22);
+    --wl-gap-en: var(--s-wl-gap-en, 6);
+    --wl-para: var(--s-wl-para, 1);
     display: flex;
     background: var(--color-bg);
     color: var(--color-text);
@@ -97,19 +106,19 @@ const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn);
     margin: clamp(56px, 12vh, 128px) 0 0;
     font-family: var(--font-heading);
     font-weight: 400;
-    font-size: calc(var(--s-wl-title, 32) * 1px);
+    font-size: calc(var(--wl-title) * 1px);
     line-height: 1.2;
     letter-spacing: normal;
   }
   /* between the title and the lead (表示設定 → はじめの案内: length, 0 = none, and weight) */
   .rule {
-    width: min(100%, calc(var(--s-wl-rule, 64) * 1px));
+    width: min(100%, calc(var(--wl-rule) * 1px));
     /* gaps above and below are settings; no line (length 0), no gaps. The
        lead's own 16px top margin counts in the gap below. */
-    margin: calc(min(1, var(--s-wl-rule, 64)) * var(--s-wl-gap-title, 22) * 1px) 0
-      calc(min(1, var(--s-wl-rule, 64)) * (var(--s-wl-gap-rule, 22) - 16) * 1px);
+    margin: calc(min(1, var(--wl-rule)) * var(--wl-gap-title) * 1px) 0
+      calc(min(1, var(--wl-rule)) * (var(--wl-gap-rule) - 16) * 1px);
     border: 0;
-    border-top: clamp(0px, var(--s-wl-rule, 64) * 100px, var(--s-wl-rule-w, 1) * 1px) solid var(--color-neutral-700);
+    border-top: clamp(0px, var(--wl-rule) * 100px, var(--s-wl-rule-w, 1) * 1px) solid var(--color-neutral-700);
   }
   /* justified, the last line flush left; centred as a block */
   .lead {
@@ -118,7 +127,7 @@ const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn);
     text-align-last: left;
     margin: 16px 0 0;
     font-family: var(--font-mincho);
-    font-size: calc(var(--s-wl-lead, 15) * 1px);
+    font-size: calc(var(--wl-lead) * 1px);
     line-height: 1.9;
     color: var(--color-neutral-800);
   }
@@ -128,10 +137,10 @@ const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn);
   }
   /* a blank line in a lead: one line high by default (表示設定 → 説明文の中の空行) */
   .lead .para + .para {
-    margin-top: calc(var(--s-wl-para, 1) * 1.9em);
+    margin-top: calc(var(--wl-para) * 1.9em);
   }
   .lead-en .para + .para {
-    margin-top: calc(var(--s-wl-para, 1) * 1.75em);
+    margin-top: calc(var(--wl-para) * 1.75em);
   }
   /* justified like the Japanese, words hyphenated so the spaces stay even */
   .lead-en {
@@ -140,10 +149,10 @@ const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn);
     text-align-last: left;
     hyphens: auto;
     -webkit-hyphens: auto;
-    margin: calc(var(--s-wl-gap-en, 6) * 1px) 0 0;
+    margin: calc(var(--wl-gap-en) * 1px) 0 0;
     font-family: var(--font-body);
     font-style: italic;
-    font-size: calc(var(--s-wl-lead-en, 13) * 1px);
+    font-size: calc(var(--wl-lead-en) * 1px);
     line-height: 1.75;
     color: var(--color-neutral-700);
   }
@@ -165,6 +174,24 @@ const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn);
     color: var(--color-neutral-700);
     text-decoration: none;
     cursor: pointer;
+  }
+  /* phones: their own values (表示設定 → はじめの案内 → スマホ), else the
+     PC ones; the logo is the set size at 390px (half the PC size unless set) */
+  @media (max-width: 759px) {
+    .welcome {
+      --wl-title: var(--s-wl-title-sp, var(--s-wl-title, 32));
+      --wl-lead: var(--s-wl-lead-sp, var(--s-wl-lead, 15));
+      --wl-lead-en: var(--s-wl-lead-en-sp, var(--s-wl-lead-en, 13));
+      --wl-rule: var(--s-wl-rule-sp, var(--s-wl-rule, 64));
+      --wl-gap-title: var(--s-wl-gap-title-sp, var(--s-wl-gap-title, 22));
+      --wl-gap-rule: var(--s-wl-gap-rule-sp, var(--s-wl-gap-rule, 22));
+      --wl-gap-en: var(--s-wl-gap-en-sp, var(--s-wl-gap-en, 6));
+      --wl-para: var(--s-wl-para-sp, var(--s-wl-para, 1));
+      --wl-logo-sp: var(--s-wl-logo-sp, var(--s-wl-logo, 128) / 2);
+    }
+    .logo {
+      font-size: clamp(calc(var(--wl-logo-sp) * 1px), calc(var(--wl-logo-sp) * 11vw / 64), calc(var(--wl-logo-sp) * 2px));
+    }
   }
   .skip :global(.skip-en) {
     margin-left: 0.6em;

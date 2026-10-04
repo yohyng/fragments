@@ -76,6 +76,16 @@ export interface Settings {
   /** the link into the site (and the button once subscribed) */
   welcomeReadJa: string;
   welcomeReadEn: string;
+  /** the same on phones (≤759px) */
+  welcomeLogoSizeSp: number;
+  welcomeTitleSizeSp: number;
+  welcomeLeadSizeSp: number;
+  welcomeLeadEnSizeSp: number;
+  welcomeRuleLengthSp: number;
+  welcomeTitleRuleGapSp: number;
+  welcomeRuleLeadGapSp: number;
+  welcomeLeadEnGapSp: number;
+  welcomeLeadParaGapSp: number;
 }
 
 export const defaults: Settings = {
@@ -137,6 +147,15 @@ export const defaults: Settings = {
   welcomeLeadParaGap: 1,
   welcomeReadJa: '記事を読む',
   welcomeReadEn: 'Read the articles',
+  welcomeLogoSizeSp: 64,
+  welcomeTitleSizeSp: 32,
+  welcomeLeadSizeSp: 15,
+  welcomeLeadEnSizeSp: 13,
+  welcomeRuleLengthSp: 64,
+  welcomeTitleRuleGapSp: 22,
+  welcomeRuleLeadGapSp: 22,
+  welcomeLeadEnGapSp: 6,
+  welcomeLeadParaGapSp: 1,
 };
 
 /** A welcome lead's text → paragraphs (split at blank lines) of lines. */
@@ -298,6 +317,15 @@ export function settingsCss(s: Settings): string {
     ['welcomeLeadEnSize', '--s-wl-lead-en'],
     ['welcomeRuleLength', '--s-wl-rule'],
     ['welcomeRuleWeight', '--s-wl-rule-w'],
+    ['welcomeLogoSizeSp', '--s-wl-logo-sp'],
+    ['welcomeTitleSizeSp', '--s-wl-title-sp'],
+    ['welcomeLeadSizeSp', '--s-wl-lead-sp'],
+    ['welcomeLeadEnSizeSp', '--s-wl-lead-en-sp'],
+    ['welcomeRuleLengthSp', '--s-wl-rule-sp'],
+    ['welcomeTitleRuleGapSp', '--s-wl-gap-title-sp'],
+    ['welcomeRuleLeadGapSp', '--s-wl-gap-rule-sp'],
+    ['welcomeLeadEnGapSp', '--s-wl-gap-en-sp'],
+    ['welcomeLeadParaGapSp', '--s-wl-para-sp'],
     ['welcomeTitleRuleGap', '--s-wl-gap-title'],
     ['welcomeRuleLeadGap', '--s-wl-gap-rule'],
     ['welcomeLeadEnGap', '--s-wl-gap-en'],

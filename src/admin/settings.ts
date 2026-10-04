@@ -22,7 +22,7 @@ type Key = keyof Settings;
 interface Field {
   key: Key;
   label: string;
-  type: 'text' | 'textarea' | 'color' | 'color-opt' | 'range' | 'check' | 'font-ja' | 'font-latin' | 'contact';
+  type: 'text' | 'textarea' | 'color' | 'color-opt' | 'range' | 'check' | 'font-ja' | 'font-latin' | 'contact' | 'heading';
   min?: number;
   max?: number;
   step?: number;
@@ -134,6 +134,16 @@ const tabs: Tab[] = [
       { key: 'welcomeRuleLeadGap', label: '間隔：区切り線と説明文（日本語）', type: 'range', min: 0, max: 80, step: 2, unit: 'px', hint: '区切り線がないとき（長さ 0）は、タイトルと説明文のあいだが 16px になります。' },
       { key: 'welcomeLeadEnGap', label: '間隔：説明文の日本語と英語', type: 'range', min: 0, max: 80, step: 2, unit: 'px' },
       { key: 'welcomeLeadParaGap', label: '説明文の中の空行の高さ', type: 'range', min: 0, max: 2, step: 0.25, unit: '行', hint: '説明文に空行（何も書かない行）を入れたところの高さです。日本語・英語とも。' },
+      { key: 'welcomeOn', label: 'スマホ（画面幅 759px 以下）', type: 'heading', hint: 'スマホでの大きさと間隔です。動かすまでは PC の値に合わせて表示します（ロゴは PC の半分）。プレビューを「スマホ」にすると確かめられます。' },
+      { key: 'welcomeLogoSizeSp', label: 'スマホ：サイト名（大きなロゴ）の文字サイズ', type: 'range', min: 32, max: 120, step: 2, unit: 'px', hint: '画面幅 390px での大きさです。それより広いスマホでは少し大きくなります。' },
+      { key: 'welcomeTitleSizeSp', label: 'スマホ：タイトルの文字サイズ', type: 'range', min: 16, max: 48, step: 1, unit: 'px' },
+      { key: 'welcomeLeadSizeSp', label: 'スマホ：説明文（日本語）の文字サイズ', type: 'range', min: 11, max: 20, step: 0.5, unit: 'px' },
+      { key: 'welcomeLeadEnSizeSp', label: 'スマホ：説明文（英語）の文字サイズ', type: 'range', min: 10, max: 18, step: 0.5, unit: 'px' },
+      { key: 'welcomeRuleLengthSp', label: 'スマホ：区切り線の長さ', type: 'range', min: 0, max: 360, step: 4, unit: 'px', hint: '0 にすると線なしになります。' },
+      { key: 'welcomeTitleRuleGapSp', label: 'スマホ：間隔：タイトルと区切り線', type: 'range', min: -240, max: 80, step: 2, unit: 'px' },
+      { key: 'welcomeRuleLeadGapSp', label: 'スマホ：間隔：区切り線と説明文（日本語）', type: 'range', min: 0, max: 80, step: 2, unit: 'px' },
+      { key: 'welcomeLeadEnGapSp', label: 'スマホ：間隔：説明文の日本語と英語', type: 'range', min: 0, max: 80, step: 2, unit: 'px' },
+      { key: 'welcomeLeadParaGapSp', label: 'スマホ：説明文の中の空行の高さ', type: 'range', min: 0, max: 2, step: 0.25, unit: '行' },
     ],
   },
 ];
@@ -273,6 +283,12 @@ function renderFields() {
 function fieldRow(f: Field): HTMLElement {
   const row = document.createElement('div');
   row.className = 'set-row';
+  if (f.type === 'heading') {
+    row.classList.add('set-heading');
+    row.append(Object.assign(document.createElement('h3'), { textContent: f.label }));
+    if (f.hint) row.append(Object.assign(document.createElement('p'), { className: 'hint', textContent: f.hint }));
+    return row;
+  }
   const set = (v: unknown) => {
     (state as any)[f.key] = v;
     dirty = true;
@@ -290,7 +306,11 @@ function fieldRow(f: Field): HTMLElement {
   });
   label.append(reset);
   if (f.type !== 'check') row.append(label);
-  const value = state[f.key];
+  // a phone value left as it is follows the PC one: show what is in effect
+  let value = state[f.key];
+  const pcKey = f.key.endsWith('Sp') ? (f.key.slice(0, -2) as Key) : null;
+  if (pcKey && pcKey in defaults && value === defaults[f.key])
+    value = (pcKey === 'welcomeLogoSize' ? (state[pcKey] as number) / 2 : state[pcKey]) as never;
   const ph = typeof f.placeholder === 'function' ? f.placeholder() : (f.placeholder ?? '');
 
   if (f.type === 'text' || f.type === 'textarea' || f.type === 'contact') {
