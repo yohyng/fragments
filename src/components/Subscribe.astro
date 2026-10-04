@@ -17,6 +17,7 @@
     <button type="submit">Subscribe</button>
   </form>
   <p class="note" role="status" data-note hidden></p>
+  <p class="policy" data-policy>登録したメールアドレスは、<a href="/privacy/">プライバシーポリシー</a>に沿って扱います。</p>
   <div class="done" hidden>
     <div class="band"><span class="check" aria-hidden="true">✓</span><span>Subscribed</span></div>
     <div class="msg" role="status"></div>
@@ -106,6 +107,19 @@
   .note {
     margin: 4px 0 0;
   }
+  .policy {
+    margin: 6px 0 0;
+    font-size: 10.5px;
+    line-height: 1.6;
+    color: var(--color-neutral-700);
+  }
+  .policy a {
+    color: inherit;
+    text-decoration-color: var(--color-divider);
+  }
+  .policy a:hover {
+    color: var(--color-accent-700);
+  }
   .note.is-error {
     color: var(--color-accent-700);
   }
@@ -151,6 +165,7 @@
       done.querySelector('.msg')!.textContent = text;
       form.hidden = true;
       note.hidden = true;
+      box.querySelector<HTMLElement>('[data-policy]')!.hidden = true;
       done.hidden = false;
     };
     const showNote = (text: string, error = false) => {

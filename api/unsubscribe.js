@@ -1,17 +1,17 @@
-// GET ?token= (the link in each mail) → the address stops receiving mail;
-// then on to /subscribe/ with the result. POST does the same without the
-// redirect, for mail apps' one-click unsubscribe (List-Unsubscribe-Post).
+// GET ?token= (the link in each mail) → the address is deleted from the list
+// (as the privacy policy says); then on to /subscribe/ with the result. A
+// second click finds nothing and reads the same. POST does the same without
+// the redirect, for mail apps' one-click unsubscribe (List-Unsubscribe-Post).
 
-import { findByToken, siteUrl, update } from '../src/lib/newsletter.mjs';
+import { findByToken, remove, siteUrl } from '../src/lib/newsletter.mjs';
+
+const TOKEN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export default async function handler(req, res) {
-  let status = 'invalid';
+  let status = TOKEN.test(String(req.query.token ?? '')) ? 'unsubscribed' : 'invalid';
   try {
-    const row = await findByToken(req.query.token);
-    if (row) {
-      if (row.status !== 'unsubscribed') await update(row.id, { status: 'unsubscribed', unsubscribed_at: new Date().toISOString() });
-      status = 'unsubscribed';
-    }
+    const row = status === 'unsubscribed' ? await findByToken(req.query.token) : null;
+    if (row) await remove(row.id);
   } catch (e) {
     console.error('[unsubscribe]', e);
     status = 'error';

@@ -1,32 +1,30 @@
 ---
-// p3: catch and description where the body goes, contact where the notes go.
-// The bottom rule is always shown.
-import Page from '../layouts/Page.astro';
+// A page of text beside the index (privacy policy, terms of use): the about
+// page's layout — heading, the light rule level with the index's, the text
+// where the body goes and an aside where the notes go.
+import Page from './Page.astro';
 import { site } from '../lib/site';
+
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
 ---
 
-<Page title="about — fragments" description={`${site.name}について。${site.catchJa} ${site.catchEn}`}>
+
+<Page title={`${title} — ${site.name}`} description={description}>
   <main class="column" data-scroll data-noscrollbar>
     <div class="rule"><a class="site" href="/">fragments</a></div>
     <div class="grid">
       <header class="head">
-        <h1>about</h1>
+        <h1>{title}</h1>
       </header>
-      <div class="text">
-        <p class="catch-ja">{site.catchJa}</p>
-        <p class="catch-en">{site.catchEn}</p>
-        <p class="desc">{site.about}</p>
+      <div class="text doc">
+        <slot />
       </div>
       <div class="side">
-        <div class="contact">
-          <span class="label">Contact</span>
-          {site.contact.map((c) => <a href={c.href}>{c.label}</a>)}
-        </div>
-        <div class="contact">
-          <span class="label">Policy</span>
-          <a href="/privacy/">プライバシーポリシー</a>
-          <a href="/terms/">利用規約</a>
-        </div>
+        <slot name="side" />
       </div>
     </div>
     <div class="end-space"></div>
@@ -36,7 +34,7 @@ import { site } from '../lib/site';
 </Page>
 
 <script>
-  // Beside the index (≥1160px): the rule under 「about」 level with the
+  // Beside the index (≥1160px): the rule under the heading level with the
   // light rule under the index's catch copy.
   function alignRule() {
     const col = document.querySelector<HTMLElement>('main.column');
@@ -107,28 +105,38 @@ import { site } from '../lib/site';
     font-size: clamp(15px, 0.8rem + 0.2vw, 16px);
     line-height: 1.9;
   }
-  .catch-ja {
-    margin: 0;
+  .text.doc {
+    gap: 12px;
+    font-size: clamp(14px, 0.78rem + 0.15vw, 15px);
+  }
+  .doc :global(h2) {
+    margin: 1.4em 0 0;
     font-family: var(--font-mincho-heading);
-    font-size: 18px;
+    font-weight: 500;
+    font-size: 16px;
     line-height: 1.7;
   }
-  .catch-en {
-    margin: 0;
-    font-family: var(--font-body);
-    font-style: italic;
-    font-size: 16px;
-    line-height: 1.6;
-    color: var(--color-neutral-800);
+  .doc :global(h2:first-child) {
+    margin-top: 0;
   }
-  .desc {
+  .doc :global(p),
+  .doc :global(ul) {
     margin: 0;
-    white-space: pre-line; /* line breaks typed in the settings */
     font-family: var(--font-mincho);
     text-align: justify;
     color: var(--color-neutral-800);
-    padding-top: 20px;
-    border-top: 1px solid var(--color-divider);
+  }
+  .doc :global(ul) {
+    padding-left: 1.4em;
+  }
+  .doc :global(.updated) {
+    margin-top: 1.6em;
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--color-neutral-700);
+  }
+  .side :global(a) {
+    display: block;
   }
   .side {
     display: flex;

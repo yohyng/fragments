@@ -53,6 +53,10 @@ export async function insert(row) {
   return (await rest('', { method: 'POST', body: row }))[0];
 }
 
+export async function remove(id) {
+  await rest(`?id=eq.${id}`, { method: 'DELETE' });
+}
+
 export async function update(id, patch) {
   return (await rest(`?id=eq.${id}`, { method: 'PATCH', body: patch }))[0];
 }
