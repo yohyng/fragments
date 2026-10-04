@@ -43,7 +43,7 @@ import { site } from '../lib/site';
     top: 0;
     z-index: 1;
     background: var(--color-bg);
-    height: 36px;
+    height: calc(var(--s-site-name, 30) * 1.2px); /* the index site name's line (36px by default) */
     padding-bottom: 6px;
     box-sizing: content-box;
     border-bottom: 1px solid var(--color-neutral-700);
@@ -167,7 +167,7 @@ import { site } from '../lib/site';
     .site {
       display: block;
       font-family: var(--font-heading);
-      font-size: 28px;
+      font-size: calc(var(--s-site-name, 30) * 28px / 30); /* as on the other pages */
       line-height: 1.2;
       text-decoration: none;
     }
@@ -197,7 +197,7 @@ import { site } from '../lib/site';
       display: block;
     }
     .site {
-      font-size: 22px;
+      font-size: calc(var(--s-site-name, 30) * 26px / 30); /* as on the top page */
     }
     .head {
       padding: 40px 0 36px;

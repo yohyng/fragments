@@ -34,7 +34,21 @@ interface Article {
   updated_at?: string;
 }
 
-const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// The default auth lock is shared by every tab (navigator.locks); a tab or
+// refresh stuck holding it freezes the others (a blank admin). One editor at
+// a time needs no more than a lock within this page.
+let authQueue: Promise<unknown> = Promise.resolve();
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    lock: (_name, _timeout, fn) => {
+      // wait for the previous holder, but not for one that never finishes
+      const prev = Promise.race([authQueue, new Promise((r) => setTimeout(r, 5000))]);
+      const run = prev.then(fn, fn);
+      authQueue = run.catch(() => {});
+      return run;
+    },
+  },
+});
 const IMAGE_BUCKET = 'article-images';
 const STATUS_LABEL: Record<string, string> = { draft: '下書き', published: '公開', scheduled: '予約', private: '非公開' };
 
@@ -61,16 +75,52 @@ const msg = (el: HTMLElement, text: string, error = false) => {
 let session: Session | null = null;
 
 async function start() {
-  const { data } = await sb.auth.getSession();
-  session = data.session;
+  // A stale login can leave the session check hanging (a refresh that never
+  // answers): after 6s, carry on signed out instead of a blank screen.
+  const timedOut = Symbol();
+  const res = await Promise.race([
+    sb.auth.getSession().catch(() => null),
+    new Promise<typeof timedOut>((r) => setTimeout(() => r(timedOut), 6000)),
+  ]);
+  if (res === timedOut) {
+    // the client is stuck on the old login: forget it and start afresh, once
+    let retried = false;
+    try {
+      retried = sessionStorage.getItem('fragments-admin-reset') === '1';
+      if (!retried) {
+        sessionStorage.setItem('fragments-admin-reset', '1');
+        for (const k of Object.keys(localStorage)) if (k.startsWith('sb-')) localStorage.removeItem(k);
+        return location.reload();
+      }
+    } catch {}
+  }
+  let wasReset = false;
+  try {
+    wasReset = sessionStorage.getItem('fragments-admin-reset') === '1';
+    sessionStorage.removeItem('fragments-admin-reset');
+  } catch {}
+  session = res && res !== timedOut ? res.data.session : null;
+  // Supabase must not be called from inside this callback (its auth lock is
+  // held there): handle the change just after it.
   sb.auth.onAuthStateChange((_e, s) => {
     session = s;
-    signedIn();
+    setTimeout(signedIn);
   });
   signedIn();
+  if (!session && (wasReset || res === timedOut || res === null))
+    msg($('[data-login-msg]'), 'ログインの状態を確かめられなかったので、ログインし直してください。', true);
 }
 
 function signedIn() {
+  try {
+    showSignedIn();
+  } catch (e) {
+    // never leave every view hidden
+    show('login');
+    msg($('[data-login-msg]'), '画面を開けませんでした: ' + (e as Error).message, true);
+  }
+}
+function showSignedIn() {
   $('[data-signout]').hidden = !session;
   $('[data-who]').textContent = session?.user.email ?? '';
   if (!session) return show('login');
