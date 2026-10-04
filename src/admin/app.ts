@@ -133,7 +133,9 @@ function showSignedIn() {
     const out = view === 'settings' ? $('[data-set-msg]') : $('[data-save-msg]');
     return msg(out, 'ログインし直しました。もう一度「保存」を押してください。');
   }
-  if ($('[data-view="login"]').hidden === false || location.hash === '') openFromHash();
+  // first load (no screen shown yet, e.g. a reload on #/settings) or just signed in
+  const none = views.every((v) => $(`[data-view="${v}"]`).hidden);
+  if (none || $('[data-view="login"]').hidden === false || location.hash === '') openFromHash();
 }
 
 // The login can run out (a tab left open for long, a refresh that failed);

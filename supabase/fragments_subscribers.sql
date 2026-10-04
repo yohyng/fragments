@@ -27,3 +27,20 @@ create policy "fragments_subscribers_auth_read" on public.fragments_subscribers
 drop policy if exists "fragments_subscribers_auth_delete" on public.fragments_subscribers;
 create policy "fragments_subscribers_auth_delete" on public.fragments_subscribers
   for delete to authenticated using (true);
+
+-- 送ったニュースレターの記録(管理画面 → 購読者 → 送信履歴)。書き込みはサーバーのみ。
+create table if not exists public.fragments_mailings (
+  id bigint generated always as identity primary key,
+  subject text not null,
+  intro text not null default '',
+  outro text not null default '',
+  articles jsonb not null default '[]'::jsonb,
+  recipients int not null default 0,
+  sent_at timestamptz not null default now()
+);
+
+alter table public.fragments_mailings enable row level security;
+
+drop policy if exists "fragments_mailings_auth_read" on public.fragments_mailings;
+create policy "fragments_mailings_auth_read" on public.fragments_mailings
+  for select to authenticated using (true);

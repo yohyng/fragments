@@ -3,6 +3,7 @@
 // api/subscribe; here they can be seen, copied and removed.
 import type { SupabaseClient } from '@supabase/supabase-js';
 import setupSql from '../../supabase/fragments_subscribers.sql?raw';
+import { renderNewsletter } from '../lib/newsletter-mail.mjs';
 
 type Row = { id: string; email: string; status: 'pending' | 'active' | 'unsubscribed'; created_at: string; confirmed_at: string | null };
 const LABEL: Record<Row['status'], string> = { active: '登録中', pending: '確認待ち', unsubscribed: '配信停止' };
@@ -14,6 +15,7 @@ let rows: Row[] = [];
 
 export function initSubscribers(client: SupabaseClient) {
   sb = client;
+  initMail();
   $('[data-sub-sql]').textContent = setupSql.trim();
   $('[data-sub-sql-copy]').addEventListener('click', async () => {
     await navigator.clipboard.writeText(setupSql.trim());
@@ -36,6 +38,7 @@ export function initSubscribers(client: SupabaseClient) {
 }
 
 export async function openSubscribers() {
+  openMail();
   const body = $('[data-sub-rows]');
   body.innerHTML = '<tr><td colspan="5" class="date">読み込み中…</td></tr>';
   $('[data-sub-msg]').textContent = '';
@@ -53,6 +56,8 @@ export async function openSubscribers() {
     return;
   }
   rows = data as Row[];
+  activeCount = rows.filter((r) => r.status === 'active').length;
+  preview();
   const n = (s: Row['status']) => rows.filter((r) => r.status === s).length;
   $('[data-sub-count]').textContent = `登録中 ${n('active')}　確認待ち ${n('pending')}　配信停止 ${n('unsubscribed')}`;
   body.replaceChildren(
@@ -69,4 +74,122 @@ export async function openSubscribers() {
         })
       : [Object.assign(document.createElement('tr'), { innerHTML: '<td colspan="5" class="date">まだ登録はありません。</td>' })]),
   );
+}
+
+// ── メールを送る ──────────────────────────────────────────────────────────
+type Art = { id: number; title: string; subtitle: string; date: string; url: string; excerpt: string };
+const SITE = (import.meta.env.SITE || 'https://fragments-of.space').replace(/\/$/, '');
+const DRAFT = 'fragments-mail-draft';
+let arts: Art[] = [];
+let activeCount = 0;
+const f = (k: string) => $<HTMLInputElement | HTMLTextAreaElement>(`[data-mail-f="${k}"]`);
+const today = () => {
+  const d = new Date();
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+};
+const ymd = (s: string) => {
+  const m = /^(\d{4})[./-](\d{1,2})[./-](\d{1,2})/.exec(s || '');
+  return m ? `${m[1]}.${m[2].padStart(2, '0')}.${m[3].padStart(2, '0')}` : s;
+};
+// the opening of the body, as plain text (without the notes and cards)
+function excerpt(html: string, n = 110) {
+  const doc = new DOMParser().parseFromString(html || '', 'text/html');
+  doc.querySelectorAll('[data-note], sup, aside, figure, img, .book-link-card, table').forEach((e) => e.remove());
+  const t = (doc.body.textContent ?? '').replace(/\s+/g, ' ').trim();
+  return t.length > n ? t.slice(0, n).trimEnd() + '…' : t;
+}
+const chosen = () => arts.filter((a) => $<HTMLInputElement>(`[data-mail-art="${a.id}"]`)?.checked);
+const payload = () => ({
+  subject: f('subject').value.trim(),
+  intro: f('intro').value,
+  outro: f('outro').value,
+  articles: chosen().map(({ title, subtitle, date, url, excerpt }) => ({ title, subtitle, date, url, excerpt })),
+});
+
+function preview() {
+  const p = payload();
+  $<HTMLIFrameElement>('[data-mail-preview]').srcdoc = renderNewsletter({ ...p, subject: p.subject || '（件名）', unsubscribe: `${SITE}/subscribe/`, site: SITE }).html;
+  try {
+    localStorage.setItem(DRAFT, JSON.stringify({ subject: f('subject').value, intro: f('intro').value, outro: f('outro').value }));
+  } catch {}
+  $('[data-mail-send]').textContent = activeCount ? `配信する（${activeCount}人）` : '配信する';
+}
+
+function initMail() {
+  try {
+    const d = JSON.parse(localStorage.getItem(DRAFT) || '{}');
+    for (const k of ['subject', 'intro', 'outro']) if (typeof d[k] === 'string') f(k).value = d[k];
+  } catch {}
+  $('[data-mail]').addEventListener('input', preview);
+  $('[data-mail-test]').addEventListener('click', () => send(true));
+  $('[data-mail-send]').addEventListener('click', () => send(false));
+}
+
+async function openMail() {
+  if (!f('subject').value) f('subject').value = `fragments folio — ${today()}`;
+  const [a, h] = await Promise.all([
+    sb.from('articles').select('id,date,title,subtitle,content,status').eq('status', 'published').order('date', { ascending: false }).order('id', { ascending: false }).limit(15),
+    sb.from('fragments_mailings').select('subject,recipients,sent_at').order('sent_at', { ascending: false }).limit(10),
+  ]);
+  arts = ((a.data ?? []) as any[]).map((r) => ({ id: r.id, title: r.title ?? '', subtitle: r.subtitle ?? '', date: ymd(r.date ?? ''), url: `${SITE}/posts/${r.id}/`, excerpt: excerpt(r.content) }));
+  const last = (h.data?.[0] as any)?.sent_at as string | undefined;
+  const since = last ? ymd(new Date(last).toLocaleDateString('sv-SE')) : ymd(new Date(Date.now() - 7 * 864e5).toLocaleDateString('sv-SE'));
+  $('[data-mail-arts]').replaceChildren(
+    ...arts.map((x) => {
+      const l = Object.assign(document.createElement('label'), { className: 'mail-art' });
+      const c = Object.assign(document.createElement('input'), { type: 'checkbox', checked: x.date >= since });
+      c.dataset.mailArt = String(x.id);
+      l.append(c, Object.assign(document.createElement('span'), { className: 'date', textContent: x.date }), Object.assign(document.createElement('span'), { textContent: x.title }));
+      return l;
+    }),
+  );
+  const hist = (h.data ?? []) as { subject: string; recipients: number; sent_at: string }[];
+  $('[data-mail-history]').replaceChildren(
+    ...(hist.length
+      ? hist.map((m) => {
+          const li = document.createElement('li');
+          li.append(Object.assign(document.createElement('span'), { className: 'date', textContent: new Date(m.sent_at).toLocaleString('ja-JP', { dateStyle: 'short', timeStyle: 'short' }) }), `${m.subject}（${m.recipients}人）`);
+          return li;
+        })
+      : [Object.assign(document.createElement('li'), { className: 'hint', textContent: h.error ? '送信履歴のテーブルがまだありません（上の SQL を実行してください）' : 'まだ送っていません。' })]),
+  );
+  preview();
+}
+
+let sending = false;
+async function send(test: boolean) {
+  if (sending) return;
+  const out = $('[data-mail-msg]');
+  const p = payload();
+  if (!p.subject) return void ((out.textContent = '件名を入れてください。'), out.classList.add('error'));
+  if (!p.intro.trim() && !p.articles.length) return void ((out.textContent = 'はじめの文か、添える記事を入れてください。'), out.classList.add('error'));
+  if (!test && !confirm(`登録中の ${activeCount} 人に「${p.subject}」を送ります。よろしいですか？（取り消せません）`)) return;
+  sending = true;
+  out.classList.remove('error');
+  out.textContent = test ? 'テスト送信しています…' : '配信しています…';
+  try {
+    const { data } = await sb.auth.getSession();
+    const res = await fetch('/api/newsletter', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', Authorization: `Bearer ${data.session?.access_token ?? ''}` },
+      body: JSON.stringify({ ...p, test }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(body.error || (res.status === 404 ? '送信の窓口（/api/newsletter）が見つかりません。Vercel 以外で開いていませんか' : `送れませんでした（${res.status}）`));
+    out.textContent = test ? `${body.to} にテスト送信しました。届き方を確かめてください。` : `${body.sent} 人に配信しました。`;
+    if (!test) {
+      try {
+        localStorage.removeItem(DRAFT);
+      } catch {}
+      f('subject').value = '';
+      f('intro').value = '';
+      f('outro').value = '';
+      openMail();
+    }
+  } catch (e) {
+    out.textContent = (e as Error).message;
+    out.classList.add('error');
+  } finally {
+    sending = false;
+  }
 }

@@ -8,7 +8,7 @@
 //   NEWSLETTER_FROM            sender, e.g. "fragments <folio@fragments-of.space>"
 //   SITE_URL                   optional; https://fragments-of.space by default
 
-import { SUPABASE_URL } from './supabase-config.mjs';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabase-config.mjs';
 
 const TABLE = 'fragments_subscribers';
 export const siteUrl = () => (process.env.SITE_URL || 'https://fragments-of.space').replace(/\/$/, '');
@@ -20,8 +20,8 @@ function key() {
   return k;
 }
 
-async function rest(path, { method = 'GET', body } = {}) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}${path}`, {
+async function rest(path, { method = 'GET', body, table = TABLE } = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${path}`, {
     method,
     headers: {
       apikey: key(),
@@ -55,6 +55,35 @@ export async function insert(row) {
 
 export async function update(id, patch) {
   return (await rest(`?id=eq.${id}`, { method: 'PATCH', body: patch }))[0];
+}
+
+/** Everyone who receives the newsletter. */
+export async function listActive() {
+  return rest('?status=eq.active&select=email,token&order=created_at.asc');
+}
+
+/** A sent newsletter, for the admin's history (fragments_mailings). */
+export async function recordMailing(row) {
+  return (await rest('', { method: 'POST', body: row, table: 'fragments_mailings' }))[0];
+}
+
+/** The signed-in admin user behind a Supabase access token, or null. */
+export async function authUser(token) {
+  if (!token) return null;
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` } });
+  return res.ok ? res.json() : null;
+}
+
+/** Mails through Resend, up to 100 a call; each { to, subject, html, text, headers? }. */
+export async function sendBatch(mails) {
+  for (let i = 0; i < mails.length; i += 100) {
+    const res = await fetch('https://api.resend.com/emails/batch', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'content-type': 'application/json' },
+      body: JSON.stringify(mails.slice(i, i + 100).map((m) => ({ from: process.env.NEWSLETTER_FROM, ...m, to: [m.to] }))),
+    });
+    if (!res.ok) throw new Error(`resend ${res.status}: ${(await res.text()).slice(0, 200)} (sent ${i} of ${mails.length})`);
+  }
 }
 
 export const confirmUrl = (token) => `${siteUrl()}/api/confirm?token=${token}`;

@@ -138,6 +138,34 @@ import '../../styles/tokens.css';
         <pre data-sub-sql></pre>
         <button type="button" class="link" data-sub-sql-copy>SQL をコピー</button>
       </div>
+      <div class="box mail" data-mail>
+        <h2>メールを送る</h2>
+        <p class="hint">登録中の全員に「fragments folio」を送ります。まず「自分にテスト送信」で届き方を確かめてください。下書きはこのブラウザに残ります。</p>
+        <div class="mail-grid">
+          <div class="mail-form">
+            <label>件名<input type="text" data-mail-f="subject" /></label>
+            <label>はじめの文<textarea data-mail-f="intro" rows="5" placeholder="今週は…（空行で段落を分けます）"></textarea></label>
+            <div class="mail-arts">
+              <span class="mail-label">添える記事 <span class="hint">（前回の配信より後の記事に、はじめから印がついています）</span></span>
+              <div data-mail-arts></div>
+            </div>
+            <label>結びの文<textarea data-mail-f="outro" rows="3" placeholder="（なくても構いません）"></textarea></label>
+            <div class="mail-actions">
+              <button type="button" class="ghost" data-mail-test>自分にテスト送信</button>
+              <button type="button" class="primary" data-mail-send>配信する</button>
+            </div>
+            <p class="msg" data-mail-msg></p>
+          </div>
+          <div class="mail-preview">
+            <span class="mail-label">プレビュー</span>
+            <iframe title="メールのプレビュー" data-mail-preview></iframe>
+          </div>
+        </div>
+        <div class="mail-history">
+          <span class="mail-label">送信履歴</span>
+          <ul data-mail-history></ul>
+        </div>
+      </div>
       <table class="list">
         <thead><tr><th>メールアドレス</th><th>状態</th><th>登録日</th><th>確認日</th><th></th></tr></thead>
         <tbody data-sub-rows></tbody>
@@ -379,6 +407,22 @@ import '../../styles/tokens.css';
   .set-status { margin: -8px 0 0; font-family: var(--font-mincho); font-size: 12px; color: var(--color-neutral-700); }
   .set-status.is-behind { color: #b3261e; }
   .set-status.is-done { color: var(--color-accent-700); }
+  .mail { max-width: 1200px; margin-bottom: 28px; }
+  .mail h2 { margin: 0; font-family: var(--font-mincho-heading); font-weight: 500; font-size: 16px; }
+  .mail-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+  .mail-form { display: flex; flex-direction: column; gap: 14px; }
+  .mail-form textarea { resize: vertical; font-family: var(--font-mincho); font-size: 13px; line-height: 1.7; }
+  .mail-label { font-family: var(--font-mincho); font-size: 12px; color: var(--color-neutral-700); }
+  .mail-arts [data-mail-arts] { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; max-height: 260px; overflow: auto; }
+  .mail-art { flex-direction: row; align-items: baseline; gap: 8px; font-size: 13px; color: var(--color-text); cursor: pointer; }
+  .mail-art input { flex: none; }
+  .mail-art .date { font-family: var(--font-body); font-size: 11px; color: var(--color-neutral-700); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .mail-actions { display: flex; gap: 10px; }
+  .mail-preview { display: flex; flex-direction: column; gap: 6px; }
+  .mail-preview iframe { width: 100%; height: 640px; border: 1px solid var(--color-divider); background: #fff; }
+  .mail-history ul { margin: 6px 0 0; padding: 0; list-style: none; font-family: var(--font-mincho); font-size: 12.5px; line-height: 1.9; }
+  .mail-history .date { font-family: var(--font-body); font-size: 11px; color: var(--color-neutral-700); margin-right: 10px; font-variant-numeric: tabular-nums; }
+  @media (max-width: 900px) { .mail-grid { grid-template-columns: minmax(0, 1fr); } .mail-preview iframe { height: 480px; } }
   .sub-count { max-width: 960px; margin: -8px 0 8px; font-variant-numeric: tabular-nums; }
   .sub-missing { max-width: 960px; margin-bottom: 18px; }
   .sub-missing pre,
