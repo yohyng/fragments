@@ -54,6 +54,7 @@ const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn);
   .welcome {
     /* sizes and gaps from 表示設定 → はじめの案内 (defaults as designed) */
     --wl-title: var(--s-wl-title, 32);
+    --wl-width: var(--s-wl-width, 520);
     --wl-lead: var(--s-wl-lead, 15);
     --wl-lead-en: var(--s-wl-lead-en, 13);
     --wl-rule: var(--s-wl-rule, 64);
@@ -90,7 +91,7 @@ const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn);
     margin: auto;
     width: 100%;
     /* wide enough for the leads and form (表示設定 → 説明文と登録欄の幅) */
-    max-width: calc(max(520, var(--s-wl-width, 520)) * 1px + 40px);
+    max-width: calc(max(520, var(--wl-width)) * 1px + 40px);
     padding: 48px 20px;
     display: flex;
     flex-direction: column;
@@ -123,7 +124,7 @@ const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn);
   }
   /* justified, the last line flush left; centred as a block */
   .lead {
-    width: min(100%, calc(var(--s-wl-width, 520) * 1px));
+    width: min(100%, calc(var(--wl-width) * 1px));
     text-align: justify;
     text-align-last: left;
     margin: 16px 0 0;
@@ -145,7 +146,7 @@ const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn);
   }
   /* justified like the Japanese, words hyphenated so the spaces stay even */
   .lead-en {
-    width: min(100%, calc(var(--s-wl-width, 520) * 1px));
+    width: min(100%, calc(var(--wl-width) * 1px));
     text-align: justify;
     text-align-last: left;
     hyphens: auto;
@@ -158,7 +159,7 @@ const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn);
     color: var(--color-neutral-700);
   }
   .form {
-    width: min(100%, calc(var(--s-wl-width, 520) * 1px)); /* as wide as the leads */
+    width: min(100%, calc(var(--wl-width) * 1px)); /* as wide as the leads */
     margin-top: 32px;
     text-align: left;
     font-family: var(--font-mincho);
@@ -188,6 +189,7 @@ const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn);
       --wl-gap-en: var(--s-wl-gap-en-sp, var(--s-wl-gap-en, 6));
       --wl-para: var(--s-wl-para-sp, var(--s-wl-para, 1));
       --wl-logo-sp: var(--s-wl-logo-sp, var(--s-wl-logo, 128) / 2);
+      --wl-width: var(--s-wl-width-sp, var(--s-wl-width, 520));
     }
     .logo {
       font-size: clamp(calc(var(--wl-logo-sp) * 1px), calc(var(--wl-logo-sp) * 11vw / 64), calc(var(--wl-logo-sp) * 2px));

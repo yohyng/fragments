@@ -141,6 +141,7 @@ const tabs: Tab[] = [
       { key: 'welcomeLeadEnGap', label: '間隔：説明文の日本語と英語', type: 'range', min: 0, max: 80, step: 2, unit: 'px' },
       { key: 'welcomeLeadParaGap', label: '説明文の中の空行の高さ', type: 'range', min: 0, max: 2, step: 0.25, unit: '行', hint: '説明文に空行（何も書かない行）を入れたところの高さです。日本語・英語とも。' },
       { key: 'welcomeOn', label: 'スマホ（画面幅 759px 以下）', type: 'heading', hint: 'スマホでの大きさと間隔です。動かすまでは PC の値に合わせて表示します（ロゴは PC の半分）。プレビューを「スマホ」にすると確かめられます。' },
+      { key: 'welcomeWidthSp', label: 'スマホ：説明文と登録欄の幅', type: 'range', min: 240, max: 760, step: 10, unit: 'px', hint: '普通のスマホでは画面幅が上限なので、主に折りたたみスマホを開いたときなど、幅の広いスマホに効きます。' },
       { key: 'welcomeLogoSizeSp', label: 'スマホ：サイト名（大きなロゴ）の文字サイズ', type: 'range', min: 32, max: 120, step: 2, unit: 'px', hint: '画面幅 390px での大きさです。それより広いスマホでは少し大きくなります。' },
       { key: 'welcomeTitleSizeSp', label: 'スマホ：タイトルの文字サイズ', type: 'range', min: 16, max: 48, step: 1, unit: 'px' },
       { key: 'welcomeLeadSizeSp', label: 'スマホ：説明文（日本語）の文字サイズ', type: 'range', min: 11, max: 20, step: 0.5, unit: 'px' },

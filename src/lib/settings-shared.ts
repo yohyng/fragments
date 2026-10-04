@@ -93,6 +93,7 @@ export interface Settings {
   welcomeRuleLeadGapSp: number;
   welcomeLeadEnGapSp: number;
   welcomeLeadParaGapSp: number;
+  welcomeWidthSp: number;
 }
 
 export const defaults: Settings = {
@@ -168,6 +169,7 @@ export const defaults: Settings = {
   welcomeRuleLeadGapSp: 22,
   welcomeLeadEnGapSp: 6,
   welcomeLeadParaGapSp: 1,
+  welcomeWidthSp: 520,
 };
 
 /** A welcome lead's text → paragraphs (split at blank lines) of lines. */
@@ -330,6 +332,7 @@ export function settingsCss(s: Settings): string {
     ['welcomeRuleLength', '--s-wl-rule'],
     ['welcomeRuleWeight', '--s-wl-rule-w'],
     ['welcomeWidth', '--s-wl-width'],
+    ['welcomeWidthSp', '--s-wl-width-sp'],
     ['welcomeLogoSizeSp', '--s-wl-logo-sp'],
     ['welcomeTitleSizeSp', '--s-wl-title-sp'],
     ['welcomeLeadSizeSp', '--s-wl-lead-sp'],
