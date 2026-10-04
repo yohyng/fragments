@@ -252,5 +252,6 @@ export function settingsCss(s: Settings): string {
   const body = Object.entries(v)
     .map(([k, val]) => `${k}:${val}`)
     .join(';');
-  return body ? `:root{${body}}` : '';
+  // :root:root outranks tokens.css, which Astro may place after this style
+  return body ? `:root:root{${body}}` : '';
 }
