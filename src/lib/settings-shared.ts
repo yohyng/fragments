@@ -31,6 +31,8 @@ export interface Settings {
   lineHeight: number;
   /** space between paragraphs, in lines */
   paragraphGap: number;
+  /** height of a blank line the writer left (an empty paragraph), in lines; 0 = none */
+  blankLine: number;
   letterSpacing: number;
   measure: number;
   indent: boolean;
@@ -75,6 +77,7 @@ export const defaults: Settings = {
   bodySizeTablet: 15.5,
   lineHeight: 1.9,
   paragraphGap: 1,
+  blankLine: 0,
   letterSpacing: 0.02,
   measure: 34,
   indent: true,
@@ -239,6 +242,7 @@ export function settingsCss(s: Settings): string {
     ['bodySizeTablet', '--s-body-tab'],
     ['lineHeight', '--s-lh'],
     ['paragraphGap', '--s-para'],
+    ['blankLine', '--s-blank'],
     ['letterSpacing', '--s-ls'],
     ['measure', '--s-measure'],
     ['titleSizePc', '--s-title-pc'],

@@ -212,7 +212,12 @@ export function convert(html, bookLinks = [], meta = new Map()) {
   const block = (n) => {
     if (n.type === 'text') return n.value.trim() ? paragraph({ children: [n] }) : [];
     if (n.type !== 'element') return [];
-    if (isEl(n, 'p', 'div')) return paragraph(n);
+    if (isEl(n, 'p', 'div')) {
+      // an empty paragraph is a blank line the writer left: kept as a spacer
+      // whose height is a setting (表示設定 → 空行の高さ; none by default)
+      const out = paragraph(n);
+      return out.length ? out : [el('div', { className: ['blank'], ariaHidden: 'true' }, [])];
+    }
     if (isEl(n, 'img')) return [figure(n)];
     if (isEl(n, 'figure')) {
       const img = n.children.find((c) => isEl(c, 'img'));
@@ -241,6 +246,9 @@ export function convert(html, bookLinks = [], meta = new Map()) {
   };
 
   const children = root.children.flatMap(block);
+  const isSpacer = (c) => isEl(c, 'div') && cls(c).includes('blank');
+  while (children.length && isSpacer(children[0])) children.shift();
+  while (children.length && isSpacer(children.at(-1))) children.pop();
   for (const b of bookLinks || []) if (b?.url) children.push(card({ url: b.url, title: b.label, image: b.image }));
   if (listed.length) children.push(notesList(listed));
 
@@ -249,6 +257,7 @@ export function convert(html, bookLinks = [], meta = new Map()) {
   const plain = children
     .filter((c) => !isEl(c, 'section', 'figure') && !cls(c).some((x) => x.startsWith('el-')))
     .map((c) => toText({ type: 'root', children: [c] }).replace(/\s+/g, ' ').trim())
+    .filter(Boolean)
     .join('\n\n');
   return { html: toHtml(tree), text: stripNoteText(children, plain) };
 }
