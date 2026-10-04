@@ -120,8 +120,12 @@ const { title, subtitle, date } = Astro.props;
   .body :global(:is(p, .p, .blank) + :is(p, .p)) {
     margin-top: calc(var(--s-para, 1) * var(--s-lh, 1.9) * 1em);
   }
+  /* a blank line adds its height; a negative one takes it from the space
+     after it (its margin collapses with the next paragraph's), down to none */
   .body :global(.blank) {
-    height: calc(var(--s-blank, 0) * var(--s-lh, 1.9) * 1em);
+    --blank-h: calc(var(--s-blank, 0) * var(--s-lh, 1.9) * 1em);
+    height: max(0px, var(--blank-h));
+    margin-bottom: max(min(0px, var(--blank-h)), -1 * var(--s-para, 1) * var(--s-lh, 1.9) * 1em);
   }
 
   /* Note number square — in the text */

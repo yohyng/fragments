@@ -69,7 +69,7 @@ const tabs: Tab[] = [
       { key: 'bodySizeTablet', label: '本文の文字サイズ（タブレット・スマホ）', type: 'range', min: 14, max: 19, step: 0.5, unit: 'px', hint: 'スマホと狭いタブレットでの大きさです。広いタブレットでは画面に合わせて最大 2.5px 大きくなります。' },
       { key: 'lineHeight', label: '行間', type: 'range', min: 1.5, max: 2.4, step: 0.05, unit: '' },
       { key: 'paragraphGap', label: '段落の間', type: 'range', min: 0, max: 1.5, step: 0.25, unit: '行', hint: '改行（Enter）で段落を分けたときの間です。0 にすると、字下げだけで区切ります。' },
-      { key: 'blankLine', label: '空行の高さ', type: 'range', min: 0, max: 1.5, step: 0.25, unit: '行', hint: '文字のない行を入れたところに、段落の間に足す高さです。0 なら空行は詰めて表示します。' },
+      { key: 'blankLine', label: '空行の高さ', type: 'range', min: -1.5, max: 1.5, step: 0.25, unit: '行', hint: '文字のない行を入れたところで、段落の間に足す高さです。マイナスにすると、空行のところだけ段落の間が狭くなります（段落の間より狭くはなりません）。0 なら空行は詰めて表示します。' },
       { key: 'letterSpacing', label: '字間', type: 'range', min: 0, max: 0.15, step: 0.01, unit: 'em' },
       { key: 'measure', label: '1行の字数（PC）', type: 'range', min: 26, max: 42, step: 1, unit: '字' },
       { key: 'indent', label: '段落の頭を1字下げる', type: 'check' },
