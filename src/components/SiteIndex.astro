@@ -55,6 +55,7 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     <a class:list={['about', { 'is-current': onAbout }]} href="/about/" aria-current={onAbout ? 'page' : undefined}>about<span class="arrow" aria-hidden="true">↗</span></a>
     <a class="subscribe" href="/subscribe/">subscribe<span class="arrow" aria-hidden="true">↗</span></a>
   </div>
+  <a class="policy" href="/privacy/">Privacy Policy</a>
   <div class="scroll-foot" aria-hidden="true"></div>
 </nav>
 <script is:inline>{
@@ -380,6 +381,17 @@ const onAbout = Astro.url.pathname.startsWith('/about');
   .about.is-current { color: var(--color-accent-700); }
   .subscribe,
   .subscribe:hover { color: var(--color-accent-700); }
+
+  /* at the very end, small */
+  .policy {
+    align-self: flex-start;
+    font-family: var(--font-body);
+    font-size: 10.5px;
+    line-height: 1.5;
+    color: var(--color-neutral-700);
+    text-decoration-color: var(--color-divider);
+  }
+  .policy:hover { color: var(--color-accent-700); }
 
   /* ── Tablet top (p7): 340px column ── */
   @media (max-width: 1159px) {
