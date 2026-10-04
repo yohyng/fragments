@@ -160,12 +160,12 @@ const related = posts.filter((p) => p.category === post.category && p.slug !== p
     }
   }
 
-  /* ── Tablet (p6): body is 30em × 15.5px = 465px ── */
+  /* ── Tablet (p6): as wide as the body (Article.astro) ── */
   @media (max-width: 1159px) {
     .sub,
     .pager,
     .related {
-      max-width: min(calc(30 * var(--s-body-tab, 15.5) * 1px), 100% - 250px);
+      max-width: min(calc(34 * var(--tab-size)), 100% - var(--tab-note) - 40px);
     }
     .sub {
       margin-top: 72px;

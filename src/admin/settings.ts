@@ -66,7 +66,7 @@ const tabs: Tab[] = [
     page: 'article',
     fields: [
       { key: 'bodySizePc', label: '本文の文字サイズ（PC）', type: 'range', min: 15, max: 22, step: 0.5, unit: 'px', hint: '画面幅 1400px 以上。それより狭い PC では少し小さくなります。' },
-      { key: 'bodySizeTablet', label: '本文の文字サイズ（タブレット・スマホ）', type: 'range', min: 14, max: 19, step: 0.5, unit: 'px' },
+      { key: 'bodySizeTablet', label: '本文の文字サイズ（タブレット・スマホ）', type: 'range', min: 14, max: 19, step: 0.5, unit: 'px', hint: 'スマホと狭いタブレットでの大きさです。広いタブレットでは画面に合わせて最大 2.5px 大きくなります。' },
       { key: 'lineHeight', label: '行間', type: 'range', min: 1.5, max: 2.4, step: 0.05, unit: '' },
       { key: 'letterSpacing', label: '字間', type: 'range', min: 0, max: 0.15, step: 0.01, unit: 'em' },
       { key: 'measure', label: '1行の字数（PC）', type: 'range', min: 26, max: 42, step: 1, unit: '字' },

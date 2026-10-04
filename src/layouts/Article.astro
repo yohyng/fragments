@@ -336,10 +336,20 @@ const { title, subtitle, date } = Astro.props;
     }
   }
 
-  /* ── Tablet (p6): no index; body 30em, notes 210px at 40px ── */
+  /* ── Tablet (p6): no index; notes at 40px beside the body. At the
+     narrowest (760px) as designed: body 15.5px, notes 210px. Wider, the
+     text, the line length (up to 34 characters) and the notes grow with the
+     screen, to 18px and 300px at 1159px, so wide tablets are not left with
+     an empty margin. ── */
   @media (max-width: 1159px) {
     .column {
       padding: 0 var(--inset-x);
+      --tab-size: clamp(
+        calc(var(--s-body-tab, 15.5) * 1px),
+        calc((var(--s-body-tab, 15.5) - 4.77) * 1px + 0.627vw),
+        calc((var(--s-body-tab, 15.5) + 2.5) * 1px)
+      );
+      --tab-note: clamp(210px, 38.6px + 22.56vw, 300px);
     }
     .endrule {
       bottom: var(--inset-bottom);
@@ -369,7 +379,7 @@ const { title, subtitle, date } = Astro.props;
     .head {
       min-height: 0;
       padding: 56px 0 40px;
-      max-width: min(calc(30 * var(--s-body-tab, 15.5) * 1px), 100% - 250px); /* = the 30em body */
+      max-width: min(calc(34 * var(--tab-size)), 100% - var(--tab-note) - 40px); /* = the body */
     }
     h1 {
       font-size: 28px;
@@ -383,13 +393,13 @@ const { title, subtitle, date } = Astro.props;
       margin-top: 8px;
     }
     .body {
-      /* 30em, giving way below ~787px so the 210px notes still fit */
-      max-width: min(30em, 100% - 250px);
-      font-size: calc(var(--s-body-tab, 15.5) * 1px);
+      /* up to 34em, giving way so the notes still fit */
+      max-width: min(34em, 100% - var(--tab-note) - 40px);
+      font-size: var(--tab-size);
     }
     .body :global(.sidenote) {
-      width: 210px;
-      margin-right: -250px;
+      width: var(--tab-note);
+      margin-right: calc(-1 * var(--tab-note) - 40px);
     }
     .end-space {
       height: 80px;
