@@ -103,6 +103,11 @@
   font-size: 12px;
   line-height: 1.6;
   color: var(--color-neutral-700);
+  /* a page's description can run long: two lines at most */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 .el-book .el-store {
   margin-top: auto;

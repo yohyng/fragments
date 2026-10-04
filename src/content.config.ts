@@ -3,6 +3,7 @@ import { glob } from 'astro/loaders';
 import type { Loader } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { fetchArticles, convert, parseDate } from './lib/supabase-content.mjs';
+import { cardUrls, fetchCardMeta } from './lib/card-meta.mjs';
 
 /**
  * Where posts come from. CONTENT_SOURCE=supabase reads the `articles` table
@@ -48,10 +49,11 @@ const supabaseLoader: Loader = {
   name: 'supabase-articles',
   async load({ store, parseData, logger }) {
     const rows = await fetchArticles();
+    const meta = await fetchCardMeta(cardUrls(rows));
     store.clear();
     for (const r of rows) {
       const id = String(r.id);
-      const { html, text } = convert(r.content, r.book_links);
+      const { html, text } = convert(r.content, r.book_links, meta);
       const data = await parseData({
         id,
         data: {

@@ -20,6 +20,7 @@ import { toText } from 'hast-util-to-text';
 import { el, text, buildNote, notesList } from './rehype-sidenotes.mjs';
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabase-config.mjs';
+import { bookLine } from './card-meta.mjs';
 
 /** Published articles, plus scheduled ones whose time has come (RLS decides). */
 export async function fetchArticles() {
@@ -92,24 +93,39 @@ function readableTitle(title, url) {
   return decoded;
 }
 
-/** A link card: with an image it is a book (cover), otherwise a plain link. */
+/** What the build looked up for each card URL (card-meta.mjs); set by convert(). */
+let cardMeta = new Map();
+
+/**
+ * A link card. A book found by its ISBN: cover, title, author／publisher、year.
+ * Otherwise with an image it is a book-style card (cover), else a plain link;
+ * both with the page's description when it has one.
+ */
 function card({ url, title: rawTitle, image }) {
   const domain = hostOf(url);
-  const title = readableTitle(rawTitle, url);
+  const m = cardMeta.get(url) ?? {};
+  const book = m.book;
+  const title = book?.title || readableTitle(rawTitle && !/^https?:\/\//.test(rawTitle) ? rawTitle : m.title || rawTitle, url);
+  // a page's share image is usually landscape: not a cover, so only the
+  // card's own image or a book's cover
+  const cover = book?.cover || image;
+  const line = book ? bookLine(book) : m.description;
   const attrs = { href: url, target: '_blank', rel: 'noopener' };
-  if (image) {
-    const store = domain.includes('amazon.') ? 'Amazon' : domain;
+  const store = domain.includes('amazon.') ? 'Amazon' : m.siteName && m.siteName.length <= 24 ? m.siteName : domain;
+  if (cover) {
     return el('a', { ...attrs, className: ['el-book'] }, [
-      el('img', { className: ['el-cover'], src: image, alt: '', loading: 'lazy', decoding: 'async' }, []),
+      el('img', { className: ['el-cover'], src: cover, alt: '', loading: 'lazy', decoding: 'async' }, []),
       el('div', { className: ['el-info'] }, [
         el('span', { className: ['el-title'] }, [text(title || domain)]),
+        ...(line ? [el('span', { className: ['el-meta'] }, [text(line)])] : []),
         el('span', { className: ['el-store'] }, [text(`${store} ↗`)]),
       ]),
     ]);
   }
   return el('a', { ...attrs, className: ['el-link'] }, [
-    el('span', { className: ['el-domain'] }, [text(domain)]),
+    el('span', { className: ['el-domain'] }, [text(store === 'Amazon' ? domain : store)]),
     el('span', { className: ['el-title'] }, [text(title || url)]),
+    ...(line ? [el('span', { className: ['el-desc'] }, [text(line)])] : []),
   ]);
 }
 
@@ -136,8 +152,10 @@ function editorCard(a) {
 /**
  * Editor HTML → { html, text } in fragments markup.
  * bookLinks: the article's book_links column [{ url, label, image, domain }]
+ * meta: what the build looked up for the cards (card-meta.mjs), by URL
  */
-export function convert(html, bookLinks = []) {
+export function convert(html, bookLinks = [], meta = new Map()) {
+  cardMeta = meta;
   const root = fromHtml(html || '', { fragment: true });
   let count = 0;
   const listed = [];
