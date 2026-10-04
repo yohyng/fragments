@@ -45,16 +45,10 @@ function place(sc: HTMLElement): HTMLElement {
   th.style.height = h + 'px';
   // at the right end of the column's rules (an article's stop at its notes
   // or its body), else at the column's right edge
-  // (drawn as ::after over the body and ::before over the notes)
   const rule = sc.querySelector<HTMLElement>('[data-endrule]');
-  let right = sc.offsetWidth - ins.right;
-  if (rule) {
-    const after = getComputedStyle(rule, '::after');
-    const before = getComputedStyle(rule, '::before');
-    const notes = parseFloat(before.width) || 0;
-    const end = notes > 0 ? parseFloat(before.left) + notes : parseFloat(after.width) || rule.offsetWidth;
-    right = rule.getBoundingClientRect().left - sc.getBoundingClientRect().left + end;
-  }
+  const right = rule
+    ? rule.getBoundingClientRect().right - sc.getBoundingClientRect().left
+    : sc.offsetWidth - ins.right;
   th.style.left = sc.offsetLeft + right - 1 + 'px';
   th.style.top =
     sc.offsetTop + off + (track - h) * (sc.scrollTop / Math.max(1, sc.scrollHeight - sc.clientHeight)) + 'px';
