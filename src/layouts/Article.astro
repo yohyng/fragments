@@ -101,6 +101,19 @@ const { title, subtitle, date } = Astro.props;
     color: var(--color-neutral-700);
     font-variant-numeric: tabular-nums;
     margin-top: 10px;
+    position: relative;
+  }
+  /* a thin, light rule under the date, flush left, drawn in the space above
+     the body so nothing moves (表示設定 → 記事本文: length, 0 = none, and
+     distance) */
+  .date::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: calc(100% + var(--s-date-rule-gap, 16) * 1px);
+    width: min(100%, calc(var(--s-date-rule, 40) * 1px));
+    height: 1px;
+    background: var(--color-divider);
   }
   .body {
     max-width: 34em;

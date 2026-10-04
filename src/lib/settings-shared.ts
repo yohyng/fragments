@@ -41,6 +41,9 @@ export interface Settings {
   justify: boolean;
   titleSizePc: number;
   noteSize: number;
+  /** the thin rule under an article's date: length (0 = none) and distance below it, px */
+  dateRuleLength: number;
+  dateRuleGap: number;
   // 記事一覧
   siteNameSize: number;
   catchJaSize: number;
@@ -135,6 +138,8 @@ export const defaults: Settings = {
   justify: true,
   titleSizePc: 36,
   noteSize: 14,
+  dateRuleLength: 40,
+  dateRuleGap: 16,
   siteNameSize: 30,
   catchJaSize: 13,
   catchEnSize: 13,
@@ -346,6 +351,8 @@ export function settingsCss(s: Settings): string {
     ['measure', '--s-measure'],
     ['titleSizePc', '--s-title-pc'],
     ['noteSize', '--s-note'],
+    ['dateRuleLength', '--s-date-rule'],
+    ['dateRuleGap', '--s-date-rule-gap'],
     ['siteNameSize', '--s-site-name'],
     ['ixHeadGap', '--s-ix-a'],
     ['ixCatchGap', '--s-ix-b'],
