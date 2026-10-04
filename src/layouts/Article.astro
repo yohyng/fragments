@@ -691,13 +691,35 @@ const { title, subtitle, date } = Astro.props;
     foot.style.width = n.width + 'px';
     foot.style.top = sub.getBoundingClientRect().top - c.top + col.scrollTop + 'px';
   }
+  // The date's rule is drawn out of the flow: make sure the body starts
+  // below it (32px), whatever its distance or alignment.
+  function clearDateRule() {
+    const head = document.querySelector<HTMLElement>('main.column .head');
+    const date = head?.querySelector<HTMLElement>('.date');
+    const body = document.querySelector<HTMLElement>('main.column .body');
+    if (!head || !date || !body) return;
+    head.style.marginBottom = '';
+    const rule = getComputedStyle(date, '::after');
+    if (!(parseFloat(rule.width) > 0)) return;
+    const first = (body.firstElementChild as HTMLElement | null) ?? body;
+    // (a margin: the head's min-height would swallow extra padding; margins
+    // can collapse with the body's first one, so measure again and repeat)
+    for (let i = 0; i < 6; i++) {
+      const ruleY = date.getBoundingClientRect().top + parseFloat(rule.top);
+      const need = ruleY + 32 - first.getBoundingClientRect().top;
+      if (need <= 0.5) break;
+      head.style.marginBottom = parseFloat(getComputedStyle(head).marginBottom) + need + 'px';
+    }
+  }
   function layoutHead() {
     alignHead();
+    clearDateRule();
     placeNotesHead();
   }
   layoutHead();
   document.fonts.ready.then(layoutHead);
   addEventListener('resize', layoutHead);
+  addEventListener('load', layoutHead); // images and cards settled
 </script>
 
 <script>

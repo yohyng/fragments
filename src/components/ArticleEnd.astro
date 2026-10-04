@@ -26,41 +26,37 @@ const e = encodeURIComponent;
 const shares: { label: string; icon: string; href: string }[] = [
   { label: 'X', icon: 'x', href: `https://x.com/intent/post?text=${e(text)}&url=${e(url)}` },
   { label: 'Facebook', icon: 'facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${e(url)}` },
-  { label: 'LINE', icon: 'line', href: `https://social-plugins.line.me/lineit/share?url=${e(url)}` },
-  { label: 'Bluesky', icon: 'bluesky', href: `https://bsky.app/intent/compose?text=${e(`${text} ${url}`)}` },
   { label: 'Threads', icon: 'threads', href: `https://www.threads.net/intent/post?text=${e(`${text} ${url}`)}` },
-  { label: 'はてなブックマーク', icon: 'hatena', href: `https://b.hatena.ne.jp/entry/${url.replace(/^https:\/\//, 's/').replace(/^http:\/\//, '')}` },
 ];
 ---
 
 <div class="end">
-<nav class="share" aria-label="この記事をシェア" data-share={url} data-share-text={text}>
-  <span class="share-label">Share</span>
-  <ul>
-    {
-      shares.map((x) => (
-        <li>
-          <a href={x.href} target="_blank" rel="noopener" aria-label={`${x.label}でシェア`} title={x.label}>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d={shareIcons[x.icon]} /></svg>
-          </a>
-        </li>
-      ))
-    }
-    <li>
-      <button type="button" data-copy aria-label="リンクをコピー" title="リンクをコピー">
-        <svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3.2-3.2a4.5 4.5 0 0 0-6.4-6.4L11.6 6" /><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3.2 3.2a4.5 4.5 0 0 0 6.4 6.4l1.6-1.6" /></svg>
-      </button>
-    </li>
-    <li hidden data-native-li>
-      <button type="button" data-native aria-label="共有" title="共有">
-        <svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3.5" /><path d="M7.5 8 12 3.5 16.5 8" /><path d="M8 11H5.5v9.5h13V11H16" /></svg>
-      </button>
-    </li>
-  </ul>
-  <span class="share-msg" aria-live="polite" data-share-msg></span>
-</nav>
-<aside class="sub" aria-label="購読">
+<aside class="sub" aria-label="購読とシェア">
   <Subscribe />
+  <nav class="share" aria-label="この記事をシェア" data-share={url} data-share-text={text}>
+    <ul>
+      {
+        shares.map((x) => (
+          <li>
+            <a href={x.href} target="_blank" rel="noopener" aria-label={`${x.label}でシェア`} title={x.label}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d={shareIcons[x.icon]} /></svg>
+            </a>
+          </li>
+        ))
+      }
+      <li>
+        <button type="button" data-copy aria-label="リンクをコピー" title="リンクをコピー">
+          <svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3.2-3.2a4.5 4.5 0 0 0-6.4-6.4L11.6 6" /><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3.2 3.2a4.5 4.5 0 0 0 6.4 6.4l1.6-1.6" /></svg>
+        </button>
+      </li>
+      <li hidden data-native-li>
+        <button type="button" data-native aria-label="共有" title="共有">
+          <svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3.5" /><path d="M7.5 8 12 3.5 16.5 8" /><path d="M8 11H5.5v9.5h13V11H16" /></svg>
+        </button>
+      </li>
+    </ul>
+    <span class="share-msg" aria-live="polite" data-share-msg></span>
+  </nav>
 </aside>
 <nav class="pager" aria-label="前後の記事">
   {
@@ -100,33 +96,27 @@ const shares: { label: string; icon: string; href: string }[] = [
 
 <style>
   /* Article end: subscribe → prev / next → related (widths follow the body's 34em) */
-  .share,
   .sub,
   .pager,
   .related {
     max-width: calc(34 * var(--body-size));
   }
-  /* share: a quiet row of the services' names */
+  /* share: icon buttons beside the subscribe form (below it when narrow) */
   .share {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    margin-top: 72px;
+    position: relative;
     font-family: var(--font-body);
     font-size: 13px;
-    line-height: 1.6;
-  }
-  .share-label {
-    color: var(--color-neutral-700);
-    font-style: italic;
   }
   .share ul {
     display: flex;
-    flex-wrap: wrap;
     gap: 8px;
-    margin: 4px 0 0;
+    margin: 0;
     padding: 0;
     list-style: none;
+  }
+  .sub > :global(.subscribe) {
+    flex: 1 1 300px;
+    min-width: 0;
   }
   /* icon buttons: a thin frame, the accent on hover */
   .share a,
@@ -156,7 +146,10 @@ const shares: { label: string; icon: string; href: string }[] = [
     stroke-linejoin: round;
   }
   .share-msg {
-    min-height: 1.6em;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    white-space: nowrap;
     font-size: 12px;
     color: var(--color-neutral-700);
   }
@@ -165,13 +158,12 @@ const shares: { label: string; icon: string; href: string }[] = [
     border-color: var(--color-accent);
     color: var(--color-accent-700);
   }
-  .share + .sub {
-    margin-top: 40px;
-  }
+  /* the subscribe form and the share buttons in one row under one rule */
   .sub {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 16px;
     margin-top: 96px;
     padding: 48px 0 12px;
     border-top: 1px solid var(--color-divider);
@@ -249,7 +241,6 @@ const shares: { label: string; icon: string; href: string }[] = [
 
   /* ── Beside the index (≥1160px): widths follow the body ── */
   @media (min-width: 1160px) {
-    .share,
     .sub,
     .pager,
     .related {
@@ -259,7 +250,6 @@ const shares: { label: string; icon: string; href: string }[] = [
 
   /* ── Tablet (p6): as wide as the body (Article.astro) ── */
   @media (max-width: 1159px) {
-    .share,
     .sub,
     .pager,
     .related {
@@ -288,7 +278,6 @@ const shares: { label: string; icon: string; href: string }[] = [
       font-size: 14px;
       line-height: 1.7;
     }
-    .share,
     .sub,
     .pager,
     .related {
