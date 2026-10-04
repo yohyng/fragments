@@ -338,4 +338,14 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     .list { margin-top: -20px; }
     .links a { padding: 12px 0; }
   }
+
+  /* ── Wider phones, e.g. an unfolded foldable: the phone layout in a
+     column of at most 480px at the left (as tablets keep theirs), so the
+     lines do not run across the whole screen; narrower phones are not
+     affected ── */
+  @media (max-width: 759px) {
+    .index {
+      padding: 0 max(var(--inset-x), 100% - 480px - var(--inset-x)) 0 var(--inset-x);
+    }
+  }
 </style>
