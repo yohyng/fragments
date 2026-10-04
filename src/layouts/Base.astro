@@ -20,14 +20,23 @@ const { title } = Astro.props;
     <script is:inline>
       document.documentElement.classList.add('js');
       // First page of a visit: keep it hidden until its web fonts have
-      // arrived, so the fallback (gothic) face never shows and swaps (at most
-      // 3s). Later pages have the fonts cached and cross-fade in instead
-      // (@view-transition in base.css), so they are not hidden.
+      // arrived, so the stand-in face never shows and swaps (at most 3s).
+      // Later pages: the Japanese fonts come in slices by character, and a new
+      // article may need slices not loaded yet, so its column (not the index,
+      // which stays put) waits for them too, briefly (at most 1.2s), and
+      // fades in with the page transition.
       let fontsOk = false;
       try {
         fontsOk = sessionStorage.getItem('fragments-fonts') === '1';
       } catch {}
-      if (!fontsOk) {
+      if (fontsOk) {
+        document.documentElement.classList.add('fonts-wait-pane');
+        const showPane = () => document.documentElement.classList.remove('fonts-wait-pane');
+        setTimeout(showPane, 1200);
+        document.addEventListener('DOMContentLoaded', () =>
+          requestAnimationFrame(() => (document.fonts.status === 'loaded' ? showPane() : document.fonts.ready.then(showPane))),
+        );
+      } else {
         document.documentElement.classList.add('fonts-wait');
         const showPage = () => document.documentElement.classList.remove('fonts-wait');
         setTimeout(showPage, 3000);

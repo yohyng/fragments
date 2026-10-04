@@ -30,12 +30,16 @@
   --sel-bg: var(--color-accent);
   --sel-fg: #fff;
 
-  /* Latin: site name / dates, categories, about, subscribe, note numbers */
-  --font-heading: "Cormorant Garamond", system-ui, sans-serif;
-  --font-body: "Lora", system-ui, sans-serif;
-  /* Japanese: headings & subtitles / body, notes, index */
-  --font-mincho-heading: 'Shippori Mincho';
-  --font-mincho: 'Zen Old Mincho';
+  /* Latin: site name / dates, categories, about, subscribe, note numbers.
+     Until the web font arrives, a similar system serif stands in (Georgia
+     has no Japanese, so Japanese still falls through to system-ui as designed). */
+  --font-heading: "Cormorant Garamond", Garamond, Georgia, system-ui, sans-serif;
+  --font-body: "Lora", Georgia, system-ui, sans-serif;
+  /* Japanese: headings & subtitles / body, notes, index. Until the web font
+     (or a slice of it) arrives, the system's mincho stands in, not a gothic. */
+  --font-ja-fallback: 'Hiragino Mincho ProN', 'Yu Mincho', YuMincho, 'Noto Serif JP', 'Noto Serif CJK JP', serif;
+  --font-mincho-heading: 'Shippori Mincho', var(--font-ja-fallback);
+  --font-mincho: 'Zen Old Mincho', var(--font-ja-fallback);
 }
 
 ::selection {

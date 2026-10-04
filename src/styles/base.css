@@ -45,6 +45,11 @@ a:hover { color: var(--color-accent-600); }
    fade. Without JavaScript the class is never set. */
 body { transition: opacity 0.2s ease; }
 html.fonts-wait body { opacity: 0; }
+/* later pages: the article column waits for its font slices (Base.astro) */
+html.fonts-wait-pane main.column,
+html.fonts-wait-pane [data-welcome='page'] { opacity: 0; }
+main.column,
+[data-welcome='page'] { transition: opacity 0.25s ease; }
 [data-noscrollbar]::-webkit-scrollbar { display: none; }
 
 /* Bottom rule of a scroll column: shown only when scrolled to the end */

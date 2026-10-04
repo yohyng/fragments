@@ -468,7 +468,7 @@ frame().addEventListener('load', () => {
   const doc = frame().contentDocument;
   if (!doc) return;
   doc.documentElement.removeAttribute('data-welcome'); // no first-visit overlay in the preview
-  doc.documentElement.classList.remove('fonts-wait');
+  doc.documentElement.classList.remove('fonts-wait', 'fonts-wait-pane');
   doc.querySelector('style[data-settings]')?.remove(); // the built settings; the preview's replace them
   refresh();
 });

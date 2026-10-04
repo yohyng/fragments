@@ -189,7 +189,14 @@ export function fontsHref(s: Settings): string {
 
 // ── CSS ──
 
-const latinStack = (f: string) => `"${f}", system-ui, sans-serif`;
+const latinStack = (f: string) => `"${f}", Georgia, system-ui, sans-serif`;
+// stand-ins until the web font arrives: a system face of the same kind
+const jaStack = (f: string) => {
+  const group = find(jaFonts, f)?.group ?? '明朝体';
+  return group === '明朝体' || group === 'カリグラフィー風'
+    ? `'${f}', var(--font-ja-fallback)`
+    : `'${f}', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', YuGothic, 'Noto Sans JP', sans-serif`;
+};
 const mix = (a: string, pct: number, b: string) => `color-mix(in srgb, ${a} ${pct}%, ${b})`;
 
 /** `:root` overrides for the site's CSS (tokens.css and the `--s-*` hooks in
@@ -220,8 +227,8 @@ export function settingsCss(s: Settings): string {
   }
   if (s.selBg) v['--sel-bg'] = s.selBg;
   if (s.selFg !== d.selFg) v['--sel-fg'] = s.selFg;
-  if (s.fontJaHeading !== d.fontJaHeading) v['--font-mincho-heading'] = `'${s.fontJaHeading}'`;
-  if (s.fontJaBody !== d.fontJaBody) v['--font-mincho'] = `'${s.fontJaBody}'`;
+  if (s.fontJaHeading !== d.fontJaHeading) v['--font-mincho-heading'] = jaStack(s.fontJaHeading);
+  if (s.fontJaBody !== d.fontJaBody) v['--font-mincho'] = jaStack(s.fontJaBody);
   if (s.fontLatinHeading !== d.fontLatinHeading) v['--font-heading'] = latinStack(s.fontLatinHeading);
   if (s.fontLatinBody !== d.fontLatinBody) v['--font-body'] = latinStack(s.fontLatinBody);
   const num: [keyof Settings, string][] = [
