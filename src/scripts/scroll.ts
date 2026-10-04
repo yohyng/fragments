@@ -2,7 +2,8 @@
 // design_handoff_fragments/fragments v2.dc.html):
 // - a 1px thumb (neutral-500) shown only while scrolling: fades in over 0.2s,
 //   fades out over 0.6s once scrolling has stopped for 700ms. It travels from
-//   10px below the column's header rule to 10px above the column's bottom.
+//   10px below the column's header rule to 10px above the column's bottom,
+//   at the right end of the column's rules.
 // - [data-atend] on the column while it is scrolled to the bottom, which fades
 //   in its bottom rule ([data-endrule] inside it, or one drawn here if absent).
 
@@ -42,7 +43,13 @@ function place(sc: HTMLElement): HTMLElement {
   const track = sc.clientHeight - off - 10 - ins.bottom;
   const h = Math.max(24, track * ratio);
   th.style.height = h + 'px';
-  th.style.left = sc.offsetLeft + sc.offsetWidth - ins.right - 1 + 'px';
+  // at the right end of the column's rules (an article's stop at its notes
+  // or its body), else at the column's right edge
+  const rule = sc.querySelector<HTMLElement>('[data-endrule]');
+  const right = rule
+    ? rule.getBoundingClientRect().right - sc.getBoundingClientRect().left
+    : sc.offsetWidth - ins.right;
+  th.style.left = sc.offsetLeft + right - 1 + 'px';
   th.style.top =
     sc.offsetTop + off + (track - h) * (sc.scrollTop / Math.max(1, sc.scrollHeight - sc.clientHeight)) + 'px';
   return th;
