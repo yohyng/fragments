@@ -84,21 +84,22 @@ const leadEn = settings.welcomeLeadEn || site.catchEn;
   }
   .logo {
     font-family: var(--font-heading);
-    font-size: clamp(64px, 11vw, 128px);
+    /* 表示設定 → はじめの案内 (128px by default, down to half with the screen) */
+    font-size: clamp(calc(var(--s-wl-logo, 128) * 0.5px), calc(var(--s-wl-logo, 128) * 11vw / 128), calc(var(--s-wl-logo, 128) * 1px));
     line-height: 1;
   }
   .title {
     margin: clamp(56px, 12vh, 128px) 0 0;
     font-family: var(--font-heading);
     font-weight: 400;
-    font-size: 32px;
+    font-size: calc(var(--s-wl-title, 32) * 1px);
     line-height: 1.2;
     letter-spacing: normal;
   }
   .lead {
     margin: 16px 0 0;
     font-family: var(--font-mincho);
-    font-size: 15px;
+    font-size: calc(var(--s-wl-lead, 15) * 1px);
     line-height: 1.9;
     color: var(--color-neutral-800);
   }
@@ -106,7 +107,7 @@ const leadEn = settings.welcomeLeadEn || site.catchEn;
     margin: 6px 0 0;
     font-family: var(--font-body);
     font-style: italic;
-    font-size: 13px;
+    font-size: calc(var(--s-wl-lead-en, 13) * 1px);
     line-height: 1.75;
     color: var(--color-neutral-700);
   }

@@ -118,6 +118,10 @@ const tabs: Tab[] = [
         placeholder: () => `${state.catchJa.replace(/\s*\/$/, '')}。\n新しい記事を、メールでお届けします。`,
       },
       { key: 'welcomeLeadEn', label: '説明文（英語）', type: 'textarea', rows: 2, hint: '空欄なら英語のキャッチコピーになります。', placeholder: () => state.catchEn },
+      { key: 'welcomeLogoSize', label: 'サイト名（大きなロゴ）の文字サイズ', type: 'range', min: 48, max: 200, step: 4, unit: 'px', hint: '広い画面での大きさです。狭い画面では画面幅に合わせて小さくなります（最小で半分）。' },
+      { key: 'welcomeTitleSize', label: 'タイトルの文字サイズ', type: 'range', min: 18, max: 56, step: 1, unit: 'px' },
+      { key: 'welcomeLeadSize', label: '説明文（日本語）の文字サイズ', type: 'range', min: 12, max: 22, step: 0.5, unit: 'px' },
+      { key: 'welcomeLeadEnSize', label: '説明文（英語）の文字サイズ', type: 'range', min: 11, max: 20, step: 0.5, unit: 'px' },
     ],
   },
 ];

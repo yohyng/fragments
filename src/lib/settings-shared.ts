@@ -58,6 +58,10 @@ export interface Settings {
   welcomeLead: string;
   /** '' = the English catch copy */
   welcomeLeadEn: string;
+  welcomeLogoSize: number;
+  welcomeTitleSize: number;
+  welcomeLeadSize: number;
+  welcomeLeadEnSize: number;
 }
 
 export const defaults: Settings = {
@@ -106,6 +110,10 @@ export const defaults: Settings = {
   welcomeTitle: 'fragments folio',
   welcomeLead: '',
   welcomeLeadEn: '',
+  welcomeLogoSize: 128,
+  welcomeTitleSize: 32,
+  welcomeLeadSize: 15,
+  welcomeLeadEnSize: 13,
 };
 
 /** Saved overrides on top of the defaults; unknown or mistyped keys are dropped. */
@@ -252,6 +260,10 @@ export function settingsCss(s: Settings): string {
     ['titleSizePc', '--s-title-pc'],
     ['noteSize', '--s-note'],
     ['siteNameSize', '--s-site-name'],
+    ['welcomeLogoSize', '--s-wl-logo'],
+    ['welcomeTitleSize', '--s-wl-title'],
+    ['welcomeLeadSize', '--s-wl-lead'],
+    ['welcomeLeadEnSize', '--s-wl-lead-en'],
     ['catchJaSize', '--s-catch-ja'],
     ['catchEnSize', '--s-catch-en'],
     ['indexSize', '--s-index'],
