@@ -316,7 +316,11 @@ const onAbout = Astro.url.pathname.startsWith('/about');
       gap: 20px;
       padding: 0 var(--inset-x);
     }
-    .site { font-size: calc(var(--s-site-name, 30) * 26px / 30); } /* 26px by default */
+    /* phone sizes (表示設定 → スマホ), else from the PC ones */
+    .site { font-size: calc(var(--s-site-name-sp, var(--s-site-name, 30) * 26 / 30) * 1px); } /* 26px by default */
+    .intro-ja { font-size: calc(var(--s-catch-ja-sp, var(--s-catch-ja, 13)) * 1px); }
+    .intro-en { font-size: calc(var(--s-catch-en-sp, var(--s-catch-en, 13)) * 1px); }
+    .item { font-size: calc(var(--s-index-sp, var(--s-index, 13) * 14 / 13) * 1px); }
     .scroll-foot { margin-top: calc(48px - 20px); }
     .intro { padding-top: 20px; }
     .cats {

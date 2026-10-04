@@ -45,6 +45,11 @@ export interface Settings {
   siteNameSize: number;
   catchJaSize: number;
   catchEnSize: number;
+  /** the index on phones (≤759px); as they are, they follow the PC sizes */
+  siteNameSizeSp: number;
+  catchJaSizeSp: number;
+  catchEnSizeSp: number;
+  indexSizeSp: number;
   indexSize: number;
   pageSize: number;
   // About・SNS
@@ -120,6 +125,10 @@ export const defaults: Settings = {
   siteNameSize: 30,
   catchJaSize: 13,
   catchEnSize: 13,
+  siteNameSizeSp: 26,
+  catchJaSizeSp: 13,
+  catchEnSizeSp: 13,
+  indexSizeSp: 14,
   indexSize: 13,
   pageSize: 20,
   about: 'メディアについての説明文（運営者、更新の方針など）がここに入ります。',
@@ -336,6 +345,10 @@ export function settingsCss(s: Settings): string {
     ['welcomeLeadParaGap', '--s-wl-para'],
     ['catchJaSize', '--s-catch-ja'],
     ['catchEnSize', '--s-catch-en'],
+    ['siteNameSizeSp', '--s-site-name-sp'],
+    ['catchJaSizeSp', '--s-catch-ja-sp'],
+    ['catchEnSizeSp', '--s-catch-en-sp'],
+    ['indexSizeSp', '--s-index-sp'],
     ['indexSize', '--s-index'],
   ];
   for (const [k, name] of num) if (s[k] !== d[k]) v[name] = String(s[k]);

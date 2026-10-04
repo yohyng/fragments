@@ -92,6 +92,11 @@ const tabs: Tab[] = [
       { key: 'fontIndex', label: '記事一覧（記事タイトル）のフォント', type: 'font-ja', sameAs: '本文と同じ' },
       { key: 'indexSize', label: '記事一覧の文字サイズ', type: 'range', min: 12, max: 17, step: 0.5, unit: 'px', hint: 'PC での大きさです。タブレット・スマホでは同じ比率で少し大きくなります。' },
       { key: 'pageSize', label: '一度に表示する記事の数', type: 'range', min: 10, max: 60, step: 5, unit: '件', hint: '「さらに読み込む」で増える数も同じです。', later: true },
+      { key: 'welcomeOn', label: 'スマホ（画面幅 759px 以下）', type: 'heading', hint: 'スマホでの文字サイズです。動かすまでは PC の値から決まる大きさで表示します。プレビューを「スマホ」にすると確かめられます。' },
+      { key: 'siteNameSizeSp', label: 'スマホ：サイト名の文字サイズ', type: 'range', min: 16, max: 44, step: 1, unit: 'px', hint: '記事ページ・About 上部のサイト名も同じ大きさです。' },
+      { key: 'catchJaSizeSp', label: 'スマホ：キャッチコピー（日本語）の文字サイズ', type: 'range', min: 10, max: 20, step: 0.5, unit: 'px' },
+      { key: 'catchEnSizeSp', label: 'スマホ：キャッチコピー（英語）の文字サイズ', type: 'range', min: 10, max: 20, step: 0.5, unit: 'px' },
+      { key: 'indexSizeSp', label: 'スマホ：記事一覧の文字サイズ', type: 'range', min: 11, max: 20, step: 0.5, unit: 'px' },
     ],
   },
   {
@@ -148,6 +153,9 @@ const tabs: Tab[] = [
     ],
   },
 ];
+
+/** what a phone value follows until set: its PC value times this */
+const phoneScale: Partial<Record<Key, number>> = { welcomeLogoSize: 0.5, siteNameSize: 26 / 30, indexSize: 14 / 13 };
 
 const devices = { pc: 1440, tablet: 1024, phone: 390 } as const;
 type Device = keyof typeof devices;
@@ -311,7 +319,7 @@ function fieldRow(f: Field): HTMLElement {
   let value = state[f.key];
   const pcKey = f.key.endsWith('Sp') ? (f.key.slice(0, -2) as Key) : null;
   if (pcKey && pcKey in defaults && value === defaults[f.key])
-    value = (pcKey === 'welcomeLogoSize' ? (state[pcKey] as number) / 2 : state[pcKey]) as never;
+    value = (Math.round((state[pcKey] as number) * (phoneScale[pcKey] ?? 1) * 2) / 2) as never;
   const ph = typeof f.placeholder === 'function' ? f.placeholder() : (f.placeholder ?? '');
 
   if (f.type === 'text' || f.type === 'textarea' || f.type === 'contact') {
