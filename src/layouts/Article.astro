@@ -505,47 +505,57 @@ const { title, subtitle, date } = Astro.props;
     }
   }
 
-  /* ── An article without notes: the header and footer rules stop at the
-     body's width (with notes they span the column, the notes' side too).
-     --text-w is the body's width in each layout; the header keeps its full
-     width as a background and draws its rule as a line of that width. ── */
+  /* ── The header and footer rules stop where the text does: at the notes'
+     right edge, or, in an article without notes, at the body's. --text-w is
+     the body's width and --notes-w the body with the notes beside it, in
+     each layout. The header keeps its full width as a background and draws
+     its rule as a line of that width. ── */
   .column {
     --text-w: 100%;
+    --notes-w: 100%;
+    --line-w: var(--notes-w);
+  }
+  .column:not(:has(:global(.sidenote))) {
+    --line-w: var(--text-w);
   }
   @media (min-width: 1300px) {
     .column {
       --text-w: var(--pc-body);
+      --notes-w: calc(var(--pc-body) + var(--pc-gap) + var(--pc-note));
     }
   }
   @media (min-width: 1160px) and (max-width: 1299px) {
     .column {
       --text-w: calc(30 * var(--body-size));
+      --notes-w: calc(30 * var(--body-size) + 250px);
     }
   }
   @media (min-width: 760px) and (max-width: 1159px) {
     .column {
       --text-w: min(calc(34 * var(--tab-size)), 100% - var(--tab-note) - 40px);
+      --notes-w: calc(var(--text-w) + 40px + var(--tab-note));
     }
   }
   @media (min-width: 656px) and (max-width: 759px) {
     .column {
       --text-w: min(calc(30 * var(--s-body-tab, 15.5) * 1px), 100% - 212px);
+      --notes-w: calc(var(--text-w) + 212px);
     }
   }
-  .column:not(:has(:global(.sidenote))) .rule {
+  .rule {
     border-bottom-color: transparent;
   }
-  .column:not(:has(:global(.sidenote))) .rule::after {
+  .rule::after {
     content: '';
     position: absolute;
     left: 0;
     bottom: -1px;
-    width: var(--text-w);
+    width: var(--line-w);
     height: 1px;
     background: var(--color-neutral-700);
   }
-  .column:not(:has(:global(.sidenote))) .endrule {
-    max-width: var(--text-w);
+  .endrule {
+    max-width: var(--line-w);
   }
 </style>
 
