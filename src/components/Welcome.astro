@@ -30,7 +30,7 @@ const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn);
     <h1 id="welcome-title" class="title">{settings.welcomeTitle}</h1>
     <hr class="rule" />
     <p class="lead">{lead.map((l) => <span class="para">{l.map((line, i) => (i ? [<br />, line] : line))}</span>)}</p>
-    {leadEn.length > 0 && <p class="lead-en">{leadEn.map((l) => <span class="para">{l.map((line, i) => (i ? [<br />, line] : line))}</span>)}</p>}
+    {leadEn.length > 0 && <p class="lead-en" lang="en">{leadEn.map((l) => <span class="para">{l.map((line, i) => (i ? [<br />, line] : line))}</span>)}</p>}
     <div class="form">
       <Subscribe />
     </div>
@@ -133,7 +133,13 @@ const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn);
   .lead-en .para + .para {
     margin-top: calc(var(--s-wl-para, 1) * 1.75em);
   }
+  /* justified like the Japanese, words hyphenated so the spaces stay even */
   .lead-en {
+    align-self: stretch;
+    text-align: justify;
+    text-align-last: left;
+    hyphens: auto;
+    -webkit-hyphens: auto;
     margin: calc(var(--s-wl-gap-en, 6) * 1px) 0 0;
     font-family: var(--font-body);
     font-style: italic;
