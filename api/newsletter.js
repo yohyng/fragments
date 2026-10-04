@@ -1,12 +1,13 @@
 // POST from the admin (購読者 → メールを送る), with the signed-in user's
 // Supabase token: sends the newsletter 「fragments folio」.
 //   { subject, intro, outro, articles: [{ title, subtitle, date, url, excerpt }], test }
-// test: true → only to the signed-in user, to check it. Otherwise to every
+// test: true → only to the saved test addresses (fragments_admin_prefs), or
+// the signed-in user, to check it. Otherwise to every
 // active subscriber, each with their own unsubscribe link, and recorded in
 // fragments_mailings. Needs RESEND_API_KEY, NEWSLETTER_FROM and
 // SUPABASE_SERVICE_ROLE_KEY.
 
-import { authUser, listActive, mailReady, recordMailing, sendBatch, siteUrl, unsubscribeUrl } from '../src/lib/newsletter.mjs';
+import { listActive, mailReady, recordMailing, requireAdmin, sendBatch, siteUrl, testRecipients, unsubscribeUrl } from '../src/lib/newsletter.mjs';
 import { renderNewsletter } from '../src/lib/newsletter-mail.mjs';
 
 export default async function handler(req, res) {
@@ -14,8 +15,9 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'method not allowed' });
   }
-  const user = await authUser(String(req.headers.authorization || '').replace(/^Bearer\s+/i, ''));
-  if (!user) return res.status(401).json({ error: 'ログインし直してください' });
+  const auth = await requireAdmin(String(req.headers.authorization || '').replace(/^Bearer\s+/i, ''));
+  if (!auth.user) return res.status(auth.status).json({ error: auth.error });
+  const { user } = auth;
   if (!mailReady()) return res.status(500).json({ error: 'RESEND_API_KEY と NEWSLETTER_FROM が Vercel に設定されていません' });
 
   const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body ?? {};
@@ -49,8 +51,9 @@ export default async function handler(req, res) {
 
   try {
     if (body.test) {
-      await sendBatch([mail(user.email, null)]);
-      return res.status(200).json({ sent: 1, test: true, to: user.email });
+      const to = await testRecipients(user.email);
+      await sendBatch(to.map((t) => mail(t, null)));
+      return res.status(200).json({ sent: to.length, test: true, to: to.join(', ') });
     }
     const list = await listActive();
     if (!list.length) return res.status(400).json({ error: '登録中の購読者がいません' });

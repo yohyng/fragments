@@ -17,9 +17,14 @@ drop policy if exists "fragments_settings_public_read" on public.fragments_setti
 create policy "fragments_settings_public_read" on public.fragments_settings
   for select using (true);
 
-drop policy if exists "fragments_settings_auth_write" on public.fragments_settings;
-create policy "fragments_settings_auth_write" on public.fragments_settings
-  for all to authenticated using (id = 1) with check (id = 1);
+-- 保存。fragments_security.sql を実行済み(管理者を限定済み)なら、そちらの権限のままにする。
+do $$ begin
+  if to_regclass('public.fragments_admins') is null then
+    drop policy if exists "fragments_settings_auth_write" on public.fragments_settings;
+    create policy "fragments_settings_auth_write" on public.fragments_settings
+      for all to authenticated using (id = 1) with check (id = 1);
+  end if;
+end $$;
 
 insert into public.fragments_settings (id) values (1)
 on conflict (id) do nothing;

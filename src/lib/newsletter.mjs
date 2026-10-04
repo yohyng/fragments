@@ -67,11 +67,52 @@ export async function recordMailing(row) {
   return (await rest('', { method: 'POST', body: row, table: 'fragments_mailings' }))[0];
 }
 
-/** The signed-in admin user behind a Supabase access token, or null. */
+/** The signed-in user behind a Supabase access token, or null. */
 export async function authUser(token) {
   if (!token) return null;
   const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` } });
   return res.ok ? res.json() : null;
+}
+
+// the claims of a token already checked by authUser
+function claims(token) {
+  try {
+    return JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * The admin behind a token: a user listed in fragments_admins, signed in with
+ * the second step (aal2) — as supabase/fragments_security.sql has the
+ * database require. Before that SQL is run (no fragments_admins), any
+ * signed-in user. Returns { user } or { error, status }.
+ */
+export async function requireAdmin(token) {
+  const user = await authUser(token);
+  if (!user) return { status: 401, error: 'ログインし直してください' };
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/fragments_admins?user_id=eq.${user.id}&select=user_id`, {
+    headers: { apikey: key(), Authorization: `Bearer ${key()}` },
+  });
+  if (res.status === 404) return { user }; // not set up yet
+  if (!res.ok) return { status: 500, error: `管理者を確かめられませんでした（${res.status}）` };
+  if (!(await res.json()).length) return { status: 403, error: 'このアカウントには権限がありません' };
+  if (claims(token).aal !== 'aal2') return { status: 403, error: '二段階認証を通してから、もう一度お試しください' };
+  return { user };
+}
+
+/** Where 「テスト送信」 goes: the saved addresses (up to 3), else the user. */
+export async function testRecipients(fallback) {
+  try {
+    const rows = await rest('?id=eq.1&select=test_recipients', { table: 'fragments_admin_prefs' });
+    const list = String(rows[0]?.test_recipients ?? '')
+      .split(/[\s,、]+/)
+      .map(normalizeEmail)
+      .filter(validEmail);
+    if (list.length) return [...new Set(list)].slice(0, 3);
+  } catch {}
+  return [fallback];
 }
 
 /** Mails through Resend, up to 100 a call; each { to, subject, html, text, headers? }. */

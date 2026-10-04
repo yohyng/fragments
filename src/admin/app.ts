@@ -54,14 +54,14 @@ const IMAGE_BUCKET = 'article-images';
 const STATUS_LABEL: Record<string, string> = { draft: '下書き', published: '公開', scheduled: '予約', private: '非公開' };
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
-const views = ['login', 'list', 'edit', 'settings', 'subscribers'] as const;
+const views = ['login', 'mfa', 'list', 'edit', 'settings', 'subscribers'] as const;
 type View = (typeof views)[number];
 let currentView: View = 'login';
 const show = (name: View) => {
   currentView = name;
   views.forEach((v) => ($(`[data-view="${v}"]`).hidden = v !== name));
   document.querySelectorAll<HTMLAnchorElement>('[data-nav]').forEach((a) => {
-    a.hidden = name === 'login';
+    a.hidden = name === 'login' || name === 'mfa';
     a.classList.toggle('is-current', a.dataset.nav === (name === 'edit' ? 'list' : name));
   });
 };
@@ -113,18 +113,17 @@ async function start() {
 }
 
 function signedIn() {
-  try {
-    showSignedIn();
-  } catch (e) {
+  showSignedIn().catch((e) => {
     // never leave every view hidden
     show('login');
     msg($('[data-login-msg]'), '画面を開けませんでした: ' + (e as Error).message, true);
-  }
+  });
 }
-function showSignedIn() {
+async function showSignedIn() {
   $('[data-signout]').hidden = !session;
   $('[data-who]').textContent = session?.user.email ?? '';
   if (!session) return show('login');
+  if (await needsSecondStep()) return;
   if (resumeView) {
     // signed in again after the login ran out: back to the same screen, edits kept
     const view = resumeView;
@@ -135,8 +134,64 @@ function showSignedIn() {
   }
   // first load (no screen shown yet, e.g. a reload on #/settings) or just signed in
   const none = views.every((v) => $(`[data-view="${v}"]`).hidden);
-  if (none || $('[data-view="login"]').hidden === false || location.hash === '') openFromHash();
+  const atGate = currentView === 'login' || currentView === 'mfa';
+  if (none || atGate || location.hash === '') openFromHash();
 }
+
+// Second step (TOTP): after the password, a 6-digit code from an
+// authenticator app. The first time, the app is set up from a QR code.
+// The database (supabase/fragments_security.sql) and api/newsletter only let
+// such a login (aal2) read the subscribers and save settings.
+let mfaFactorId: string | null = null;
+let mfaChecking = false;
+async function needsSecondStep(): Promise<boolean> {
+  const { data, error } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (error) throw error;
+  if (data.currentLevel === 'aal2') {
+    mfaFactorId = null;
+    return false;
+  }
+  if (currentView === 'mfa' && mfaFactorId) return true; // already asking
+  if (mfaChecking) return true;
+  mfaChecking = true;
+  try {
+    const { data: f, error: le } = await sb.auth.mfa.listFactors();
+    if (le) throw le;
+    const verified = f.totp.find((x) => x.status === 'verified');
+    $('[data-mfa-enroll]').hidden = !!verified;
+    $('[data-mfa-verify-hint]').hidden = !verified;
+    if (verified) mfaFactorId = verified.id;
+    else {
+      // a setup left unfinished: start again
+      for (const x of f.all) if (x.factor_type === 'totp' && x.status !== 'verified') await sb.auth.mfa.unenroll({ factorId: x.id });
+      const { data: e, error: ee } = await sb.auth.mfa.enroll({ factorType: 'totp', friendlyName: `fragments ${new Date().toISOString().slice(0, 10)}` });
+      if (ee) throw ee;
+      mfaFactorId = e.id;
+      $<HTMLImageElement>('[data-mfa-qr]').src = e.totp.qr_code;
+      $('[data-mfa-secret]').textContent = e.totp.secret;
+    }
+    msg($('[data-mfa-msg]'), '');
+    show('mfa');
+    $<HTMLInputElement>('[data-mfa] input[name="code"]').focus();
+    return true;
+  } finally {
+    mfaChecking = false;
+  }
+}
+
+$<HTMLFormElement>('[data-mfa]').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const input = $<HTMLInputElement>('[data-mfa] input[name="code"]');
+  const code = input.value.replace(/\D/g, '');
+  const out = $('[data-mfa-msg]');
+  if (!mfaFactorId || code.length !== 6) return msg(out, '6 桁の数字を入れてください。', true);
+  msg(out, '確かめています…');
+  const { error } = await sb.auth.mfa.challengeAndVerify({ factorId: mfaFactorId, code });
+  if (error) return msg(out, 'コードが違うか、時間切れです。アプリの新しい数字で、もう一度お試しください。', true);
+  input.value = '';
+  msg(out, '');
+  // the session is now aal2: onAuthStateChange opens the screen
+});
 
 // The login can run out (a tab left open for long, a refresh that failed);
 // then writes go out signed out and change nothing. Before saving, make sure

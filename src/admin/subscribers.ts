@@ -120,13 +120,18 @@ function initMail() {
     const d = JSON.parse(localStorage.getItem(DRAFT) || '{}');
     for (const k of ['subject', 'intro', 'outro']) if (typeof d[k] === 'string') f(k).value = d[k];
   } catch {}
-  $('[data-mail]').addEventListener('input', preview);
+  $('[data-mail]').addEventListener('input', (e) => {
+    if ((e.target as HTMLElement).matches('[data-mail-to]')) return;
+    preview();
+  });
+  $('[data-mail-to]').addEventListener('change', saveTestTo);
   $('[data-mail-test]').addEventListener('click', () => send(true));
   $('[data-mail-send]').addEventListener('click', () => send(false));
 }
 
 async function openMail() {
   if (!f('subject').value) f('subject').value = `fragments folio — ${today()}`;
+  loadTestTo();
   const [a, h] = await Promise.all([
     sb.from('articles').select('id,date,title,subtitle,content,status').eq('status', 'published').order('date', { ascending: false }).order('id', { ascending: false }).limit(15),
     sb.from('fragments_mailings').select('subject,recipients,sent_at').order('sent_at', { ascending: false }).limit(10),
@@ -165,6 +170,7 @@ async function send(test: boolean) {
   if (!p.intro.trim() && !p.articles.length) return void ((out.textContent = 'はじめの文か、添える記事を入れてください。'), out.classList.add('error'));
   if (!test && !confirm(`登録中の ${activeCount} 人に「${p.subject}」を送ります。よろしいですか？（取り消せません）`)) return;
   sending = true;
+  if (test && !toInput().disabled) await saveTestTo();
   out.classList.remove('error');
   out.textContent = test ? 'テスト送信しています…' : '配信しています…';
   try {
@@ -192,4 +198,30 @@ async function send(test: boolean) {
   } finally {
     sending = false;
   }
+}
+
+// テスト送信先: kept in fragments_admin_prefs (admins only; see
+// supabase/fragments_security.sql), so api/newsletter sends the test there
+const toInput = () => $<HTMLInputElement>('[data-mail-to]');
+const parseTo = (v: string) => [...new Set(v.split(/[\s,、]+/).map((x) => x.trim().toLowerCase()).filter(Boolean))];
+async function loadTestTo() {
+  const { data, error } = await sb.from('fragments_admin_prefs').select('test_recipients').eq('id', 1).maybeSingle();
+  const missing = !!error && (error.code === 'PGRST205' || error.code === '42P01');
+  toInput().disabled = missing;
+  $('[data-mail-to-hint]').textContent = missing
+    ? 'テスト送信先を保存するには、supabase/fragments_security.sql を実行してください。それまではログイン中のアドレスに送ります。'
+    : 'カンマで区切って 3 件まで。入れたアドレスは、管理者だけが読める場所に保存されます。';
+  if (!error) toInput().value = (data as any)?.test_recipients ?? '';
+}
+async function saveTestTo() {
+  const out = $('[data-mail-msg]');
+  const list = parseTo(toInput().value);
+  const bad = list.filter((x) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x));
+  out.classList.toggle('error', !!bad.length || list.length > 3);
+  if (bad.length) return void (out.textContent = `メールアドレスの形ではありません: ${bad.join(', ')}`);
+  if (list.length > 3) return void (out.textContent = 'テスト送信先は 3 件までです。');
+  toInput().value = list.join(', ');
+  const { error } = await sb.from('fragments_admin_prefs').upsert({ id: 1, test_recipients: toInput().value, updated_at: new Date().toISOString() });
+  out.classList.toggle('error', !!error);
+  out.textContent = error ? 'テスト送信先を保存できませんでした: ' + error.message : 'テスト送信先を保存しました。';
 }

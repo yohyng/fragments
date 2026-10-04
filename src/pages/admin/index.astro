@@ -44,6 +44,22 @@ import '../../styles/tokens.css';
       </form>
     </section>
 
+    <!-- second step: a code from an authenticator app (TOTP) -->
+    <section class="view" data-view="mfa" hidden>
+      <form class="login" data-mfa>
+        <h1>二段階認証</h1>
+        <div class="mfa-enroll" data-mfa-enroll hidden>
+          <p class="hint">はじめに一度だけ設定します。スマホの認証アプリ（Google Authenticator、1Password、iPhone の「パスワード」など）でこの QR コードを読み取り、表示された 6 桁の数字を入れてください。</p>
+          <img data-mfa-qr alt="認証アプリで読み取る QR コード" width="180" height="180" />
+          <p class="hint">読み取れないときは、アプリにこのキーを入れてください：<br /><code data-mfa-secret></code></p>
+        </div>
+        <p class="hint" data-mfa-verify-hint hidden>認証アプリに表示されている 6 桁の数字を入れてください。</p>
+        <label>確認コード<input type="text" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required /></label>
+        <button type="submit" class="primary">確認</button>
+        <p class="msg" data-mfa-msg></p>
+      </form>
+    </section>
+
     <!-- list -->
     <section class="view" data-view="list" hidden>
       <div class="list-head">
@@ -140,7 +156,7 @@ import '../../styles/tokens.css';
       </div>
       <div class="box mail" data-mail>
         <h2>メールを送る</h2>
-        <p class="hint">登録中の全員に「fragments folio」を送ります。まず「自分にテスト送信」で届き方を確かめてください。下書きはこのブラウザに残ります。</p>
+        <p class="hint">登録中の全員に「fragments folio」を送ります。まず「テスト送信」で届き方を確かめてください。下書きはこのブラウザに残ります。</p>
         <div class="mail-grid">
           <div class="mail-form">
             <label>件名<input type="text" data-mail-f="subject" /></label>
@@ -150,8 +166,10 @@ import '../../styles/tokens.css';
               <div data-mail-arts></div>
             </div>
             <label>結びの文<textarea data-mail-f="outro" rows="3" placeholder="（なくても構いません）"></textarea></label>
+            <label>テスト送信先<input type="text" data-mail-to placeholder="空欄ならログイン中のアドレス" /></label>
+            <p class="hint mail-to-hint" data-mail-to-hint>カンマで区切って 3 件まで。入れたアドレスは、管理者だけが読める場所に保存されます。</p>
             <div class="mail-actions">
-              <button type="button" class="ghost" data-mail-test>自分にテスト送信</button>
+              <button type="button" class="ghost" data-mail-test>テスト送信</button>
               <button type="button" class="primary" data-mail-send>配信する</button>
             </div>
             <p class="msg" data-mail-msg></p>
@@ -276,6 +294,9 @@ import '../../styles/tokens.css';
   .msg { min-height: 1.6em; margin: 0; font-family: var(--font-mincho); font-size: 12px; color: var(--color-neutral-700); }
   .msg.error { color: #b3261e; }
 
+  .mfa-enroll { display: flex; flex-direction: column; gap: 12px; }
+  .mfa-enroll img { align-self: center; background: #fff; padding: 8px; }
+  .mfa-enroll code { font-size: 12px; word-break: break-all; user-select: all; }
   .login { max-width: 360px; margin: 48px auto; display: flex; flex-direction: column; gap: 16px; }
 
   .list-head { display: flex; align-items: baseline; justify-content: space-between; max-width: 960px; margin-bottom: 18px; }
@@ -417,6 +438,7 @@ import '../../styles/tokens.css';
   .mail-art { flex-direction: row; align-items: baseline; gap: 8px; font-size: 13px; color: var(--color-text); cursor: pointer; }
   .mail-art input { flex: none; }
   .mail-art .date { font-family: var(--font-body); font-size: 11px; color: var(--color-neutral-700); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .mail-to-hint { margin-top: -8px; }
   .mail-actions { display: flex; gap: 10px; }
   .mail-preview { display: flex; flex-direction: column; gap: 6px; }
   .mail-preview iframe { width: 100%; height: 640px; border: 1px solid var(--color-divider); background: #fff; }
