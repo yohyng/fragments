@@ -191,7 +191,6 @@ export async function openSettings() {
   state = structuredClone(saved);
   $('[data-set-missing]').hidden = !tableMissing;
   $('[data-set-sql]').textContent = setupSql.trim();
-  $<HTMLButtonElement>('[data-set-save]').disabled = tableMissing;
   if (!tableMissing) msg('');
   renderTabs();
   renderFields();
@@ -405,6 +404,16 @@ $('[data-set-preset-save]').addEventListener('click', () => {
 $('[data-set-save]').addEventListener('click', async () => {
   const button = $<HTMLButtonElement>('[data-set-save]');
   button.disabled = true;
+  if (tableMissing) {
+    // the SQL may have been run since this screen was opened: look again
+    const { error } = await sb.from('fragments_settings').select('id').limit(1);
+    tableMissing = isMissing(error);
+    $('[data-set-missing]').hidden = !tableMissing;
+    if (tableMissing) {
+      button.disabled = false;
+      return msg('表示設定のテーブルがまだ見つかりません。上の SQL を Supabase で実行してから、もう一度押してください。', true);
+    }
+  }
   msg('保存しています…');
   const { error } = await sb.from('fragments_settings').upsert({ id: 1, data: diff(state), presets, updated_at: new Date().toISOString() });
   button.disabled = false;
