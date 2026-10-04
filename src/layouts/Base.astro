@@ -77,6 +77,41 @@ const { title } = Astro.props;
       window.addEventListener('resize', setFrameH);
       window.addEventListener('orientationchange', setFrameH);
       window.addEventListener('pageshow', setFrameH);
+      document.addEventListener('visibilitychange', setFrameH);
+      // ?frame-debug: show the heights the browser reports (for iPad layouts)
+      if (location.search.includes('frame-debug')) {
+        addEventListener('load', () => {
+          const box = document.createElement('pre');
+          box.style.cssText =
+            'position:fixed;z-index:99;left:8px;bottom:8px;margin:0;padding:8px 10px;background:#000c;color:#fff;font:12px/1.5 monospace;pointer-events:none';
+          const probe = (h) => {
+            const d = document.createElement('div');
+            d.style.cssText = 'position:fixed;top:0;left:0;width:1px;visibility:hidden;height:' + h;
+            document.body.append(d);
+            const v = Math.round(d.getBoundingClientRect().height);
+            d.remove();
+            return v;
+          };
+          const show = () => {
+            const v = window.visualViewport;
+            const page = document.querySelector('.page');
+            box.textContent = [
+              'inner ' + innerWidth + '×' + innerHeight,
+              'client ' + document.documentElement.clientWidth + '×' + document.documentElement.clientHeight,
+              'visual ' + (v ? Math.round(v.width) + '×' + Math.round(v.height) + ' s' + v.scale.toFixed(2) + ' top' + Math.round(v.offsetTop) : '-'),
+              'frame-h ' + getComputedStyle(document.documentElement).getPropertyValue('--frame-h'),
+              'page ' + (page ? Math.round(page.getBoundingClientRect().height) : '-'),
+              'dvh ' + probe('100dvh') + ' svh ' + probe('100svh') + ' lvh ' + probe('100lvh') + ' fixed ' + probe('100%'),
+              'screen ' + screen.width + '×' + screen.height + ' dpr ' + devicePixelRatio,
+              'coarse ' + matchMedia('(pointer: coarse)').matches,
+            ].join('\n');
+          };
+          document.body.append(box);
+          show();
+          addEventListener('resize', show);
+          window.visualViewport?.addEventListener('resize', show);
+        });
+      }
       // A swipe that starts outside every column (gaps, margins) must not
       // drag the page. A column pulled down past its top must not bounce
       // (that would drag the sticky header down and show the space above);
