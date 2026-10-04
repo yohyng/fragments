@@ -110,8 +110,8 @@ const { title, subtitle, date } = Astro.props;
     content: '';
     position: absolute;
     left: 0;
-    top: calc(100% + var(--s-date-rule-gap, 16) * 1px);
-    width: min(100%, calc(var(--s-date-rule, 40) * 1px));
+    top: var(--date-rule-top, calc(100% + var(--s-date-rule-gap, 16) * 1px)); /* set by the script when aligned with the index */
+    width: min(100%, calc(var(--s-date-rule, 900) * 1px));
     height: 1px;
     background: var(--color-divider);
   }
@@ -584,6 +584,52 @@ const { title, subtitle, date } = Astro.props;
     }
   }
 </style>
+
+<script>
+  // Beside the index (≥1160px; 表示設定 → 記事本文 → そろえる): the date's
+  // text bottom level with the index's English catch copy, and the rule
+  // under the date level with the rule under the catch copy. Positions are
+  // taken from each column's header rule, scroll left out. A long title that
+  // already brings the date lower keeps it there.
+  function alignHead() {
+    const col = document.querySelector<HTMLElement>('main.column');
+    const head = col?.querySelector<HTMLElement>('.head');
+    const date = head?.querySelector<HTMLElement>('.date');
+    const rule = col?.querySelector<HTMLElement>('.rule');
+    const index = document.querySelector<HTMLElement>('[data-index]');
+    const en = index?.querySelector<HTMLElement>('.intro-en');
+    const site = index?.querySelector<HTMLElement>('.site');
+    if (!col || !head || !date || !rule || !index || !en || !site) return;
+    date.style.marginTop = '';
+    date.style.removeProperty('--date-rule-top');
+    const on = getComputedStyle(document.documentElement).getPropertyValue('--s-date-align').trim() !== '0';
+    if (!on || !matchMedia('(min-width: 1160px)').matches || !en.offsetParent) return;
+    const textBottom = (el: HTMLElement) => {
+      const r = document.createRange();
+      r.selectNodeContents(el);
+      const rects = r.getClientRects();
+      return rects[rects.length - 1]?.bottom ?? el.getBoundingClientRect().bottom;
+    };
+    // y in the index, from the bottom of its header rule
+    const ixTop = index.getBoundingClientRect().top - index.scrollTop;
+    const ixRule = site.getBoundingClientRect().bottom - index.getBoundingClientRect().top;
+    const inIndex = (y: number) => y - ixTop - ixRule;
+    // y in the article column, from the bottom of its header rule
+    const colTop = col.getBoundingClientRect().top - col.scrollTop;
+    const colRule = rule.getBoundingClientRect().bottom - col.getBoundingClientRect().top;
+    const inCol = (y: number) => y - colTop - colRule;
+
+    const shift = inIndex(textBottom(en)) - inCol(textBottom(date));
+    if (shift > 0) date.style.marginTop = parseFloat(getComputedStyle(date).marginTop) + shift + 'px';
+    // the index's rule: the catch copy's ::after, `top` below the copy's box
+    const enTop = en.getBoundingClientRect().top;
+    const ixRuleY = inIndex(enTop + parseFloat(getComputedStyle(en, '::after').top));
+    date.style.setProperty('--date-rule-top', ixRuleY - inCol(date.getBoundingClientRect().top) + 'px');
+  }
+  alignHead();
+  document.fonts.ready.then(alignHead);
+  addEventListener('resize', alignHead);
+</script>
 
 <script>
   // Hover a number or note → highlight both. Click a number → smooth-scroll to

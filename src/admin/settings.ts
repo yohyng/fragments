@@ -80,7 +80,8 @@ const tabs: Tab[] = [
       { key: 'titleSizePc', label: '記事タイトルの文字サイズ（PC）', type: 'range', min: 26, max: 44, step: 1, unit: 'px' },
       { key: 'noteSize', label: '注の文字サイズ（PC）', type: 'range', min: 12, max: 16, step: 0.5, unit: 'px' },
       { key: 'dateRuleLength', label: '日付の下の区切り線：長さ', type: 'range', min: 0, max: 900, step: 4, unit: 'px', hint: '左揃えの細く薄い線です。0 にすると線なしになります。タイトルの幅より長くすると、その幅で止まります。' },
-      { key: 'dateRuleGap', label: '日付の下の区切り線：日付からの距離', type: 'range', min: 0, max: 120, step: 1, unit: 'px', hint: '線は余白の中に重ねて引くので、本文の位置は変わりません。' },
+      { key: 'dateAlign', label: '記事一覧と並ぶとき、日付と線の高さを記事一覧にそろえる（日付の下端を英文のキャッチコピーの下端に、線をキャッチコピーの下の線に）', type: 'check' },
+      { key: 'dateRuleGap', label: '日付の下の区切り線：日付からの距離', type: 'range', min: 0, max: 120, step: 1, unit: 'px', hint: '上の「そろえる」が切れているとき、またはタブレット・スマホでの距離です。線は余白の中に重ねて引くので、本文の位置は変わりません。' },
     ],
   },
   {

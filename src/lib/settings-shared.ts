@@ -44,6 +44,8 @@ export interface Settings {
   /** the thin rule under an article's date: length (0 = none) and distance below it, px */
   dateRuleLength: number;
   dateRuleGap: number;
+  /** beside the index: the date level with the English catch copy, its rule with the index's */
+  dateAlign: boolean;
   // 記事一覧
   siteNameSize: number;
   catchJaSize: number;
@@ -138,8 +140,9 @@ export const defaults: Settings = {
   justify: true,
   titleSizePc: 36,
   noteSize: 14,
-  dateRuleLength: 40,
+  dateRuleLength: 900,
   dateRuleGap: 16,
+  dateAlign: true,
   siteNameSize: 30,
   catchJaSize: 13,
   catchEnSize: 13,
@@ -399,6 +402,7 @@ export function settingsCss(s: Settings): string {
     v['--s-ix-c-pc'] = `${s.ixCatsGap - 14 - s.ixCatchGap}px`; // less the categories' padding and the catch gap
     v['--s-ix-c-minh'] = '0px';
   }
+  if (!s.dateAlign) v['--s-date-align'] = '0';
   if (!s.indent) v['--s-indent'] = '0';
   if (!s.justify) v['--s-align'] = 'left';
   const body = Object.entries(v)
