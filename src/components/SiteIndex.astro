@@ -18,7 +18,7 @@ const onAbout = Astro.url.pathname.startsWith('/about');
   <a class="site" href="/">{site.name}</a>
   <div class="intro">
     <span class="intro-ja">{site.catchJa}</span>
-    <span class="intro-en">{site.catchEn}</span>
+    <span class="intro-en" lang="en">{site.catchEn}</span>
     <div class="cats">
       {
         ['all', ...categories].map((c) => (
@@ -178,6 +178,14 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     line-height: 1.75;
     color: var(--color-neutral-800);
   }
+  /* the catch copy justified, the last line flush left (English hyphenated) */
+  .intro-ja,
+  .intro-en {
+    display: block;
+    text-align: justify;
+    text-align-last: left;
+  }
+  .intro-en { hyphens: auto; -webkit-hyphens: auto; }
   .intro-ja { font-family: var(--font-mincho); font-size: calc(var(--s-catch-ja, 13) * 1px); }
   .intro-en { font-family: var(--font-body); font-style: italic; font-size: calc(var(--s-catch-en, 13) * 1px); }
   .cats {
