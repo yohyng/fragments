@@ -251,13 +251,14 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     text-overflow: ellipsis;
     font-family: var(--font-index, var(--font-mincho)); /* 表示設定 → 記事一覧のフォント */
   }
-  /* the article being read, beside the index (≥1160px): marked like a
-     text selection, the accent behind the title */
+  /* the article being read, beside the index (≥1160px): its title in the
+     accent, underlined in the accent */
   @media (min-width: 1160px) {
     .item.is-current .item-mark {
-      padding: 1px 0;
-      background: var(--sel-bg);
-      color: var(--sel-fg);
+      text-decoration: underline;
+      text-decoration-color: var(--color-accent);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.25em;
     }
     .item.is-current .item-sub {
       color: inherit;
