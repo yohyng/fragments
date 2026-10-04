@@ -64,6 +64,9 @@ export interface Settings {
   welcomeTitleSize: number;
   welcomeLeadSize: number;
   welcomeLeadEnSize: number;
+  /** the rule between the title and the lead: length (0 = none) and weight, px */
+  welcomeRuleLength: number;
+  welcomeRuleWeight: number;
 }
 
 export const defaults: Settings = {
@@ -117,6 +120,8 @@ export const defaults: Settings = {
   welcomeTitleSize: 32,
   welcomeLeadSize: 15,
   welcomeLeadEnSize: 13,
+  welcomeRuleLength: 64,
+  welcomeRuleWeight: 1,
 };
 
 /** Saved overrides on top of the defaults; unknown or mistyped keys are dropped. */
@@ -269,6 +274,8 @@ export function settingsCss(s: Settings): string {
     ['welcomeTitleSize', '--s-wl-title'],
     ['welcomeLeadSize', '--s-wl-lead'],
     ['welcomeLeadEnSize', '--s-wl-lead-en'],
+    ['welcomeRuleLength', '--s-wl-rule'],
+    ['welcomeRuleWeight', '--s-wl-rule-w'],
     ['catchJaSize', '--s-catch-ja'],
     ['catchEnSize', '--s-catch-en'],
     ['indexSize', '--s-index'],

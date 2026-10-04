@@ -125,6 +125,8 @@ const tabs: Tab[] = [
       { key: 'welcomeTitleSize', label: 'タイトルの文字サイズ', type: 'range', min: 18, max: 56, step: 1, unit: 'px' },
       { key: 'welcomeLeadSize', label: '説明文（日本語）の文字サイズ', type: 'range', min: 12, max: 22, step: 0.5, unit: 'px' },
       { key: 'welcomeLeadEnSize', label: '説明文（英語）の文字サイズ', type: 'range', min: 11, max: 20, step: 0.5, unit: 'px' },
+      { key: 'welcomeRuleLength', label: 'タイトルと説明文のあいだの区切り線：長さ', type: 'range', min: 0, max: 520, step: 4, unit: 'px', hint: '0 にすると線なしになります。' },
+      { key: 'welcomeRuleWeight', label: 'タイトルと説明文のあいだの区切り線：太さ', type: 'range', min: 0.5, max: 4, step: 0.5, unit: 'px' },
     ],
   },
 ];
