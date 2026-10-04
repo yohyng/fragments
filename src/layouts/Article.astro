@@ -38,6 +38,9 @@ const { title, subtitle, date } = Astro.props;
     </script>
   </article>
   <slot name="end" />
+  <!-- the notes column's closing rule, level with the rule above the
+       subscribe box (placed by the script) -->
+  <div class="notes-foot" aria-hidden="true" hidden></div>
   <div class="end-space"></div>
   <div class="endrule" data-endrule></div>
   <div class="scroll-foot" aria-hidden="true"></div>
@@ -112,7 +115,11 @@ const { title, subtitle, date } = Astro.props;
   article {
     position: relative;
   }
-  .notes-head {
+  .column {
+    position: relative; /* for .notes-foot */
+  }
+  .notes-head,
+  .notes-foot {
     position: absolute;
     height: 1px;
     background: var(--color-divider);
@@ -651,7 +658,12 @@ const { title, subtitle, date } = Astro.props;
     if (!article || !nh || !mark || !date) return;
     const note = [...article.querySelectorAll<HTMLElement>('.sidenote')].find((n) => getComputedStyle(n).display !== 'none');
     const dateRule = getComputedStyle(date, '::after');
-    if (!note || !(parseFloat(dateRule.width) > 0)) return void (nh.hidden = true);
+    if (!note || !(parseFloat(dateRule.width) > 0)) {
+      nh.hidden = true;
+      const foot = article.closest('main')?.querySelector<HTMLElement>('.notes-foot');
+      if (foot) foot.hidden = true;
+      return;
+    }
     nh.hidden = false;
     const a = article.getBoundingClientRect();
     const n = note.getBoundingClientRect();
@@ -667,6 +679,17 @@ const { title, subtitle, date } = Astro.props;
       return rects[rects.length - 1]?.bottom ?? el.getBoundingClientRect().bottom;
     };
     mark.style.top = bottom(date) - bottom(mark.querySelector<HTMLElement>('.notes-mark-ja') ?? mark) + 'px';
+    // the closing rule: level with the subscribe box's top rule
+    const col = article.closest<HTMLElement>('main.column');
+    const foot = col?.querySelector<HTMLElement>('.notes-foot');
+    const sub = col?.querySelector<HTMLElement>('.sub');
+    if (!col || !foot) return;
+    if (!sub) return void (foot.hidden = true);
+    foot.hidden = false;
+    const c = col.getBoundingClientRect();
+    foot.style.left = n.left - c.left + 'px';
+    foot.style.width = n.width + 'px';
+    foot.style.top = sub.getBoundingClientRect().top - c.top + col.scrollTop + 'px';
   }
   function layoutHead() {
     alignHead();

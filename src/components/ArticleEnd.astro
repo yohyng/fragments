@@ -3,6 +3,7 @@
 import Subscribe from './Subscribe.astro';
 import { formatDate, type Post } from '../lib/posts';
 import { site } from '../lib/site';
+import { shareIcons } from '../lib/share-icons';
 
 interface Props {
   post: Post;
@@ -22,13 +23,13 @@ const related = posts.filter((p) => p.category === post.category && p.slug !== p
 const url = new URL(`/posts/${post.slug}/`, Astro.site ?? site.url).href;
 const text = post.subtitle ? `${post.title} ${post.subtitle}` : post.title;
 const e = encodeURIComponent;
-const shares = [
-  { label: 'X', href: `https://x.com/intent/post?text=${e(text)}&url=${e(url)}` },
-  { label: 'Facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${e(url)}` },
-  { label: 'LINE', href: `https://social-plugins.line.me/lineit/share?url=${e(url)}` },
-  { label: 'Bluesky', href: `https://bsky.app/intent/compose?text=${e(`${text} ${url}`)}` },
-  { label: 'Threads', href: `https://www.threads.net/intent/post?text=${e(`${text} ${url}`)}` },
-  { label: 'はてブ', href: `https://b.hatena.ne.jp/entry/${url.replace(/^https:\/\//, 's/').replace(/^http:\/\//, '')}` },
+const shares: { label: string; icon: string; href: string }[] = [
+  { label: 'X', icon: 'x', href: `https://x.com/intent/post?text=${e(text)}&url=${e(url)}` },
+  { label: 'Facebook', icon: 'facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${e(url)}` },
+  { label: 'LINE', icon: 'line', href: `https://social-plugins.line.me/lineit/share?url=${e(url)}` },
+  { label: 'Bluesky', icon: 'bluesky', href: `https://bsky.app/intent/compose?text=${e(`${text} ${url}`)}` },
+  { label: 'Threads', icon: 'threads', href: `https://www.threads.net/intent/post?text=${e(`${text} ${url}`)}` },
+  { label: 'はてなブックマーク', icon: 'hatena', href: `https://b.hatena.ne.jp/entry/${url.replace(/^https:\/\//, 's/').replace(/^http:\/\//, '')}` },
 ];
 ---
 
@@ -36,10 +37,27 @@ const shares = [
 <nav class="share" aria-label="この記事をシェア" data-share={url} data-share-text={text}>
   <span class="share-label">Share</span>
   <ul>
-    {shares.map((x) => <li><a href={x.href} target="_blank" rel="noopener">{x.label}</a></li>)}
-    <li><button type="button" data-copy>リンクをコピー</button></li>
-    <li hidden data-native-li><button type="button" data-native>共有…</button></li>
+    {
+      shares.map((x) => (
+        <li>
+          <a href={x.href} target="_blank" rel="noopener" aria-label={`${x.label}でシェア`} title={x.label}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d={shareIcons[x.icon]} /></svg>
+          </a>
+        </li>
+      ))
+    }
+    <li>
+      <button type="button" data-copy aria-label="リンクをコピー" title="リンクをコピー">
+        <svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3.2-3.2a4.5 4.5 0 0 0-6.4-6.4L11.6 6" /><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3.2 3.2a4.5 4.5 0 0 0 6.4 6.4l1.6-1.6" /></svg>
+      </button>
+    </li>
+    <li hidden data-native-li>
+      <button type="button" data-native aria-label="共有" title="共有">
+        <svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3.5" /><path d="M7.5 8 12 3.5 16.5 8" /><path d="M8 11H5.5v9.5h13V11H16" /></svg>
+      </button>
+    </li>
   </ul>
+  <span class="share-msg" aria-live="polite" data-share-msg></span>
 </nav>
 <aside class="sub" aria-label="購読">
   <Subscribe />
@@ -110,19 +128,37 @@ const shares = [
     padding: 0;
     list-style: none;
   }
-  /* buttons: a thin frame, the accent on hover */
+  /* icon buttons: a thin frame, the accent on hover */
   .share a,
   .share button {
-    display: inline-block;
-    padding: 6px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
     border: 1px solid var(--color-divider);
     background: none;
-    font: inherit;
-    line-height: 1.4;
     color: var(--color-text);
-    text-decoration: none;
     cursor: pointer;
     transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  .share svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
+  .share svg.line-icon {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .share-msg {
+    min-height: 1.6em;
+    font-size: 12px;
+    color: var(--color-neutral-700);
   }
   .share a:hover,
   .share button:hover {
@@ -138,7 +174,7 @@ const shares = [
     gap: 8px;
     margin-top: 96px;
     padding: 48px 0 12px;
-    border-top: 1px solid var(--color-text);
+    border-top: 1px solid var(--color-divider);
     font-family: var(--font-mincho);
     font-size: 14px;
   }
@@ -297,14 +333,17 @@ const shares = [
   if (nav) {
     const url = nav.dataset.share!;
     const copy = nav.querySelector<HTMLButtonElement>('[data-copy]')!;
+    const msg = nav.querySelector<HTMLElement>('[data-share-msg]')!;
+    let t: ReturnType<typeof setTimeout>;
     copy.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(url);
-        copy.textContent = 'コピーしました';
+        msg.textContent = 'リンクをコピーしました';
       } catch {
-        copy.textContent = url;
+        msg.textContent = url;
       }
-      setTimeout(() => (copy.textContent = 'リンクをコピー'), 2000);
+      clearTimeout(t);
+      t = setTimeout(() => (msg.textContent = ''), 2500);
     });
     if (navigator.share) {
       nav.querySelector<HTMLElement>('[data-native-li]')!.hidden = false;
