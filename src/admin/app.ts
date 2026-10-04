@@ -40,7 +40,10 @@ const STATUS_LABEL: Record<string, string> = { draft: '下書き', published: '�
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const views = ['login', 'list', 'edit', 'settings'] as const;
-const show = (name: (typeof views)[number]) => {
+type View = (typeof views)[number];
+let currentView: View = 'login';
+const show = (name: View) => {
+  currentView = name;
   views.forEach((v) => ($(`[data-view="${v}"]`).hidden = v !== name));
   document.querySelectorAll<HTMLAnchorElement>('[data-nav]').forEach((a) => {
     a.hidden = name === 'login';
@@ -71,7 +74,30 @@ function signedIn() {
   $('[data-signout]').hidden = !session;
   $('[data-who]').textContent = session?.user.email ?? '';
   if (!session) return show('login');
+  if (resumeView) {
+    // signed in again after the login ran out: back to the same screen, edits kept
+    const view = resumeView;
+    resumeView = null;
+    show(view);
+    const out = view === 'settings' ? $('[data-set-msg]') : $('[data-save-msg]');
+    return msg(out, 'ログインし直しました。もう一度「保存」を押してください。');
+  }
   if ($('[data-view="login"]').hidden === false || location.hash === '') openFromHash();
+}
+
+// The login can run out (a tab left open for long, a refresh that failed);
+// then writes go out signed out and change nothing. Before saving, make sure
+// there is a session; if not, ask to sign in again over the open screen.
+let resumeView: View | null = null;
+async function ensureSignedIn(): Promise<boolean> {
+  const { data } = await sb.auth.getSession();
+  if (data.session) return true;
+  const { data: r } = await sb.auth.refreshSession();
+  if (r.session) return true;
+  resumeView = currentView;
+  show('login');
+  msg($('[data-login-msg]'), 'ログインが切れていました。ログインし直してください（編集中の内容はそのまま残っています）。', true);
+  return false;
 }
 
 $<HTMLFormElement>('[data-login]').addEventListener('submit', async (e) => {
@@ -423,11 +449,17 @@ $('[data-save]').addEventListener('click', async () => {
   if (!row.title) return msg(out, 'タイトルを入れてください。', true);
   button.disabled = true;
   msg(out, '保存しています…');
+  if (!(await ensureSignedIn())) return void (button.disabled = false);
   const wasVisible = current.status === 'published' || current.status === 'scheduled';
   const res = current.id === undefined
     ? await sb.from('articles').insert(row).select('id').single()
     : await sb.from('articles').update(row).eq('id', current.id).select('id').single();
   button.disabled = false;
+  // no row changed: signed out after all (or the article is gone)
+  if (res.error?.code === 'PGRST116') {
+    if (!(await ensureSignedIn())) return;
+    return msg(out, '保存できませんでした。記事が見つからないか、書き込みが許可されていません。ページを再読み込みしてください。', true);
+  }
   if (res.error) return msg(out, '保存できませんでした: ' + res.error.message, true);
   const isNew = current.id === undefined;
   current = { ...current, ...row, id: res.data.id };
@@ -448,6 +480,7 @@ $('[data-save]').addEventListener('click', async () => {
 $('[data-delete]').addEventListener('click', async () => {
   if (!current?.id || !confirm(`「${current.title}」を削除します。元に戻せません。よろしいですか？`)) return;
   const wasVisible = current.status === 'published' || current.status === 'scheduled';
+  if (!(await ensureSignedIn())) return;
   const { error } = await sb.from('articles').delete().eq('id', current.id);
   if (error) return msg($('[data-save-msg]'), '削除できませんでした: ' + error.message, true);
   if (wasVisible) await rebuild();
@@ -457,5 +490,5 @@ $('[data-delete]').addEventListener('click', async () => {
 
 // the saved display settings are public: apply them (the editor shows the
 // article's type) whether or not anyone is signed in
-initSettings(sb, rebuild);
+initSettings(sb, rebuild, ensureSignedIn);
 start();

@@ -169,7 +169,9 @@ function setFonts(doc: Document, s: Settings, id: string) {
 }
 
 /** Load the saved settings (public) and apply them to the admin. */
-export async function initSettings(client: SupabaseClient, rebuildSite: () => Promise<boolean>) {
+let ensureSignedIn: () => Promise<boolean> = async () => true;
+export async function initSettings(client: SupabaseClient, rebuildSite: () => Promise<boolean>, signedIn?: () => Promise<boolean>) {
+  if (signedIn) ensureSignedIn = signedIn;
   sb = client;
   rebuild = rebuildSite;
   await load();
@@ -363,6 +365,7 @@ function renderPresets() {
 }
 
 async function savePresets(next: Preset[], done: string) {
+  if (!(await ensureSignedIn())) return;
   const { error } = await sb.from('fragments_settings').upsert({ id: 1, data: diff(saved), presets: next });
   if (error) return msg('テンプレートを保存できませんでした: ' + error.message, true);
   presets = next;
@@ -415,6 +418,7 @@ $('[data-set-save]').addEventListener('click', async () => {
     }
   }
   msg('保存しています…');
+  if (!(await ensureSignedIn())) return void (button.disabled = false);
   const { error } = await sb.from('fragments_settings').upsert({ id: 1, data: diff(state), presets, updated_at: new Date().toISOString() });
   button.disabled = false;
   if (error) return msg('保存できませんでした: ' + error.message, true);
