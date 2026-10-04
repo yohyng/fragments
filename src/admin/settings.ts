@@ -31,6 +31,8 @@ interface Field {
   placeholder?: string | (() => string);
   /** shows only after saving (the preview cannot show it) */
   later?: boolean;
+  /** font fields: a first option for '' (follow another font) */
+  sameAs?: string;
 }
 interface Tab {
   id: string;
@@ -86,6 +88,7 @@ const tabs: Tab[] = [
       { key: 'siteNameSize', label: 'サイト名の文字サイズ', type: 'range', min: 20, max: 48, step: 1, unit: 'px', hint: 'PC での大きさです。タブレット・スマホでは同じ比率で少し小さくなります（記事ページ上部のサイト名も）。' },
       { key: 'catchJaSize', label: 'キャッチコピー（日本語）の文字サイズ', type: 'range', min: 11, max: 20, step: 0.5, unit: 'px' },
       { key: 'catchEnSize', label: 'キャッチコピー（英語）の文字サイズ', type: 'range', min: 11, max: 20, step: 0.5, unit: 'px' },
+      { key: 'fontIndex', label: '記事一覧（記事タイトル）のフォント', type: 'font-ja', sameAs: '本文と同じ' },
       { key: 'indexSize', label: '記事一覧の文字サイズ', type: 'range', min: 12, max: 17, step: 0.5, unit: 'px', hint: 'PC での大きさです。タブレット・スマホでは同じ比率で少し大きくなります。' },
       { key: 'pageSize', label: '一度に表示する記事の数', type: 'range', min: 10, max: 60, step: 5, unit: '件', hint: '「さらに読み込む」で増える数も同じです。', later: true },
     ],
@@ -349,12 +352,13 @@ function fieldRow(f: Field): HTMLElement {
   } else {
     const select = document.createElement('select');
     const list = f.type === 'font-ja' ? jaFonts : latinFonts;
+    if (f.sameAs) select.append(new Option(f.sameAs, ''));
     fontOptions(select, list);
     select.value = String(value);
-    select.style.fontFamily = `'${value}'`;
+    select.style.fontFamily = value ? `'${value}'` : '';
     select.addEventListener('change', () => {
       set(select.value);
-      select.style.fontFamily = `'${select.value}'`;
+      select.style.fontFamily = select.value ? `'${select.value}'` : '';
     });
     row.append(select);
   }

@@ -23,6 +23,8 @@ export interface Settings {
   selFg: string;
   fontJaHeading: string;
   fontJaBody: string;
+  /** article titles in the index; '' = the body font */
+  fontIndex: string;
   fontLatinHeading: string;
   fontLatinBody: string;
   // 記事本文
@@ -77,6 +79,7 @@ export const defaults: Settings = {
   selFg: '#ffffff',
   fontJaHeading: 'Shippori Mincho',
   fontJaBody: 'Zen Old Mincho',
+  fontIndex: '',
   fontLatinHeading: 'Cormorant Garamond',
   fontLatinBody: 'Lora',
   bodySizePc: 18,
@@ -201,6 +204,7 @@ export function fontsHref(s: Settings): string {
   add(s.fontLatinBody, find(latinFonts, s.fontLatinBody)?.ital ? 'ital@0;1' : '');
   add(s.fontJaHeading, find(jaFonts, s.fontJaHeading)?.w500 ? 'wght@400;500' : '');
   add(s.fontJaBody, '');
+  add(s.fontIndex, find(jaFonts, s.fontIndex)?.w500 ? 'wght@400;500' : '');
   const q = [...specs].map(([f, spec]) => 'family=' + f.replace(/ /g, '+') + (spec ? ':' + spec : '')).join('&');
   return `https://fonts.googleapis.com/css2?${q}&display=swap`;
 }
@@ -247,6 +251,7 @@ export function settingsCss(s: Settings): string {
   if (s.selFg !== d.selFg) v['--sel-fg'] = s.selFg;
   if (s.fontJaHeading !== d.fontJaHeading) v['--font-mincho-heading'] = jaStack(s.fontJaHeading);
   if (s.fontJaBody !== d.fontJaBody) v['--font-mincho'] = jaStack(s.fontJaBody);
+  if (s.fontIndex) v['--font-index'] = jaStack(s.fontIndex);
   if (s.fontLatinHeading !== d.fontLatinHeading) v['--font-heading'] = latinStack(s.fontLatinHeading);
   if (s.fontLatinBody !== d.fontLatinBody) v['--font-body'] = latinStack(s.fontLatinBody);
   const num: [keyof Settings, string][] = [

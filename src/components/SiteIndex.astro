@@ -226,7 +226,7 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-family: var(--font-mincho);
+    font-family: var(--font-index, var(--font-mincho)); /* 表示設定 → 記事一覧のフォント */
   }
   .item-sub {
     margin-left: 8px;
