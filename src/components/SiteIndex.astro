@@ -324,25 +324,11 @@ const onAbout = Astro.url.pathname.startsWith('/about');
       margin-top: calc(var(--s-ix-c, 62) * 1px - var(--s-ix-b, 4) * 1px); /* the gap from the English line */
       padding-top: 0;
     }
-    .cat {
-      font-size: 14px;
-      padding: 10px 0 6px;
-    }
-    .list { margin-top: calc(var(--s-ix-d, 12) * 1px - 22px); }
-    .item {
-      padding: 9px 0;
-      font-size: calc(var(--s-index, 13) * 14px / 13); /* 14px by default */
-      line-height: 1.6;
-    }
-    .item-date { font-size: 11px; }
-    .more { font-size: 14px; }
+    /* the categories, list and links are set as on PC (sizes, spacing) */
     .links {
       flex-direction: row;
       gap: 24px;
-      font-size: 14px;
-      line-height: 1.55;
     }
-    .links a { padding: 10px 0; }
   }
 
   /* ── Phone top (p4): one column; categories scroll sideways ── */
@@ -355,7 +341,7 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     .site { font-size: calc(var(--s-site-name-sp, var(--s-site-name, 30) * 26 / 30) * 1px); } /* 26px by default */
     .intro-ja { font-size: calc(var(--s-catch-ja-sp, var(--s-catch-ja, 13)) * 1px); }
     .intro-en { font-size: calc(var(--s-catch-en-sp, var(--s-catch-en, 13)) * 1px); }
-    .item { font-size: calc(var(--s-index-sp, var(--s-index, 13) * 14 / 13) * 1px); }
+    .item { font-size: calc(var(--s-index-sp, var(--s-index, 13)) * 1px); }
     .scroll-foot { margin-top: calc(48px - 20px); }
     .intro {
       padding-top: calc(var(--s-ix-a-sp, 40) * 1px - 20px);
@@ -371,10 +357,8 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     .cats::-webkit-scrollbar { display: none; }
     .cat {
       flex: none;
-      padding: 12px 0 8px;
     }
-    .list { margin-top: calc(var(--s-ix-d-sp, 0) * 1px - 20px); }
-    .links a { padding: 12px 0; }
+    .list { margin-top: calc(var(--s-ix-d-sp, 22) * 1px - 20px); }
   }
 
   /* ── Wider phones, e.g. an unfolded foldable: the phone layout in a
