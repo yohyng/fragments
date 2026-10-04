@@ -17,7 +17,9 @@
     <button type="submit">Subscribe</button>
   </form>
   <p class="note" role="status" data-note hidden></p>
-  <p class="policy" data-policy>登録したメールアドレスは、<a href="/privacy/">プライバシーポリシー</a>に沿って扱います。</p>
+  <!-- the purpose of use, shown where the address is taken (as Japan's
+       privacy law asks): only a link -->
+  <p class="policy" data-policy><a href="/privacy/">Privacy Policy</a></p>
   <div class="done" hidden>
     <div class="band"><span class="check" aria-hidden="true">✓</span><span>Subscribed</span></div>
     <div class="msg" role="status"></div>
@@ -109,6 +111,7 @@
   }
   .policy {
     margin: 6px 0 0;
+    font-family: var(--font-body);
     font-size: 10.5px;
     line-height: 1.6;
     color: var(--color-neutral-700);
