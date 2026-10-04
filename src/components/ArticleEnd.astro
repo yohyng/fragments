@@ -2,6 +2,7 @@
 // Article end: subscribe → 前の記事 / 次の記事 → 関連する記事
 import Subscribe from './Subscribe.astro';
 import { formatDate, type Post } from '../lib/posts';
+import { site } from '../lib/site';
 
 interface Props {
   post: Post;
@@ -16,9 +17,30 @@ const prev = posts[i + 1];
 const next = posts[i - 1];
 // 関連する記事: same category, newest first
 const related = posts.filter((p) => p.category === post.category && p.slug !== post.slug).slice(0, 3);
+
+// share: the services' own share pages (no scripts of theirs on this site)
+const url = new URL(`/posts/${post.slug}/`, Astro.site ?? site.url).href;
+const text = post.subtitle ? `${post.title} ${post.subtitle}` : post.title;
+const e = encodeURIComponent;
+const shares = [
+  { label: 'X', href: `https://x.com/intent/post?text=${e(text)}&url=${e(url)}` },
+  { label: 'Facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${e(url)}` },
+  { label: 'LINE', href: `https://social-plugins.line.me/lineit/share?url=${e(url)}` },
+  { label: 'Bluesky', href: `https://bsky.app/intent/compose?text=${e(`${text} ${url}`)}` },
+  { label: 'Threads', href: `https://www.threads.net/intent/post?text=${e(`${text} ${url}`)}` },
+  { label: 'はてブ', href: `https://b.hatena.ne.jp/entry/${url.replace(/^https:\/\//, 's/').replace(/^http:\/\//, '')}` },
+];
 ---
 
 <div class="end">
+<nav class="share" aria-label="この記事をシェア" data-share={url} data-share-text={text}>
+  <span class="share-label">Share</span>
+  <ul>
+    {shares.map((x) => <li><a href={x.href} target="_blank" rel="noopener">{x.label}</a></li>)}
+    <li><button type="button" data-copy>リンクをコピー</button></li>
+    <li hidden data-native-li><button type="button" data-native>共有…</button></li>
+  </ul>
+</nav>
 <aside class="sub" aria-label="購読">
   <Subscribe />
 </aside>
@@ -60,10 +82,50 @@ const related = posts.filter((p) => p.category === post.category && p.slug !== p
 
 <style>
   /* Article end: subscribe → prev / next → related (widths follow the body's 34em) */
+  .share,
   .sub,
   .pager,
   .related {
     max-width: calc(34 * var(--body-size));
+  }
+  /* share: a quiet row of the services' names */
+  .share {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 72px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .share-label {
+    color: var(--color-neutral-700);
+    font-style: italic;
+  }
+  .share ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .share a,
+  .share button {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: var(--color-text);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .share a:hover,
+  .share button:hover {
+    color: var(--color-accent-700);
+  }
+  .share + .sub {
+    margin-top: 40px;
   }
   .sub {
     display: flex;
@@ -146,6 +208,7 @@ const related = posts.filter((p) => p.category === post.category && p.slug !== p
 
   /* ── PC and compact 3 columns: widths follow the body ── */
   @media (min-width: 1300px) {
+    .share,
     .sub,
     .pager,
     .related {
@@ -153,6 +216,7 @@ const related = posts.filter((p) => p.category === post.category && p.slug !== p
     }
   }
   @media (min-width: 1160px) and (max-width: 1299px) {
+    .share,
     .sub,
     .pager,
     .related {
@@ -162,6 +226,7 @@ const related = posts.filter((p) => p.category === post.category && p.slug !== p
 
   /* ── Tablet (p6): as wide as the body (Article.astro) ── */
   @media (max-width: 1159px) {
+    .share,
     .sub,
     .pager,
     .related {
@@ -190,6 +255,7 @@ const related = posts.filter((p) => p.category === post.category && p.slug !== p
       font-size: 14px;
       line-height: 1.7;
     }
+    .share,
     .sub,
     .pager,
     .related {
@@ -227,3 +293,27 @@ const related = posts.filter((p) => p.category === post.category && p.slug !== p
     }
   }
 </style>
+
+<script>
+  // リンクをコピー, and the device's own share sheet where there is one
+  const nav = document.querySelector<HTMLElement>('[data-share]');
+  if (nav) {
+    const url = nav.dataset.share!;
+    const copy = nav.querySelector<HTMLButtonElement>('[data-copy]')!;
+    copy.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+        copy.textContent = 'コピーしました';
+      } catch {
+        copy.textContent = url;
+      }
+      setTimeout(() => (copy.textContent = 'リンクをコピー'), 2000);
+    });
+    if (navigator.share) {
+      nav.querySelector<HTMLElement>('[data-native-li]')!.hidden = false;
+      nav.querySelector('[data-native]')!.addEventListener('click', () =>
+        navigator.share({ title: document.title, text: nav.dataset.shareText, url }).catch(() => {}),
+      );
+    }
+  }
+</script>
