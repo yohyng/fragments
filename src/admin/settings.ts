@@ -6,6 +6,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   defaults,
+  leadParagraphs,
   merge,
   diff,
   settingsCss,
@@ -121,12 +122,18 @@ const tabs: Tab[] = [
         placeholder: () => `${state.catchJa.replace(/\s*\/$/, '')}。\n新しい記事を、メールでお届けします。`,
       },
       { key: 'welcomeLeadEn', label: '説明文（英語）', type: 'textarea', rows: 2, hint: '空欄なら英語のキャッチコピーになります。', placeholder: () => state.catchEn },
+      { key: 'welcomeReadJa', label: '「記事を読む」の文言（日本語）', type: 'text' },
+      { key: 'welcomeReadEn', label: '「記事を読む」の文言（英語）', type: 'text', hint: '空欄なら日本語だけになります。' },
       { key: 'welcomeLogoSize', label: 'サイト名（大きなロゴ）の文字サイズ', type: 'range', min: 48, max: 200, step: 4, unit: 'px', hint: '広い画面での大きさです。狭い画面では画面幅に合わせて小さくなります（最小で半分）。' },
       { key: 'welcomeTitleSize', label: 'タイトルの文字サイズ', type: 'range', min: 18, max: 56, step: 1, unit: 'px' },
       { key: 'welcomeLeadSize', label: '説明文（日本語）の文字サイズ', type: 'range', min: 12, max: 22, step: 0.5, unit: 'px' },
       { key: 'welcomeLeadEnSize', label: '説明文（英語）の文字サイズ', type: 'range', min: 11, max: 20, step: 0.5, unit: 'px' },
       { key: 'welcomeRuleLength', label: 'タイトルと説明文のあいだの区切り線：長さ', type: 'range', min: 0, max: 520, step: 4, unit: 'px', hint: '0 にすると線なしになります。' },
       { key: 'welcomeRuleWeight', label: 'タイトルと説明文のあいだの区切り線：太さ', type: 'range', min: 0.5, max: 4, step: 0.5, unit: 'px' },
+      { key: 'welcomeTitleRuleGap', label: '間隔：タイトルと区切り線', type: 'range', min: 0, max: 80, step: 2, unit: 'px' },
+      { key: 'welcomeRuleLeadGap', label: '間隔：区切り線と説明文（日本語）', type: 'range', min: 0, max: 80, step: 2, unit: 'px', hint: '区切り線がないとき（長さ 0）は、タイトルと説明文のあいだが 16px になります。' },
+      { key: 'welcomeLeadEnGap', label: '間隔：説明文の日本語と英語', type: 'range', min: 0, max: 80, step: 2, unit: 'px' },
+      { key: 'welcomeLeadParaGap', label: '説明文の中の空行の高さ', type: 'range', min: 0, max: 2, step: 0.25, unit: '行', hint: '説明文に空行（何も書かない行）を入れたところの高さです。日本語・英語とも。' },
     ],
   },
 ];
@@ -565,12 +572,21 @@ function refresh(changed?: Key) {
   text('.intro-en, .catch-en', s.catchEn);
   text('.desc', s.about);
   text('#welcome-title', s.welcomeTitle);
-  const lead = doc.querySelector('.welcome .lead');
-  if (lead) {
-    const lines = (s.welcomeLead || `${s.catchJa.replace(/\s*\/$/, '')}。\n新しい記事を、メールでお届けします。`).split('\n');
-    lead.replaceChildren(...lines.flatMap((l, i) => (i ? [doc.createElement('br'), l] : [l])));
-  }
-  text('.welcome .lead-en', s.welcomeLeadEn || s.catchEn);
+  // the leads as Welcome.astro sets them: paragraphs at blank lines, <br> within
+  const setLead = (sel: string, t: string) => {
+    const el = doc.querySelector(sel);
+    if (!el) return;
+    el.replaceChildren(
+      ...leadParagraphs(t).map((lines) => {
+        const para = doc.createElement('span');
+        para.className = el.querySelector('.para')?.className || 'para';
+        para.append(...lines.flatMap((l, i) => (i ? [doc.createElement('br'), l] : [l])));
+        return para;
+      }),
+    );
+  };
+  setLead('.welcome .lead', s.welcomeLead || `${s.catchJa.replace(/\s*\/$/, '')}。\n新しい記事を、メールでお届けします。`);
+  setLead('.welcome .lead-en', s.welcomeLeadEn || s.catchEn);
   // placeholders that follow other fields
   if (changed === 'catchJa' || changed === 'catchEn' || !changed)
     document.querySelectorAll<HTMLTextAreaElement>('[data-set-fields] textarea').forEach((t) => {

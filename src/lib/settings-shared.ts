@@ -67,6 +67,15 @@ export interface Settings {
   /** the rule between the title and the lead: length (0 = none) and weight, px */
   welcomeRuleLength: number;
   welcomeRuleWeight: number;
+  /** px: title → rule, rule → Japanese lead, Japanese → English lead */
+  welcomeTitleRuleGap: number;
+  welcomeRuleLeadGap: number;
+  welcomeLeadEnGap: number;
+  /** a blank line inside the leads, in lines */
+  welcomeLeadParaGap: number;
+  /** the link into the site (and the button once subscribed) */
+  welcomeReadJa: string;
+  welcomeReadEn: string;
 }
 
 export const defaults: Settings = {
@@ -122,7 +131,20 @@ export const defaults: Settings = {
   welcomeLeadEnSize: 13,
   welcomeRuleLength: 64,
   welcomeRuleWeight: 1,
+  welcomeTitleRuleGap: 22,
+  welcomeRuleLeadGap: 22,
+  welcomeLeadEnGap: 6,
+  welcomeLeadParaGap: 1,
+  welcomeReadJa: '記事を読む',
+  welcomeReadEn: 'Read the articles',
 };
+
+/** A welcome lead's text → paragraphs (split at blank lines) of lines. */
+export const leadParagraphs = (text: string): string[][] =>
+  text
+    .split(/\n\s*\n/)
+    .map((p) => p.split('\n').map((l) => l.trim()).filter(Boolean))
+    .filter((p) => p.length);
 
 /** Saved overrides on top of the defaults; unknown or mistyped keys are dropped. */
 export function merge(saved: unknown): Settings {
@@ -276,6 +298,10 @@ export function settingsCss(s: Settings): string {
     ['welcomeLeadEnSize', '--s-wl-lead-en'],
     ['welcomeRuleLength', '--s-wl-rule'],
     ['welcomeRuleWeight', '--s-wl-rule-w'],
+    ['welcomeTitleRuleGap', '--s-wl-gap-title'],
+    ['welcomeRuleLeadGap', '--s-wl-gap-rule'],
+    ['welcomeLeadEnGap', '--s-wl-gap-en'],
+    ['welcomeLeadParaGap', '--s-wl-para'],
     ['catchJaSize', '--s-catch-ja'],
     ['catchEnSize', '--s-catch-en'],
     ['indexSize', '--s-index'],

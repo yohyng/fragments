@@ -6,14 +6,16 @@
 import Subscribe from './Subscribe.astro';
 import { site } from '../lib/site';
 import { settings } from '../lib/settings';
+import { leadParagraphs } from '../lib/settings-shared';
 
 interface Props {
   mode: 'overlay' | 'page';
 }
 const { mode } = Astro.props;
 // the lead is the Japanese catch copy and the newsletter line unless set
-const lead = (settings.welcomeLead || `${site.catchJa.replace(/\s*\/$/, '')}。\n新しい記事を、メールでお届けします。`).split('\n');
-const leadEn = settings.welcomeLeadEn || site.catchEn;
+// (blank lines part paragraphs; their gap is a setting)
+const lead = leadParagraphs(settings.welcomeLead || `${site.catchJa.replace(/\s*\/$/, '')}。\n新しい記事を、メールでお届けします。`);
+const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn);
 ---
 
 <div
@@ -27,19 +29,21 @@ const leadEn = settings.welcomeLeadEn || site.catchEn;
     <div class="logo" aria-hidden={mode === 'overlay' ? 'true' : undefined}>{site.name}</div>
     <h1 id="welcome-title" class="title">{settings.welcomeTitle}</h1>
     <hr class="rule" />
-    <p class="lead">{lead.map((line, i) => (i ? [<br />, line] : line))}</p>
-    {leadEn && <p class="lead-en">{leadEn}</p>}
+    <p class="lead">{lead.map((l) => <span class="para">{l.map((line, i) => (i ? [<br />, line] : line))}</span>)}</p>
+    {leadEn.length > 0 && <p class="lead-en">{leadEn.map((l) => <span class="para">{l.map((line, i) => (i ? [<br />, line] : line))}</span>)}</p>}
     <div class="form">
       <Subscribe />
     </div>
     {
       mode === 'overlay' ? (
-        <button type="button" class="skip" data-welcome-close>
+        <button type="button" class="skip" data-welcome-close data-read-ja={settings.welcomeReadJa} data-read-en={settings.welcomeReadEn}>
           No thanks <span aria-hidden="true">→</span>
         </button>
       ) : (
         <a class="skip" href="/">
-          記事を読む <span aria-hidden="true">→</span>
+          {settings.welcomeReadJa}
+          {settings.welcomeReadEn && <span class="skip-en">{settings.welcomeReadEn}</span>}
+          <span aria-hidden="true">→</span>
         </a>
       )
     }
@@ -100,8 +104,10 @@ const leadEn = settings.welcomeLeadEn || site.catchEn;
   /* between the title and the lead (表示設定 → はじめの案内: length, 0 = none, and weight) */
   .rule {
     width: min(100%, calc(var(--s-wl-rule, 64) * 1px));
-    /* no line, no space */
-    margin: clamp(0px, var(--s-wl-rule, 64) * 22px, 22px) 0 clamp(0px, var(--s-wl-rule, 64) * 6px, 6px);
+    /* gaps above and below are settings; no line (length 0), no gaps. The
+       lead's own 16px top margin counts in the gap below. */
+    margin: calc(min(1, var(--s-wl-rule, 64)) * var(--s-wl-gap-title, 22) * 1px) 0
+      calc(min(1, var(--s-wl-rule, 64)) * (var(--s-wl-gap-rule, 22) - 16) * 1px);
     border: 0;
     border-top: clamp(0px, var(--s-wl-rule, 64) * 100px, var(--s-wl-rule-w, 1) * 1px) solid var(--color-neutral-700);
   }
@@ -112,8 +118,19 @@ const leadEn = settings.welcomeLeadEn || site.catchEn;
     line-height: 1.9;
     color: var(--color-neutral-800);
   }
+  .lead .para,
+  .lead-en .para {
+    display: block;
+  }
+  /* a blank line in a lead: one line high by default (表示設定 → 説明文の中の空行) */
+  .lead .para + .para {
+    margin-top: calc(var(--s-wl-para, 1) * 1.9em);
+  }
+  .lead-en .para + .para {
+    margin-top: calc(var(--s-wl-para, 1) * 1.75em);
+  }
   .lead-en {
-    margin: 6px 0 0;
+    margin: calc(var(--s-wl-gap-en, 6) * 1px) 0 0;
     font-family: var(--font-body);
     font-style: italic;
     font-size: calc(var(--s-wl-lead-en, 13) * 1px);
@@ -138,6 +155,13 @@ const leadEn = settings.welcomeLeadEn || site.catchEn;
     color: var(--color-neutral-700);
     text-decoration: none;
     cursor: pointer;
+  }
+  .skip :global(.skip-en) {
+    margin-left: 0.6em;
+    margin-right: 0.4em;
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 0.93em;
   }
   .skip:hover {
     color: var(--color-text);
@@ -170,8 +194,14 @@ const leadEn = settings.welcomeLeadEn || site.catchEn;
         try {
           localStorage.setItem(KEY, 'done');
         } catch {}
-        const skip = box.querySelector('[data-welcome-close]');
-        if (skip) skip.innerHTML = '記事を読む <span aria-hidden="true">→</span>';
+        const skip = box.querySelector<HTMLElement>('[data-welcome-close]');
+        if (skip) {
+          // "記事を読む Read the articles →", as on /subscribe/
+          const en = Object.assign(document.createElement('span'), { className: 'skip-en', textContent: skip.dataset.readEn ?? '' });
+          const arrow = Object.assign(document.createElement('span'), { textContent: '→' });
+          arrow.setAttribute('aria-hidden', 'true');
+          skip.replaceChildren(`${skip.dataset.readJa ?? ''} `, ...(en.textContent ? [en, ' '] : []), arrow);
+        }
       }
     }).observe(box, { subtree: true, attributes: true, attributeFilter: ['hidden'] });
   }
