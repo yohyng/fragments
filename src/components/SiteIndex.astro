@@ -186,14 +186,15 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     text-align-last: left;
   }
   .intro-en { hyphens: auto; -webkit-hyphens: auto; position: relative; }
-  /* a thin, light rule under the catch copy, flush left, drawn in the gap
-     above the categories (表示設定: length, 0 = none, and distance) */
+  /* a thin, light rule under the catch copy, as wide as the column (like
+     the header's), drawn in the gap above the categories (表示設定: its
+     distance below the English) */
   .intro-en::after {
     content: '';
     position: absolute;
     left: 0;
     top: calc(100% + var(--s-ix-rule-gap, 16) * 1px);
-    width: min(100%, calc(var(--s-ix-rule, 40) * 1px));
+    width: 100%;
     height: 1px;
     background: var(--color-divider);
   }
