@@ -22,7 +22,7 @@ const { title, subtitle, date } = Astro.props;
     </header>
     <!-- over the notes column: a light rule level with the date's, and 註
          above its left end level with the date (placed by the script) -->
-    <div class="notes-head" aria-hidden="true" hidden><span class="notes-mark">註</span></div>
+    <div class="notes-head" aria-hidden="true" hidden><span class="notes-mark"><span class="notes-mark-ja">註</span> / <span class="notes-mark-en">annotation</span></span></div>
     <div class="body" data-fade-imgs>
       <slot />
     </div>
@@ -125,6 +125,12 @@ const { title, subtitle, date } = Astro.props;
     font-size: 13px;
     line-height: 1;
     color: var(--color-neutral-700);
+    white-space: nowrap;
+  }
+  .notes-mark-en {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 12px;
   }
   .date::after {
     content: '';
@@ -660,7 +666,7 @@ const { title, subtitle, date } = Astro.props;
       const rects = r.getClientRects();
       return rects[rects.length - 1]?.bottom ?? el.getBoundingClientRect().bottom;
     };
-    mark.style.top = bottom(date) - bottom(mark) + 'px';
+    mark.style.top = bottom(date) - bottom(mark.querySelector<HTMLElement>('.notes-mark-ja') ?? mark) + 'px';
   }
   function layoutHead() {
     alignHead();
