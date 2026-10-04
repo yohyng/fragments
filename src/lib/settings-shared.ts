@@ -73,6 +73,8 @@ export interface Settings {
   welcomeLeadEnGap: number;
   /** a blank line inside the leads, in lines */
   welcomeLeadParaGap: number;
+  /** width of the leads and the subscribe form, px */
+  welcomeWidth: number;
   /** the link into the site (and the button once subscribed) */
   welcomeReadJa: string;
   welcomeReadEn: string;
@@ -145,6 +147,7 @@ export const defaults: Settings = {
   welcomeRuleLeadGap: 22,
   welcomeLeadEnGap: 6,
   welcomeLeadParaGap: 1,
+  welcomeWidth: 520,
   welcomeReadJa: '記事を読む',
   welcomeReadEn: 'Read the articles',
   welcomeLogoSizeSp: 64,
@@ -317,6 +320,7 @@ export function settingsCss(s: Settings): string {
     ['welcomeLeadEnSize', '--s-wl-lead-en'],
     ['welcomeRuleLength', '--s-wl-rule'],
     ['welcomeRuleWeight', '--s-wl-rule-w'],
+    ['welcomeWidth', '--s-wl-width'],
     ['welcomeLogoSizeSp', '--s-wl-logo-sp'],
     ['welcomeTitleSizeSp', '--s-wl-title-sp'],
     ['welcomeLeadSizeSp', '--s-wl-lead-sp'],

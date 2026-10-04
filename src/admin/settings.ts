@@ -124,6 +124,7 @@ const tabs: Tab[] = [
       { key: 'welcomeLeadEn', label: '説明文（英語）', type: 'textarea', rows: 2, hint: '空欄なら英語のキャッチコピーになります。', placeholder: () => state.catchEn },
       { key: 'welcomeReadJa', label: '「記事を読む」の文言（日本語）', type: 'text' },
       { key: 'welcomeReadEn', label: '「記事を読む」の文言（英語）', type: 'text', hint: '空欄なら日本語だけになります。' },
+      { key: 'welcomeWidth', label: '説明文と登録欄の幅', type: 'range', min: 280, max: 960, step: 10, unit: 'px', hint: '日本語・英語の説明文とメール登録欄が、この幅にそろいます。狭い画面では画面幅に合わせます。' },
       { key: 'welcomeLogoSize', label: 'サイト名（大きなロゴ）の文字サイズ', type: 'range', min: 48, max: 200, step: 4, unit: 'px', hint: '広い画面での大きさです。狭い画面では画面幅に合わせて小さくなります（最小で半分）。' },
       { key: 'welcomeTitleSize', label: 'タイトルの文字サイズ', type: 'range', min: 18, max: 56, step: 1, unit: 'px' },
       { key: 'welcomeLeadSize', label: '説明文（日本語）の文字サイズ', type: 'range', min: 12, max: 22, step: 0.5, unit: 'px' },
