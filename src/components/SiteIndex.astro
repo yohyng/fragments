@@ -135,6 +135,70 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     });
 
     addEventListener('pagehide', () => save({ scroll: nav.scrollTop }));
+
+    // A title too long for its line is cut so that it and its 「…」 fill the
+    // line exactly, justified, and every cut title ends at the same right
+    // edge (CSS ellipsis cuts at a character, leaving a ragged edge). The
+    // CSS ellipsis stays as the fallback without JS.
+    const titles = items.map((a) => {
+      const t = a.querySelector('.item-title');
+      const walk = document.createTreeWalker(t, NodeFilter.SHOW_TEXT);
+      const nodes = [];
+      while (walk.nextNode()) nodes.push(walk.currentNode);
+      const orig = nodes.map((n) => n.data);
+      const full = orig.join('').replace(/\s+/g, ' ').trim();
+      t.title = full;
+      a.setAttribute('aria-label', `${full} ${a.querySelector('.item-date')?.textContent ?? ''}`.trim());
+      return { t, nodes, orig, total: orig.reduce((s, x) => s + x.length, 0) };
+    });
+    const range = document.createRange();
+    const fits = (t) => {
+      range.selectNodeContents(t);
+      return range.getBoundingClientRect().width <= t.clientWidth + 0.1;
+    };
+    const cutTo = ({ nodes, orig }, k) => {
+      let last = -1;
+      nodes.forEach((n, i) => {
+        const before = orig.slice(0, i).reduce((s, x) => s + x.length, 0);
+        const part = orig[i].slice(0, Math.max(0, k - before));
+        n.data = part;
+        if (part.trim()) last = i;
+      });
+      if (last >= 0 && k < orig.join('').length) nodes[last].data = nodes[last].data.trimEnd() + '…';
+    };
+    let fitting = false;
+    const fitTitles = () => {
+      if (fitting) return;
+      fitting = true;
+      for (const x of titles) {
+        const { t, nodes, orig, total } = x;
+        if (!t.clientWidth) continue; // hidden (not loaded yet)
+        nodes.forEach((n, i) => (n.data = orig[i]));
+        t.classList.remove('is-cut');
+        if (fits(t)) continue;
+        t.classList.add('is-cut'); // left-aligned while measuring (justify stretches)
+        t.style.textAlignLast = 'left';
+        let lo = 0;
+        let hi = total - 1;
+        while (lo < hi) {
+          const mid = Math.ceil((lo + hi) / 2);
+          cutTo(x, mid);
+          if (fits(t)) lo = mid;
+          else hi = mid - 1;
+        }
+        cutTo(x, lo);
+        t.style.textAlignLast = '';
+      }
+      fitting = false;
+    };
+    fitTitles();
+    document.fonts?.ready.then(fitTitles);
+    let w = 0;
+    new ResizeObserver(() => {
+      const list = nav.querySelector('.list');
+      const nw = list ? list.clientWidth + ':' + list.querySelectorAll('.item:not([data-more])').length : '';
+      if (nw !== w) { w = nw; fitTitles(); }
+    }).observe(nav.querySelector('.list') ?? nav);
   }
 }
 </script>
@@ -251,6 +315,12 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     overflow: hidden;
     text-overflow: ellipsis;
     font-family: var(--font-index, var(--font-mincho)); /* 表示設定 → 記事一覧のフォント */
+  }
+  /* cut by the script: the title and its 「…」 fill the line, justified */
+  .item-title.is-cut {
+    text-overflow: clip;
+    text-align: justify;
+    text-align-last: justify;
   }
   /* the article being read, beside the index (≥1160px): its title in the
      accent, underlined in the accent */

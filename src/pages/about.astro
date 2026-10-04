@@ -8,10 +8,10 @@ import { site } from '../lib/site';
 <Page title="about — fragments" description={`${site.name}について。${site.catchJa} ${site.catchEn}`}>
   <main class="column" data-scroll data-noscrollbar>
     <div class="rule"><a class="site" href="/">fragments</a></div>
-    <header class="head">
-      <h1>about</h1>
-    </header>
     <div class="grid">
+      <header class="head">
+        <h1>about</h1>
+      </header>
       <div class="text">
         <p class="catch-ja">{site.catchJa}</p>
         <p class="catch-en">{site.catchEn}</p>
@@ -29,6 +29,28 @@ import { site } from '../lib/site';
     <div class="scroll-foot" aria-hidden="true"></div>
   </main>
 </Page>
+
+<script>
+  // Beside the index (≥1160px): the rule under 「about」 level with the
+  // light rule under the index's catch copy.
+  function alignRule() {
+    const col = document.querySelector<HTMLElement>('main.column');
+    const head = col?.querySelector<HTMLElement>('.head');
+    const index = document.querySelector<HTMLElement>('[data-index]');
+    const en = index?.querySelector<HTMLElement>('.intro-en');
+    if (!col || !head || !en) return;
+    head.style.minHeight = '';
+    if (!matchMedia('(min-width: 1160px)').matches || !en.offsetParent) return;
+    // the index's rule: the catch copy's ::after, `top` below the copy's box
+    const ruleY = en.getBoundingClientRect().top + parseFloat(getComputedStyle(en, '::after').top) + index!.scrollTop;
+    const headTop = head.getBoundingClientRect().top + col.scrollTop;
+    // the head's bottom border is the rule (border-box: its top edge is at height − 1)
+    head.style.minHeight = Math.max(0, ruleY - headTop + 1) + 'px';
+  }
+  alignRule();
+  document.fonts.ready.then(alignRule);
+  addEventListener('resize', alignRule);
+</script>
 
 <style>
   .column {
@@ -55,6 +77,10 @@ import { site } from '../lib/site';
     padding-top: 56px;
     min-height: 220px;
     box-sizing: border-box;
+    /* across the text and the contact, a light rule; the text below it */
+    grid-column: 1 / -1;
+    border-bottom: 1px solid var(--color-divider);
+    margin-bottom: 40px;
   }
   h1 {
     font-family: var(--font-mincho-heading);
@@ -201,6 +227,7 @@ import { site } from '../lib/site';
     }
     .head {
       padding: 40px 0 36px;
+      margin-bottom: 0; /* the grid's row gap */
     }
     .grid {
       grid-template-columns: minmax(0, 1fr);

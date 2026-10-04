@@ -268,6 +268,19 @@ const { title, subtitle, date } = Astro.props;
   .body :global(.sidenote-body a:hover) {
     color: var(--color-accent-700);
   }
+  /* a link out of the article (in the text or a note) ends in ↗; not the
+     note numbers, the cards or a linked image */
+  .body :global(a[href]:not([href^="#"]):not([class*="el-"]):not(:has(img))::after) {
+    content: '↗';
+    display: inline-block;
+    margin-left: 0.15em;
+    font-family: var(--font-body);
+    font-size: 0.85em;
+    font-style: normal;
+    line-height: 1;
+    text-decoration: none;
+    text-indent: 0;
+  }
 
   /* Hover / jump highlight */
   .body :global(.note-ref.is-hl),
@@ -306,6 +319,7 @@ const { title, subtitle, date } = Astro.props;
     padding: 2px 0 2px 1.5em;
     border-left: 1px solid var(--color-accent);
     color: var(--color-neutral-800);
+    font-style: italic;
   }
   .body :global(blockquote cite) {
     display: block;
