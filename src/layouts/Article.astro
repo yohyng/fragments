@@ -557,6 +557,19 @@ const { title, subtitle, date } = Astro.props;
   .endrule {
     max-width: var(--line-w);
   }
+
+  /* ── Beside the index (≥1160px): the title's first line starts level with
+     the catch copy's. The index puts that --s-ix-a below its header rule
+     (56px by default), in lines 1.75 high; the title's lines are 1.4 high,
+     so its half-leading is taken off and the catch copy's added. ── */
+  @media (min-width: 1160px) {
+    .head {
+      padding-top: calc(var(--s-ix-a, 56) * 1px + var(--s-catch-ja, 13) * 0.375px);
+    }
+    h1 {
+      margin-top: -0.2em;
+    }
+  }
 </style>
 
 <script>
