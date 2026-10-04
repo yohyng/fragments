@@ -26,6 +26,7 @@ import '../../styles/tokens.css';
       <nav class="nav">
         <a href="#/" data-nav="list" hidden>記事</a>
         <a href="#/settings" data-nav="settings" hidden>表示設定</a>
+        <a href="#/subscribers" data-nav="subscribers" hidden>購読者</a>
       </nav>
       <span class="spacer"></span>
       <span class="who" data-who></span>
@@ -121,6 +122,26 @@ import '../../styles/tokens.css';
           </div>
         </aside>
       </div>
+    </section>
+
+    <!-- subscribers -->
+    <section class="view" data-view="subscribers" hidden>
+      <div class="list-head">
+        <h1>購読者</h1>
+        <button type="button" class="ghost" data-sub-copy>登録中のアドレスをコピー</button>
+      </div>
+      <p class="hint sub-count" data-sub-count></p>
+      <p class="hint" data-sub-msg></p>
+      <div class="box sub-missing" data-sub-missing hidden>
+        <h2>はじめに一度だけ</h2>
+        <p class="hint">購読者をしまっておくテーブルが、Supabase にまだありません。Supabase の「SQL Editor」で次を実行してから、このページを開き直してください（旧サイトの購読者には触れません）。</p>
+        <pre data-sub-sql></pre>
+        <button type="button" class="link" data-sub-sql-copy>SQL をコピー</button>
+      </div>
+      <table class="list">
+        <thead><tr><th>メールアドレス</th><th>状態</th><th>登録日</th><th>確認日</th><th></th></tr></thead>
+        <tbody data-sub-rows></tbody>
+      </table>
     </section>
 
     <!-- display settings -->
@@ -358,6 +379,9 @@ import '../../styles/tokens.css';
   .set-status { margin: -8px 0 0; font-family: var(--font-mincho); font-size: 12px; color: var(--color-neutral-700); }
   .set-status.is-behind { color: #b3261e; }
   .set-status.is-done { color: var(--color-accent-700); }
+  .sub-count { max-width: 960px; margin: -8px 0 8px; font-variant-numeric: tabular-nums; }
+  .sub-missing { max-width: 960px; margin-bottom: 18px; }
+  .sub-missing pre,
   .set-missing pre { margin: 0; padding: 10px; max-height: 220px; overflow: auto; background: var(--color-surface); font-size: 11px; line-height: 1.5; white-space: pre-wrap; }
   .set-missing .link { align-self: flex-start; }
   .set-line { display: flex; gap: 6px; }

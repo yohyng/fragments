@@ -12,8 +12,11 @@
       aria-label="メールアドレス"
       placeholder="email@example.com　新着記事をメールで受け取る"
     />
+    <!-- left empty by people (it is off screen); bots fill it in -->
+    <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
     <button type="submit">Subscribe</button>
   </form>
+  <p class="note" role="status" data-note hidden></p>
   <div class="done" hidden>
     <div class="band"><span class="check" aria-hidden="true">✓</span><span>Subscribed</span></div>
     <div class="msg" role="status"></div>
@@ -75,30 +78,39 @@
     flex-direction: column;
     gap: 4px;
   }
+  /* the whole box in the accent, 「✓ Subscribed」 in white */
   .band {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     height: 34px;
     padding: 0 12px;
+    box-sizing: border-box;
     border: 1px solid var(--color-accent);
-    background: var(--color-accent-100);
+    background: var(--color-accent);
     font-family: var(--font-body);
     font-size: 13px;
-    color: var(--color-accent-700);
+    color: #fff;
   }
   .check {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 16px;
-    height: 16px;
-    background: var(--color-accent);
-    color: #fff;
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1;
   }
-  .msg {
+  .hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+  .note {
+    margin: 4px 0 0;
+  }
+  .note.is-error {
+    color: var(--color-accent-700);
+  }
+  .msg,
+  .note {
     font-size: 11.5px;
     line-height: 1.7;
     color: var(--color-neutral-700);
@@ -117,26 +129,60 @@
 <script>
   import { subscribe } from '../lib/subscribe';
 
+  // after the links in the mails (api/confirm, api/unsubscribe): /subscribe/?status=…
+  const RESULT: Record<string, { done?: string; note?: string; error?: boolean }> = {
+    confirmed: { done: '登録が完了しました。新しい記事をメールでお届けします。' },
+    unsubscribed: { note: '配信を停止しました。また読みたくなったら、いつでも登録し直せます。' },
+    invalid: { note: 'このリンクは使えなくなっています。お手数ですが、もう一度登録してください。', error: true },
+    error: { note: 'うまく処理できませんでした。時間をおいて、もう一度お試しください。', error: true },
+  };
+  const result = RESULT[new URLSearchParams(location.search).get('status') ?? ''];
+
   document.querySelectorAll<HTMLElement>('[data-subscribe]').forEach((box) => {
     const form = box.querySelector('form')!;
-    const input = form.querySelector('input')!;
+    const input = form.querySelector<HTMLInputElement>('input[type="email"]')!;
+    const hp = form.querySelector<HTMLInputElement>('input[name="website"]')!;
     const button = form.querySelector('button')!;
     const done = box.querySelector<HTMLElement>('.done')!;
+    const note = box.querySelector<HTMLElement>('[data-note]')!;
     let sending = false;
+
+    const showDone = (text: string) => {
+      done.querySelector('.msg')!.textContent = text;
+      form.hidden = true;
+      note.hidden = true;
+      done.hidden = false;
+    };
+    const showNote = (text: string, error = false) => {
+      note.textContent = text;
+      note.classList.toggle('is-error', error);
+      note.hidden = !text;
+    };
+    if (result?.done) showDone(result.done);
+    else if (result?.note) showNote(result.note, result.error);
 
     // Click or Enter. Input without "@" does nothing.
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = input.value;
+      const email = input.value.trim();
       if (sending || !email.includes('@')) return;
       sending = true;
       button.textContent = 'Sending…';
+      showNote('');
       try {
-        await subscribe(email);
-        done.querySelector('.msg')!.textContent =
-          email + ' に確認メールを送りました。メール内のリンクを押すと登録が完了します。';
-        form.hidden = true;
-        done.hidden = false;
+        const state = await subscribe(email, hp.value);
+        showDone(
+          state === 'active'
+            ? email + ' を登録しました。新しい記事をメールでお届けします。'
+            : email + ' に確認メールを送りました。メール内のリンクを押すと登録が完了します。',
+        );
+      } catch (err) {
+        showNote(
+          (err as Error).message === 'invalid'
+            ? 'メールアドレスの形が正しくないようです。確かめてください。'
+            : '送信できませんでした。時間をおいて、もう一度お試しください。',
+          true,
+        );
       } finally {
         sending = false;
         button.textContent = 'Subscribe';

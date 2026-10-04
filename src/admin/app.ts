@@ -9,6 +9,7 @@ import { Plugin, NodeSelection } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../lib/supabase-config.mjs';
 import { initSettings, openSettings } from './settings';
+import { initSubscribers, openSubscribers } from './subscribers';
 import {
   createEditor,
   getHtml,
@@ -53,7 +54,7 @@ const IMAGE_BUCKET = 'article-images';
 const STATUS_LABEL: Record<string, string> = { draft: '下書き', published: '公開', scheduled: '予約', private: '非公開' };
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
-const views = ['login', 'list', 'edit', 'settings'] as const;
+const views = ['login', 'list', 'edit', 'settings', 'subscribers'] as const;
 type View = (typeof views)[number];
 let currentView: View = 'login';
 const show = (name: View) => {
@@ -164,12 +165,17 @@ $<HTMLFormElement>('[data-login]').addEventListener('submit', async (e) => {
 });
 $('[data-signout]').addEventListener('click', () => sb.auth.signOut());
 
-// #/ → list, #/new → new article, #/41 → article 41, #/settings → 表示設定
+// #/ → list, #/new → new article, #/41 → article 41, #/settings → 表示設定,
+// #/subscribers → 購読者
 addEventListener('hashchange', () => session && openFromHash());
 function openFromHash() {
   if (location.hash === '#/settings') {
     show('settings');
     return openSettings();
+  }
+  if (location.hash === '#/subscribers') {
+    show('subscribers');
+    return openSubscribers();
   }
   const m = /^#\/(new|\d+)$/.exec(location.hash);
   if (!m) return openList();
@@ -549,4 +555,5 @@ $('[data-delete]').addEventListener('click', async () => {
 // the saved display settings are public: apply them (the editor shows the
 // article's type) whether or not anyone is signed in
 initSettings(sb, rebuild, ensureSignedIn);
+initSubscribers(sb);
 start();
