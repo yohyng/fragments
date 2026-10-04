@@ -75,6 +75,7 @@ const tabs: Tab[] = [
       { key: 'blankLine', label: '空行の高さ', type: 'range', min: -1.5, max: 1.5, step: 0.25, unit: '行', hint: '文字のない行を入れたところで、段落の間に足す高さです。マイナスにすると、空行のところだけ段落の間が狭くなります（段落の間より狭くはなりません）。0 なら空行は詰めて表示します。' },
       { key: 'letterSpacing', label: '字間', type: 'range', min: 0, max: 0.15, step: 0.01, unit: 'em' },
       { key: 'measure', label: '1行の字数（PC）', type: 'range', min: 26, max: 42, step: 1, unit: '字' },
+      { key: 'colGap', label: '段のあいだの余白（記事一覧・本文・注）', type: 'range', min: 24, max: 160, step: 2, unit: 'px', hint: '記事一覧と本文、本文と注のあいだが、PC（画面幅 1160px 以上）でこの幅にそろいます。' },
       { key: 'indent', label: '段落の頭を1字下げる', type: 'check' },
       { key: 'justify', label: '両端揃え', type: 'check' },
       { key: 'titleSizePc', label: '記事タイトルの文字サイズ（PC）', type: 'range', min: 26, max: 44, step: 1, unit: 'px' },

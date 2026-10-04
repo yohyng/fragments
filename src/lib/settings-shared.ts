@@ -37,6 +37,8 @@ export interface Settings {
   blankLine: number;
   letterSpacing: number;
   measure: number;
+  /** the gap between the columns (index, body, notes) beside the index, px */
+  colGap: number;
   indent: boolean;
   justify: boolean;
   titleSizePc: number;
@@ -136,6 +138,7 @@ export const defaults: Settings = {
   blankLine: 0,
   letterSpacing: 0.02,
   measure: 34,
+  colGap: 70,
   indent: true,
   justify: true,
   titleSizePc: 36,
@@ -352,6 +355,7 @@ export function settingsCss(s: Settings): string {
     ['blankLine', '--s-blank'],
     ['letterSpacing', '--s-ls'],
     ['measure', '--s-measure'],
+    ['colGap', '--s-col-gap'],
     ['titleSizePc', '--s-title-pc'],
     ['noteSize', '--s-note'],
     ['dateRuleLength', '--s-date-rule'],

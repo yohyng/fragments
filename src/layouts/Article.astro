@@ -331,23 +331,23 @@ const { title, subtitle, date } = Astro.props;
     }
   }
 
-  /* ── Compact 3 columns (not in the design) ──
-     1300–1399px: PC body and notes; the body gives way if the column is short.
-     1160–1299px: the tablet's 30em body and 210px notes. */
-  /* ── ≥1300px (PC and compact): the body is --s-measure characters wide
-     (34 by default), giving way so the 300px notes fit at 88px beside it.
-     Characters asked for beyond 34 are made room for by narrowing the notes
-     (to 220px) and their gap (to 56px), so the setting still shows on
-     screens where 34 already fills the column. 100cqi = the column. ── */
-  @media (min-width: 1300px) {
+  /* ── Beside the index (≥1160px): the body is --s-measure characters wide
+     (34 by default), the notes 300px (210px below 1300px) beside it, the
+     gap between them the same as between the index and the body
+     (表示設定 → 段のあいだの余白, 70px by default; Page.astro). The body
+     gives way if the column is short; characters asked for beyond 34 are
+     made room for by narrowing the notes (by up to 80px). 100cqi = the
+     column. ── */
+  @media (min-width: 1160px) {
     .column {
       container-type: inline-size;
+      --note-max: 300px;
+      --pc-gap: calc(var(--s-col-gap, 70) * 1px);
       --pc-body: min(
         calc(var(--s-measure, 34) * var(--body-size)),
-        calc(100cqi - 388px + clamp(0px, (var(--s-measure, 34) - 34) * var(--body-size), 112px))
+        calc(100cqi - var(--note-max) - var(--pc-gap) + clamp(0px, (var(--s-measure, 34) - 34) * var(--body-size), 80px))
       );
-      --pc-gap: clamp(56px, 100cqi - var(--pc-body) - 300px, 88px);
-      --pc-note: min(300px, 100cqi - var(--pc-body) - var(--pc-gap));
+      --pc-note: min(var(--note-max), 100cqi - var(--pc-body) - var(--pc-gap));
     }
     .head,
     .body {
@@ -359,15 +359,8 @@ const { title, subtitle, date } = Astro.props;
     }
   }
   @media (min-width: 1160px) and (max-width: 1299px) {
-    .body {
-      max-width: 30em;
-    }
-    .head {
-      max-width: calc(30 * var(--body-size));
-    }
-    .body :global(.sidenote) {
-      width: 210px;
-      margin-right: -250px;
+    .column {
+      --note-max: 210px;
     }
   }
 
@@ -531,16 +524,10 @@ const { title, subtitle, date } = Astro.props;
   .column:not(:has(:global(.sidenote))) {
     --line-w: var(--text-w);
   }
-  @media (min-width: 1300px) {
+  @media (min-width: 1160px) {
     .column {
       --text-w: var(--pc-body);
       --notes-w: calc(var(--pc-body) + var(--pc-gap) + var(--pc-note));
-    }
-  }
-  @media (min-width: 1160px) and (max-width: 1299px) {
-    .column {
-      --text-w: calc(30 * var(--body-size));
-      --notes-w: calc(30 * var(--body-size) + 250px);
     }
   }
   @media (min-width: 760px) and (max-width: 1159px) {

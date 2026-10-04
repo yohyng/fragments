@@ -206,21 +206,13 @@ const shares = [
     font-variant-numeric: tabular-nums;
   }
 
-  /* ── PC and compact 3 columns: widths follow the body ── */
-  @media (min-width: 1300px) {
+  /* ── Beside the index (≥1160px): widths follow the body ── */
+  @media (min-width: 1160px) {
     .share,
     .sub,
     .pager,
     .related {
       max-width: var(--pc-body); /* Article.astro */
-    }
-  }
-  @media (min-width: 1160px) and (max-width: 1299px) {
-    .share,
-    .sub,
-    .pager,
-    .related {
-      max-width: calc(30 * var(--body-size));
     }
   }
 
