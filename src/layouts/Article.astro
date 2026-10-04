@@ -520,12 +520,13 @@ const { title, subtitle, date } = Astro.props;
 
   /* ── The header and footer rules stop where the text does: at the notes'
      right edge, or, in an article without notes, at the body's. --text-w is
-     the body's width and --notes-w the body with the notes beside it, in
-     each layout. The header keeps its full width as a background and draws
-     its rule as a line of that width. ── */
+     the body's width, --notes-w the body with the notes beside it and
+     --gutter the space between them, in each layout. The header keeps its
+     full width as a background and draws its rule as lines. ── */
   .column {
     --text-w: 100%;
     --notes-w: 100%;
+    --gutter: 0px; /* between the body and the notes */
     --line-w: var(--notes-w);
   }
   .column:not(:has(:global(.sidenote))) {
@@ -535,40 +536,63 @@ const { title, subtitle, date } = Astro.props;
     .column {
       --text-w: var(--pc-body);
       --notes-w: calc(var(--pc-body) + var(--pc-gap) + var(--pc-note));
+      --gutter: var(--pc-gap);
     }
   }
   @media (min-width: 1160px) and (max-width: 1299px) {
     .column {
       --text-w: calc(30 * var(--body-size));
       --notes-w: calc(30 * var(--body-size) + 250px);
+      --gutter: 40px;
     }
   }
   @media (min-width: 760px) and (max-width: 1159px) {
     .column {
       --text-w: min(calc(34 * var(--tab-size)), 100% - var(--tab-note) - 40px);
       --notes-w: calc(var(--text-w) + 40px + var(--tab-note));
+      --gutter: 40px;
     }
   }
   @media (min-width: 656px) and (max-width: 759px) {
     .column {
       --text-w: min(calc(30 * var(--s-body-tab, 15.5) * 1px), 100% - 212px);
       --notes-w: calc(var(--text-w) + 212px);
+      --gutter: 32px;
     }
   }
-  .rule {
-    border-bottom-color: transparent;
+  /* Each rule is drawn in two pieces, over the body and over the notes,
+     parted where the columns are (as the index's rule is from the body's):
+     ::after over the body, ::before over the notes (none without notes). */
+  .rule,
+  .endrule {
+    border-color: transparent;
   }
-  .rule::after {
+  .rule::after,
+  .rule::before,
+  .endrule::after,
+  .endrule::before {
     content: '';
     position: absolute;
-    left: 0;
-    bottom: -1px;
-    width: var(--line-w);
     height: 1px;
     background: var(--color-neutral-700);
   }
-  .endrule {
-    max-width: var(--line-w);
+  .rule::after,
+  .rule::before {
+    bottom: -1px;
+  }
+  .endrule::after,
+  .endrule::before {
+    top: 0;
+  }
+  .rule::after,
+  .endrule::after {
+    left: 0;
+    width: var(--text-w);
+  }
+  .rule::before,
+  .endrule::before {
+    left: calc(var(--text-w) + var(--gutter));
+    width: max(0px, var(--line-w) - var(--text-w) - var(--gutter));
   }
 
   /* ── Beside the index (≥1160px): the title's first line starts level with
