@@ -390,7 +390,7 @@ const { title, subtitle, date } = Astro.props;
     .site {
       display: block;
       font-family: var(--font-heading);
-      font-size: 28px;
+      font-size: calc(var(--s-site-name, 30) * 28px / 30); /* 28px by default */
       line-height: 1.2;
       text-decoration: none;
     }
@@ -435,7 +435,7 @@ const { title, subtitle, date } = Astro.props;
       display: block;
     }
     .site {
-      font-size: 22px;
+      font-size: calc(var(--s-site-name, 30) * 22px / 30); /* 22px by default */
     }
     .head {
       padding: 40px 0 36px;

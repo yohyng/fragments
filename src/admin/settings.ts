@@ -80,11 +80,13 @@ const tabs: Tab[] = [
   },
   {
     id: 'index',
-    label: '記事一覧',
+    label: 'トップ・記事一覧',
     page: 'top',
     fields: [
-      { key: 'siteNameSize', label: 'サイト名の文字サイズ（PC）', type: 'range', min: 22, max: 40, step: 1, unit: 'px' },
-      { key: 'indexSize', label: '記事一覧の文字サイズ（PC）', type: 'range', min: 12, max: 16, step: 0.5, unit: 'px' },
+      { key: 'siteNameSize', label: 'サイト名の文字サイズ', type: 'range', min: 20, max: 48, step: 1, unit: 'px', hint: 'PC での大きさです。タブレット・スマホでは同じ比率で少し小さくなります（記事ページ上部のサイト名も）。' },
+      { key: 'catchJaSize', label: 'キャッチコピー（日本語）の文字サイズ', type: 'range', min: 11, max: 20, step: 0.5, unit: 'px' },
+      { key: 'catchEnSize', label: 'キャッチコピー（英語）の文字サイズ', type: 'range', min: 11, max: 20, step: 0.5, unit: 'px' },
+      { key: 'indexSize', label: '記事一覧の文字サイズ', type: 'range', min: 12, max: 17, step: 0.5, unit: 'px', hint: 'PC での大きさです。タブレット・スマホでは同じ比率で少し大きくなります。' },
       { key: 'pageSize', label: '一度に表示する記事の数', type: 'range', min: 10, max: 60, step: 5, unit: '件', hint: '「さらに読み込む」で増える数も同じです。', later: true },
     ],
   },

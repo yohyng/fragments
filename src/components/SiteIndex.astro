@@ -175,8 +175,8 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     line-height: 1.75;
     color: var(--color-neutral-800);
   }
-  .intro-ja { font-family: var(--font-mincho); }
-  .intro-en { font-family: var(--font-body); font-style: italic; }
+  .intro-ja { font-family: var(--font-mincho); font-size: calc(var(--s-catch-ja, 13) * 1px); }
+  .intro-en { font-family: var(--font-body); font-style: italic; font-size: calc(var(--s-catch-en, 13) * 1px); }
   .cats {
     display: flex;
     flex-wrap: wrap;
@@ -276,7 +276,7 @@ const onAbout = Astro.url.pathname.startsWith('/about');
       padding: 0 calc(100% - 340px - var(--inset-x)) 0 var(--inset-x);
     }
     .site {
-      font-size: 28px;
+      font-size: calc(var(--s-site-name, 30) * 28px / 30); /* 28px by default */
       padding-top: var(--inset-top);
     }
     /* 80px below the links, then the bottom margin strip */
@@ -296,7 +296,7 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     .list { margin-top: -10px; }
     .item {
       padding: 9px 0;
-      font-size: 14px;
+      font-size: calc(var(--s-index, 13) * 14px / 13); /* 14px by default */
       line-height: 1.6;
     }
     .item-date { font-size: 11px; }
@@ -316,7 +316,7 @@ const onAbout = Astro.url.pathname.startsWith('/about');
       gap: 20px;
       padding: 0 var(--inset-x);
     }
-    .site { font-size: 26px; }
+    .site { font-size: calc(var(--s-site-name, 30) * 26px / 30); } /* 26px by default */
     .scroll-foot { margin-top: calc(48px - 20px); }
     .intro { padding-top: 20px; }
     .cats {

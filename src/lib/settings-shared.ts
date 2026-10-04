@@ -41,6 +41,8 @@ export interface Settings {
   noteSize: number;
   // 記事一覧
   siteNameSize: number;
+  catchJaSize: number;
+  catchEnSize: number;
   indexSize: number;
   pageSize: number;
   // About・SNS
@@ -85,6 +87,8 @@ export const defaults: Settings = {
   titleSizePc: 36,
   noteSize: 14,
   siteNameSize: 30,
+  catchJaSize: 13,
+  catchEnSize: 13,
   indexSize: 13,
   pageSize: 20,
   about: 'メディアについての説明文（運営者、更新の方針など）がここに入ります。',
@@ -248,6 +252,8 @@ export function settingsCss(s: Settings): string {
     ['titleSizePc', '--s-title-pc'],
     ['noteSize', '--s-note'],
     ['siteNameSize', '--s-site-name'],
+    ['catchJaSize', '--s-catch-ja'],
+    ['catchEnSize', '--s-catch-en'],
     ['indexSize', '--s-index'],
   ];
   for (const [k, name] of num) if (s[k] !== d[k]) v[name] = String(s[k]);
