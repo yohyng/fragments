@@ -130,7 +130,7 @@ const tabs: Tab[] = [
       { key: 'welcomeLeadEnSize', label: '説明文（英語）の文字サイズ', type: 'range', min: 11, max: 20, step: 0.5, unit: 'px' },
       { key: 'welcomeRuleLength', label: 'タイトルと説明文のあいだの区切り線：長さ', type: 'range', min: 0, max: 520, step: 4, unit: 'px', hint: '0 にすると線なしになります。' },
       { key: 'welcomeRuleWeight', label: 'タイトルと説明文のあいだの区切り線：太さ', type: 'range', min: 0.5, max: 4, step: 0.5, unit: 'px' },
-      { key: 'welcomeTitleRuleGap', label: '間隔：タイトルと区切り線', type: 'range', min: 0, max: 80, step: 2, unit: 'px' },
+      { key: 'welcomeTitleRuleGap', label: '間隔：タイトルと区切り線', type: 'range', min: -240, max: 80, step: 2, unit: 'px', hint: 'マイナスにすると線が上に寄ります。タイトルが空欄のときも、その上の余白（画面の高さの 12%、56〜128px）が残るので、マイナスで詰められます。' },
       { key: 'welcomeRuleLeadGap', label: '間隔：区切り線と説明文（日本語）', type: 'range', min: 0, max: 80, step: 2, unit: 'px', hint: '区切り線がないとき（長さ 0）は、タイトルと説明文のあいだが 16px になります。' },
       { key: 'welcomeLeadEnGap', label: '間隔：説明文の日本語と英語', type: 'range', min: 0, max: 80, step: 2, unit: 'px' },
       { key: 'welcomeLeadParaGap', label: '説明文の中の空行の高さ', type: 'range', min: 0, max: 2, step: 0.25, unit: '行', hint: '説明文に空行（何も書かない行）を入れたところの高さです。日本語・英語とも。' },
