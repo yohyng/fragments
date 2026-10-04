@@ -290,12 +290,6 @@ const { title, subtitle, date } = Astro.props;
         calc(var(--s-body-pc, 18) * 1px)
       );
     }
-    .head {
-      max-width: min(calc(var(--s-measure, 34) * var(--body-size)), 100% - 388px);
-    }
-    .body {
-      max-width: min(calc(var(--s-measure, 34) * 1em), 100% - 388px);
-    }
     h1 {
       font-size: clamp(
         calc((var(--s-title-pc, 36) - 6) * 1px),
@@ -327,12 +321,28 @@ const { title, subtitle, date } = Astro.props;
   /* ── Compact 3 columns (not in the design) ──
      1300–1399px: PC body and notes; the body gives way if the column is short.
      1160–1299px: the tablet's 30em body and 210px notes. */
-  @media (min-width: 1300px) and (max-width: 1399px) {
-    .body {
-      max-width: min(calc(var(--s-measure, 34) * 1em), 100% - 388px);
+  /* ── ≥1300px (PC and compact): the body is --s-measure characters wide
+     (34 by default), giving way so the 300px notes fit at 88px beside it.
+     Characters asked for beyond 34 are made room for by narrowing the notes
+     (to 220px) and their gap (to 56px), so the setting still shows on
+     screens where 34 already fills the column. 100cqi = the column. ── */
+  @media (min-width: 1300px) {
+    .column {
+      container-type: inline-size;
+      --pc-body: min(
+        calc(var(--s-measure, 34) * var(--body-size)),
+        calc(100cqi - 388px + clamp(0px, (var(--s-measure, 34) - 34) * var(--body-size), 112px))
+      );
+      --pc-gap: clamp(56px, 100cqi - var(--pc-body) - 300px, 88px);
+      --pc-note: min(300px, 100cqi - var(--pc-body) - var(--pc-gap));
     }
-    .head {
-      max-width: min(calc(var(--s-measure, 34) * var(--body-size)), 100% - 388px);
+    .head,
+    .body {
+      max-width: var(--pc-body);
+    }
+    .body :global(.sidenote) {
+      width: var(--pc-note);
+      margin-right: calc(-1 * (var(--pc-note) + var(--pc-gap)));
     }
   }
   @media (min-width: 1160px) and (max-width: 1299px) {

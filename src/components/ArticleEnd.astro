@@ -149,7 +149,7 @@ const related = posts.filter((p) => p.category === post.category && p.slug !== p
     .sub,
     .pager,
     .related {
-      max-width: min(calc(var(--s-measure, 34) * var(--body-size)), 100% - 388px);
+      max-width: var(--pc-body); /* Article.astro */
     }
   }
   @media (min-width: 1160px) and (max-width: 1299px) {
