@@ -18,6 +18,8 @@ const H = 1920;
 const X = 84; // side margin
 const C = { accent: '#0000ff', bg: '#f3f2f2', text: '#201f1d', sub: '#605d5d', light: '#9b9797', divider: '#d4d3d2' };
 const SITE = 'fragments-of.space';
+const FOOT = 310; // the white band under the bottom rule, for the link sticker
+const ARROW_TOP = 82; // where the ↗ sits in it (level with the sticker's middle)
 
 const anon = { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` };
 
@@ -133,10 +135,10 @@ const h = (type, style, ...children) => {
 function layout({ name, title, subtitle, date, image, paras, fonts }) {
   const imgW = W - X * 2;
   let imgH = 0;
-  // its own shape, up to 720px tall (a tall one, e.g. a book cover, whole
+  // its own shape, up to 840px tall (a tall one, e.g. a book cover, whole
   // and centred, as the site shows it); smaller when the title is long, so
   // the text below keeps its five lines
-  if (image) imgH = Math.round(Math.min(720, (imgW * image.h) / image.w));
+  if (image) imgH = Math.round(Math.min(840, (imgW * image.h) / image.w));
   const line = 38 * 1.9;
   return h(
     'div',
@@ -155,7 +157,7 @@ function layout({ name, title, subtitle, date, image, paras, fonts }) {
       ),
     ),
     // title block
-    h('div', { display: 'flex', marginTop: 96, fontFamily: fonts.jaHeading, fontWeight: fonts.headingWeight, fontSize: 62, lineHeight: 1.5, letterSpacing: 1 }, title),
+    h('div', { display: 'flex', marginTop: 52, fontFamily: fonts.jaHeading, fontWeight: fonts.headingWeight, fontSize: 62, lineHeight: 1.5, letterSpacing: 1 }, title),
     subtitle ? h('div', { display: 'flex', marginTop: 14, fontFamily: fonts.jaHeading, fontSize: 36, lineHeight: 1.6, color: C.sub }, subtitle) : null,
     h('div', { display: 'flex', marginTop: 28, paddingBottom: 30, borderBottom: `2px solid ${C.divider}`, fontFamily: fonts.latinBody, fontSize: 30, color: C.sub, letterSpacing: 1 }, date),
     // the first image
@@ -174,12 +176,22 @@ function layout({ name, title, subtitle, date, image, paras, fonts }) {
     ),
     // what the image and five lines leave goes above the foot
     image ? h('div', { display: 'flex', flexGrow: 1 }, []) : null,
-    // foot: the address, above the story's reply bar
+    // foot: the rule, and under it a white band (as white as the link
+    // sticker put there) with ↗ at its right end — the sticker goes to its
+    // left and reads as one line with it
+    h('div', { display: 'flex', borderTop: `2px solid ${C.sub}` }, []),
     h(
       'div',
-      { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 240, paddingTop: 26, borderTop: `2px solid ${C.sub}`, fontFamily: fonts.latinBody, fontSize: 30, color: C.sub },
-      h('div', { display: 'flex' }, SITE),
-      h('div', { display: 'flex' }, '→'),
+      { display: 'flex', justifyContent: 'flex-end', height: FOOT, margin: `0 -${X}px`, padding: `${ARROW_TOP}px ${X}px 0`, background: '#fff' },
+      {
+        type: 'svg',
+        props: {
+          width: 60,
+          height: 60,
+          viewBox: '0 0 24 24',
+          children: { type: 'path', props: { d: 'M6.5 17.5 17.5 6.5 M8.5 6.5 H17.5 V15.5', stroke: C.text, strokeWidth: 1.5, fill: 'none', strokeLinecap: 'square' } },
+        },
+      },
     ),
   );
 }
@@ -209,7 +221,7 @@ async function renderStory(a, s) {
   const heading500 = await loadFont(fam.jaHeading, 500, title + subtitle);
   const loaded = await Promise.all([
     loadFont(fam.latinHeading, 400, name),
-    loadFont(fam.latinBody, 400, date + SITE + '→NEW'),
+    loadFont(fam.latinBody, 400, date + 'NEW'),
     heading500 ?? loadFont(fam.jaHeading, 400, title + subtitle),
     heading500 ? loadFont(fam.jaHeading, 400, subtitle) : null,
     loadFont(fam.jaBody, 400, text),
