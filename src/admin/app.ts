@@ -541,7 +541,7 @@ function syncStory() {
   $('[data-story]').hidden = !saved;
   if (saved) $<HTMLAnchorElement>('[data-story-view]').href = `/api/story?id=${current!.id}`;
 }
-/** Sends the story image; returns a line on how it went, or '' when nothing is set up. */
+/** Sends the story image; returns how it went, channel by channel. */
 async function sendStory(id: number): Promise<string> {
   try {
     const res = await fetch('/api/story-send', {
@@ -556,8 +556,14 @@ async function sendStory(id: number): Promise<string> {
     } catch {}
     if (!res.ok) return `ストーリー画像を送れませんでした（${res.status}）: ${r.error ?? raw.replace(/\s+/g, ' ').slice(0, 160)}`;
     const done = [r.mail === 'sent' && 'メール', r.line === 'sent' && 'LINE'].filter(Boolean).join('と');
-    const errs = [r.mail, r.line].filter((x) => x && x !== 'sent' && x !== 'skipped');
-    return [done && `ストーリー画像を${done}に送りました。`, ...errs].filter(Boolean).join(' ');
+    const why = (ch: string, v: string) =>
+      v === 'off'
+        ? `${ch}：Vercel の環境変数（${ch === 'メール' ? 'RESEND_API_KEY・NEWSLETTER_FROM' : 'LINE_CHANNEL_ACCESS_TOKEN・LINE_USER_ID'}）が入っていないので送っていません。`
+        : v === 'unpublished'
+          ? `${ch}：公開済みの記事だけ送れます（予約・下書きは公開後に）。`
+          : `${ch}：${v}`;
+    const notes = [['メール', r.mail], ['LINE', r.line]].filter(([, v]) => v && v !== 'sent').map(([c, v]) => why(c, v));
+    return [done && `ストーリー画像を${done}に送りました。`, ...notes].filter(Boolean).join(' ');
   } catch {
     return 'ストーリー画像を送れませんでした（窓口につながりません）';
   }
@@ -567,7 +573,7 @@ $('[data-story-send]').addEventListener('click', async () => {
   const out = $('[data-save-msg]');
   msg(out, 'ストーリー画像を送っています…');
   const r = await sendStory(current.id);
-  msg(out, r || 'メールも LINE も設定されていないので、送れませんでした（Vercel の環境変数を確かめてください）。', !r || /送れません/.test(r));
+  msg(out, r, !/送りました/.test(r));
 });
 
 async function rebuild(): Promise<string | null> {

@@ -6,8 +6,8 @@
 //     (LINE_CHANNEL_ACCESS_TOKEN, LINE_USER_ID — 「Your user ID」 on the
 //     channel's Basic settings). LINE fetches the image from api/story, so it
 //     goes only for a published article.
-// Replies { mail, line }: each 'sent', 'skipped' (not set up / not published)
-// or an error message.
+// Replies { mail, line }: each 'sent', 'off' (not set up in Vercel),
+// 'unpublished' (LINE only) or an error message.
 
 import { mailReady, requireAdmin, siteUrl, testRecipients } from '../src/lib/newsletter.mjs';
 
@@ -42,7 +42,8 @@ async function send(req, res) {
   if (!article) return res.status(404).json({ error: '記事が見つかりません' });
   const site = siteUrl();
   const url = `${site}/posts/${id}/`;
-  const out = { mail: 'skipped', line: 'skipped' };
+  // 'off': not set up in Vercel; 'unpublished': LINE needs a published article
+  const out = { mail: 'off', line: 'off' };
 
   if (mailReady()) {
     try {
@@ -69,7 +70,7 @@ async function send(req, res) {
   const lineToken = process.env.LINE_CHANNEL_ACCESS_TOKEN;
   const lineTo = process.env.LINE_USER_ID;
   if (lineToken && lineTo) {
-    if (article.status !== 'published') out.line = 'skipped';
+    if (article.status !== 'published') out.line = 'unpublished';
     else {
       try {
         const img = `${site}/api/story?id=${id}&v=${Date.now()}`;
