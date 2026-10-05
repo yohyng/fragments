@@ -16,7 +16,7 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabase-config.mjs';
 const W = 1080;
 const H = 1920;
 const X = 84; // side margin
-const C = { accent: '#0000ff', bg: '#f3f2f2', text: '#201f1d', sub: '#605d5d', light: '#9b9797', divider: '#d4d3d2' };
+const C = { accent: '#0000ff', bg: '#ffffff', text: '#201f1d', sub: '#605d5d', light: '#9b9797', divider: '#d4d3d2' };
 const SITE = 'fragments-of.space';
 const FOOT = 310; // the white band under the bottom rule, for the link sticker
 const ARROW_TOP = 82; // where the ↗ sits in it (level with the sticker's middle)
@@ -172,11 +172,11 @@ function layout({ name, title, subtitle, date, image, paras, fonts }) {
       paras.map((t, i) =>
         h('div', { display: 'flex', marginTop: i ? 40 : 0, fontFamily: fonts.jaBody, fontSize: 38, lineHeight: 1.9, textAlign: 'justify' }, `　${t}`),
       ),
-      h('div', { display: 'flex', position: 'absolute', left: 0, right: 0, bottom: 0, height: image ? Math.round(line * 1.6) : 260, backgroundImage: `linear-gradient(to bottom, rgba(243,242,242,0), ${C.bg})` }, []),
+      h('div', { display: 'flex', position: 'absolute', left: 0, right: 0, bottom: 0, height: image ? Math.round(line * 1.6) : 260, backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0), ${C.bg})` }, []),
     ),
     // what the image and five lines leave goes above the foot
     image ? h('div', { display: 'flex', flexGrow: 1 }, []) : null,
-    // foot: the rule, and under it a white band (as white as the link
+    // foot: the rule, and under it a band (white, as the whole image and the link
     // sticker put there) with ↗ at its right end — the sticker goes to its
     // left and reads as one line with it
     h('div', { display: 'flex', borderTop: `2px solid ${C.sub}` }, []),
