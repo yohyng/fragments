@@ -18,5 +18,13 @@
       "path": "/api/rebuild",
       "schedule": "5 15 * * *"
     }
-  ]
+  ],
+  "functions": {
+    "api/story.js": {
+      "includeFiles": "node_modules/harfbuzzjs/*.wasm"
+    },
+    "api/story-send.js": {
+      "includeFiles": "node_modules/harfbuzzjs/*.wasm"
+    }
+  }
 }
