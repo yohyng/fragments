@@ -539,7 +539,7 @@ async function addCard() {
 function syncStory() {
   const saved = current?.id !== undefined;
   $('[data-story]').hidden = !saved;
-  if (saved) $<HTMLAnchorElement>('[data-story-view]').href = `/api/story?id=${current!.id}`;
+  if (saved) $<HTMLAnchorElement>('[data-story-view]').href = `/api/story/?id=${current!.id}`;
 }
 /** Sends the story image; returns how it went, channel by channel. */
 async function sendStory(id: number): Promise<string> {

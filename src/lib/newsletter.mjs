@@ -132,8 +132,8 @@ export async function sendBatch(mails) {
   }
 }
 
-export const confirmUrl = (token) => `${siteUrl()}/api/confirm?token=${token}`;
-export const unsubscribeUrl = (token) => `${siteUrl()}/api/unsubscribe?token=${token}`;
+export const confirmUrl = (token) => `${siteUrl()}/api/confirm/?token=${token}`;
+export const unsubscribeUrl = (token) => `${siteUrl()}/api/unsubscribe/?token=${token}`;
 
 /** The confirmation mail (Resend). */
 export async function sendConfirmation(email, token) {

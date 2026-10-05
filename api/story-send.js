@@ -73,7 +73,9 @@ async function send(req, res) {
     if (article.status !== 'published') out.line = 'unpublished';
     else {
       try {
-        const img = `${site}/api/story?id=${id}&v=${Date.now()}`;
+        // with the slash the site's URLs end in (vercel.json trailingSlash):
+        // LINE does not follow the redirect from /api/story?id=…
+        const img = `${site}/api/story/?id=${id}&v=${Date.now()}`;
         const r = await fetch('https://api.line.me/v2/bot/message/push', {
           method: 'POST',
           headers: { Authorization: `Bearer ${lineToken}`, 'content-type': 'application/json' },
