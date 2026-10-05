@@ -542,12 +542,12 @@ function syncStory() {
   if (saved) $<HTMLAnchorElement>('[data-story-view]').href = `/api/story/?id=${current!.id}`;
 }
 /** Sends the story image; returns how it went, channel by channel. */
-async function sendStory(id: number): Promise<string> {
+async function sendStory(id: number, live = false): Promise<string> {
   try {
     const res = await fetch('/api/story-send', {
       method: 'POST',
       headers: { 'content-type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
-      body: JSON.stringify({ id }),
+      body: JSON.stringify({ id, live }),
     });
     const raw = await res.text();
     let r: any = {};
@@ -635,7 +635,7 @@ $('[data-save]').addEventListener('click', async () => {
     msg(out, why ? `保存しました。ただ、サイトに反映できませんでした: ${why}。` : '保存しました。1〜2分でサイトに反映されます。', !!why);
     // just published: the story image goes out by mail and LINE
     if (status === 'published' && !wasPublished && !why) {
-      const sent = await sendStory(current.id!);
+      const sent = await sendStory(current.id!, true);
       if (sent) msg(out, `保存しました。1〜2分でサイトに反映されます。${sent}`);
     }
   } else msg(out, '保存しました（下書き・非公開なので、サイトには出ません）。');

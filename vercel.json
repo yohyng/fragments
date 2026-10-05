@@ -25,6 +25,9 @@
     },
     "api/story-send.js": {
       "includeFiles": "node_modules/harfbuzzjs/*.wasm"
+    },
+    "api/rebuild.js": {
+      "includeFiles": "node_modules/harfbuzzjs/*.wasm"
     }
   }
 }
