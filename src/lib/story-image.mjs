@@ -21,7 +21,7 @@ const SITE = 'fragments-of.space';
 const FOOT = 310; // the white band under the bottom rule, for the link sticker
 // the ↗, in the band's own coordinates: measured from a story with the
 // link sticker centred, 「READ THE ARTICLE ↗」 in its default size
-const ARROW = { x: 864, y: 65, size: 82 }; // the box; the stroke spans 20/26 of it (the capitals' 69px)
+const ARROW = { x: 864, y: 69, size: 82 }; // the box; the stroke spans 20/26 of it (the capitals' 69px)
 // where the arrow's stroke ends on the right (its box less the padding)
 const ARROW_RIGHT = Math.round(ARROW.x + (ARROW.size * 23) / 26 + 3);
 const READ_TOP = 6; // 「記事を読む」 above it, its right end level with the arrow's
