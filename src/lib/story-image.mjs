@@ -16,7 +16,7 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabase-config.mjs';
 const W = 1080;
 const H = 1920;
 const X = 84; // side margin
-const C = { bg: '#f3f2f2', text: '#201f1d', sub: '#605d5d', light: '#9b9797', divider: '#d4d3d2' };
+const C = { accent: '#0000ff', bg: '#f3f2f2', text: '#201f1d', sub: '#605d5d', light: '#9b9797', divider: '#d4d3d2' };
 const SITE = 'fragments-of.space';
 
 const anon = { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` };
@@ -141,8 +141,19 @@ function layout({ name, title, subtitle, date, image, paras, fonts }) {
   return h(
     'div',
     { width: W, height: H, display: 'flex', flexDirection: 'column', background: C.bg, padding: `200px ${X}px 0`, color: C.text },
-    // header: the site name over the rule
-    h('div', { display: 'flex', fontFamily: fonts.latinHeading, fontSize: 76, lineHeight: 1.2, paddingBottom: 14, borderBottom: `2px solid ${C.sub}` }, name),
+    // header: the site name over the rule, and at its right end 「NEW」 in
+    // white on the accent (as the site's note numbers), clear of the
+    // story's own controls above
+    h(
+      'div',
+      { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', paddingBottom: 14, borderBottom: `2px solid ${C.sub}` },
+      h('div', { display: 'flex', fontFamily: fonts.latinHeading, fontSize: 76, lineHeight: 1.2 }, name),
+      h(
+        'div',
+        { display: 'flex', marginBottom: 14, padding: '7px 16px 6px 19px', background: C.accent, color: '#fff', fontFamily: fonts.latinBody, fontSize: 26, lineHeight: 1.2, letterSpacing: 5 },
+        'NEW',
+      ),
+    ),
     // title block
     h('div', { display: 'flex', marginTop: 96, fontFamily: fonts.jaHeading, fontWeight: fonts.headingWeight, fontSize: 62, lineHeight: 1.5, letterSpacing: 1 }, title),
     subtitle ? h('div', { display: 'flex', marginTop: 14, fontFamily: fonts.jaHeading, fontSize: 36, lineHeight: 1.6, color: C.sub }, subtitle) : null,
@@ -198,7 +209,7 @@ async function renderStory(a, s) {
   const heading500 = await loadFont(fam.jaHeading, 500, title + subtitle);
   const loaded = await Promise.all([
     loadFont(fam.latinHeading, 400, name),
-    loadFont(fam.latinBody, 400, date + SITE + '→'),
+    loadFont(fam.latinBody, 400, date + SITE + '→NEW'),
     heading500 ?? loadFont(fam.jaHeading, 400, title + subtitle),
     heading500 ? loadFont(fam.jaHeading, 400, subtitle) : null,
     loadFont(fam.jaBody, 400, text),
