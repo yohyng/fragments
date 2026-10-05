@@ -461,4 +461,10 @@ const onAbout = Astro.url.pathname.startsWith('/about');
       padding: 0 max(var(--inset-x), 100% - 480px - var(--inset-x)) 0 var(--inset-x);
     }
   }
+  /* unfolded (560px and up): the tablet's 340px column */
+  @media (min-width: 560px) and (max-width: 759px) {
+    .index {
+      padding: 0 calc(100% - 340px - var(--inset-x)) 0 var(--inset-x);
+    }
+  }
 </style>
