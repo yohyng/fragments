@@ -19,12 +19,14 @@ const X = 84; // side margin
 const C = { accent: '#0000ff', bg: '#ffffff', text: '#201f1d', sub: '#605d5d', light: '#9b9797', divider: '#d4d3d2' };
 const SITE = 'fragments-of.space';
 const FOOT = 310; // the white band under the bottom rule, for the link sticker
-// the ↗, in the band's own coordinates: measured from a story with the
-// link sticker centred, 「READ THE ARTICLE ↗」 in its default size
-const ARROW = { x: 864, y: 69, size: 82 }; // the box; the stroke spans 20/26 of it (the capitals' 69px)
+// the arrow's box; its stroke (viewBox -1…25, path 2…22) shows from 6px to
+// 76px down the box. It sits at the foot: the stroke ends 24px above the
+// image's bottom edge.
+const ARROW = { x: 864, y: FOOT - 24 - 76, size: 82 };
 // the middle of the arrow's stroke (viewBox -1…25, stroke 2…22)
 const ARROW_MID = Math.round(ARROW.x + (ARROW.size * 13) / 26);
-const READ_TOP = 10; // 「記事を読む」 above it, centred over it
+// 「記事を読む」 (31px high) just above the arrow's stroke, centred over it
+const READ_TOP = ARROW.y + 6 - 10 - 31;
 
 const anon = { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` };
 
@@ -187,7 +189,7 @@ function layout({ name, title, subtitle, date, image, paras, fonts }) {
     h('div', { display: 'flex', borderTop: `2px solid ${C.sub}` }, []),
     h(
       'div',
-      { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', position: 'relative', height: FOOT, margin: `0 -${X}px`, padding: `${READ_TOP}px ${X}px 0`, background: '#fff' },
+      { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', position: 'relative', height: FOOT, margin: `0 -${X}px`, background: '#fff' },
       // 「記事を読む」, small, just under the rule, centred over the ↗
       h(
         'div',
