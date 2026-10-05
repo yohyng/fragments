@@ -122,13 +122,14 @@ async function loadImage(url) {
 
 // ── fonts: Google Fonts, cut to the characters used ──
 
-async function loadFont(family, weight, text) {
-  const q = `family=${encodeURIComponent(family).replace(/%20/g, '+')}${weight !== 400 ? `:wght@${weight}` : ''}&text=${encodeURIComponent(text)}`;
+async function loadFont(family, weight, text, style = 'normal') {
+  const axis = style === 'italic' ? `:ital,wght@1,${weight}` : weight !== 400 ? `:wght@${weight}` : '';
+  const q = `family=${encodeURIComponent(family).replace(/%20/g, '+')}${axis}&text=${encodeURIComponent(text)}`;
   const css = await fetch(`https://fonts.googleapis.com/css2?${q}`).then((r) => (r.ok ? r.text() : ''));
   const url = /src:\s*url\(([^)]+)\)\s*format\('(?:truetype|opentype)'\)/.exec(css)?.[1];
   if (!url) return null;
   const data = await fetch(url).then((r) => (r.ok ? r.arrayBuffer() : null));
-  return data && { name: family, data, weight, style: 'normal' };
+  return data && { name: family, data, weight, style };
 }
 
 // ── layout (satori elements) ──
@@ -150,7 +151,7 @@ function layout({ name, title, subtitle, date, image, paras, fonts }) {
   return h(
     'div',
     { width: W, height: H, display: 'flex', flexDirection: 'column', background: C.bg, padding: `200px ${X}px 0`, color: C.text },
-    // header: the site name over the rule, and at its right end 「NEW」 in
+    // header: the site name over the rule, and at its right end 「new post」 (italic) in
     // white on the accent (as the site's note numbers), clear of the
     // story's own controls above
     h(
@@ -159,8 +160,8 @@ function layout({ name, title, subtitle, date, image, paras, fonts }) {
       h('div', { display: 'flex', fontFamily: fonts.latinHeading, fontSize: 76, lineHeight: 1.2 }, name),
       h(
         'div',
-        { display: 'flex', marginBottom: 12, padding: '10px 22px 9px 27px', background: C.accent, color: '#fff', fontFamily: fonts.latinBody, fontSize: 38, lineHeight: 1.2, letterSpacing: 7 },
-        'NEW',
+        { display: 'flex', marginBottom: 12, padding: '8px 22px 11px 20px', background: C.accent, color: '#fff', fontFamily: fonts.latinBody, fontStyle: 'italic', fontSize: 38, lineHeight: 1.2, letterSpacing: 1 },
+        'new post',
       ),
     ),
     // title block
@@ -238,7 +239,8 @@ async function renderStory(a, s) {
   const heading500 = await loadFont(fam.jaHeading, 500, title + subtitle);
   const loaded = await Promise.all([
     loadFont(fam.latinHeading, 400, name),
-    loadFont(fam.latinBody, 400, date + 'NEW'),
+    loadFont(fam.latinBody, 400, date),
+    loadFont(fam.latinBody, 400, 'new post', 'italic'),
     heading500 ?? loadFont(fam.jaHeading, 400, title + subtitle),
     heading500 ? loadFont(fam.jaHeading, 400, subtitle) : null,
     loadFont(fam.jaBody, 400, text),
