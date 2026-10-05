@@ -549,8 +549,12 @@ async function sendStory(id: number): Promise<string> {
       headers: { 'content-type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
       body: JSON.stringify({ id }),
     });
-    const r = await res.json().catch(() => ({}));
-    if (!res.ok) return `ストーリー画像を送れませんでした: ${r.error ?? res.status}`;
+    const raw = await res.text();
+    let r: any = {};
+    try {
+      r = JSON.parse(raw);
+    } catch {}
+    if (!res.ok) return `ストーリー画像を送れませんでした（${res.status}）: ${r.error ?? raw.replace(/\s+/g, ' ').slice(0, 160)}`;
     const done = [r.mail === 'sent' && 'メール', r.line === 'sent' && 'LINE'].filter(Boolean).join('と');
     const errs = [r.mail, r.line].filter((x) => x && x !== 'sent' && x !== 'skipped');
     return [done && `ストーリー画像を${done}に送りました。`, ...errs].filter(Boolean).join(' ');

@@ -96,6 +96,7 @@ function claims(token) {
 export async function requireAdmin(token) {
   const user = await authUser(token);
   if (!user) return { status: 401, error: 'ログインし直してください' };
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return { status: 500, error: 'Vercel の環境変数 SUPABASE_SERVICE_ROLE_KEY が設定されていません' };
   const res = await fetch(`${SUPABASE_URL}/rest/v1/fragments_admins?user_id=eq.${user.id}&select=user_id`, {
     headers: { apikey: key(), Authorization: `Bearer ${key()}` },
   });

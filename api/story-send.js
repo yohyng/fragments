@@ -10,9 +10,18 @@
 // or an error message.
 
 import { mailReady, requireAdmin, siteUrl, testRecipients } from '../src/lib/newsletter.mjs';
-import { fetchArticle, storyFileName, storyImage } from '../src/lib/story-image.mjs';
 
+// any failure comes back as a message for the admin to read, not a bare 500
 export default async function handler(req, res) {
+  try {
+    return await send(req, res);
+  } catch (e) {
+    console.error('[story-send]', e);
+    return res.status(500).json({ error: String(e?.message || e) });
+  }
+}
+
+async function send(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'method not allowed' });
@@ -23,6 +32,11 @@ export default async function handler(req, res) {
   const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body ?? {};
   const id = String(body.id ?? '');
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!key) return res.status(500).json({ error: 'Vercel の環境変数 SUPABASE_SERVICE_ROLE_KEY が設定されていません' });
+  // loaded here, so a renderer that will not load is reported, not a crash
+  const { fetchArticle, storyFileName, storyImage } = await import('../src/lib/story-image.mjs').catch((e) => {
+    throw new Error(`画像を作る部品を読み込めませんでした（${e.message}）`);
+  });
 
   const article = await fetchArticle(id, key);
   if (!article) return res.status(404).json({ error: '記事が見つかりません' });
