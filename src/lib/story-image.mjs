@@ -20,9 +20,9 @@ const C = { accent: '#0000ff', bg: '#ffffff', text: '#201f1d', sub: '#605d5d', l
 const SITE = 'fragments-of.space';
 const FOOT = 310; // the white band under the bottom rule, for the link sticker
 // the arrow's box; its stroke (viewBox -1…25, path 2…22) shows from 6px to
-// 76px down the box. It sits at the foot: the stroke ends 24px above the
-// image's bottom edge.
-const ARROW = { x: 864, y: FOOT - 24 - 76, size: 82 };
+// 76px down (and across) the box. It sits at the foot: the stroke ends 24px
+// above the image's bottom edge, and on the right at the margin (the rules' end).
+const ARROW = { x: W - X - 76, y: FOOT - 24 - 76, size: 82 };
 // the middle of the arrow's stroke (viewBox -1…25, stroke 2…22)
 const ARROW_MID = Math.round(ARROW.x + (ARROW.size * 13) / 26);
 // 「記事を読む」 (31px high) just above the arrow's stroke, centred over it
