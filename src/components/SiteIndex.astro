@@ -211,7 +211,7 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     display: flex;
     flex-direction: column;
     gap: 22px;
-    padding-bottom: 96px;
+    padding-bottom: 24px; /* below the policy link, the last thing */
   }
   /* never squeeze a block to fit the column (it scrolls instead) */
   .index > * {
@@ -382,9 +382,11 @@ const onAbout = Astro.url.pathname.startsWith('/about');
   .subscribe,
   .subscribe:hover { color: var(--color-accent-700); }
 
-  /* at the very end, small */
+  /* at the very end, small, down by the bottom edge: 24px above it (the
+     index's bottom padding, or the bottom strip on tablets and phones) */
   .policy {
     align-self: flex-start;
+    margin-top: 40px;
     font-family: var(--font-body);
     font-size: 10.5px;
     line-height: 1.5;
@@ -404,7 +406,7 @@ const onAbout = Astro.url.pathname.startsWith('/about');
       padding-top: var(--inset-top);
     }
     /* 80px below the links, then the bottom margin strip */
-    .scroll-foot { margin-top: calc(80px - 22px); }
+    .scroll-foot { margin-top: calc(24px - 22px); } /* 24px below the policy link */
     .intro {
       min-height: 0;
     }
@@ -431,7 +433,7 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     .intro-ja { font-size: calc(var(--s-catch-ja-sp, var(--s-catch-ja, 13)) * 1px); }
     .intro-en { font-size: calc(var(--s-catch-en-sp, var(--s-catch-en, 13)) * 1px); }
     .item { font-size: calc(var(--s-index-sp, var(--s-index, 13)) * 1px); }
-    .scroll-foot { margin-top: calc(48px - 20px); }
+    .scroll-foot { margin-top: calc(24px - 20px); }
     .intro {
       padding-top: calc(var(--s-ix-a-sp, 40) * 1px - 20px);
       gap: calc(var(--s-ix-b-sp, 4) * 1px);
