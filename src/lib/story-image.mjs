@@ -21,10 +21,10 @@ const SITE = 'fragments-of.space';
 const FOOT = 310; // the white band under the bottom rule, for the link sticker
 // the ↗, in the band's own coordinates: measured from a story with the
 // link sticker centred, 「READ THE ARTICLE ↗」 in its default size
-const ARROW = { x: 860, y: 65, size: 82 }; // the box; the stroke spans 20/26 of it (the capitals' 69px)
+const ARROW = { x: 864, y: 65, size: 82 }; // the box; the stroke spans 20/26 of it (the capitals' 69px)
 // where the arrow's stroke ends on the right (its box less the padding)
 const ARROW_RIGHT = Math.round(ARROW.x + (ARROW.size * 23) / 26 + 3);
-const READ_TOP = 18; // 「記事を読む」 above it, its right end level with the arrow's
+const READ_TOP = 6; // 「記事を読む」 above it, its right end level with the arrow's
 
 const anon = { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` };
 
@@ -189,7 +189,7 @@ function layout({ name, title, subtitle, date, image, paras, fonts }) {
       'div',
       { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', position: 'relative', height: FOOT, margin: `0 -${X}px`, padding: `${READ_TOP}px ${X}px 0`, background: '#fff' },
       // 「記事を読む」, small, just under the rule, ending over the ↗'s end
-      h('div', { display: 'flex', marginRight: W - X - ARROW_RIGHT, fontFamily: fonts.jaBody, fontSize: 26, lineHeight: 1.5, color: C.sub }, '記事を読む'),
+      h('div', { display: 'flex', marginRight: W - X - ARROW_RIGHT, fontFamily: fonts.jaBody, fontSize: 24, lineHeight: 1.3, color: C.sub }, '記事を読む'),
       // ↗ where the sticker's own arrow would be (a little to its right), as
       // tall as the sticker's capitals and about as heavy; the sticker is
       // set with its text alone (「READ THE ARTICLE」) to its left
