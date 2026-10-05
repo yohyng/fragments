@@ -19,7 +19,9 @@ const X = 84; // side margin
 const C = { accent: '#0000ff', bg: '#ffffff', text: '#201f1d', sub: '#605d5d', light: '#9b9797', divider: '#d4d3d2' };
 const SITE = 'fragments-of.space';
 const FOOT = 310; // the white band under the bottom rule, for the link sticker
-const ARROW_TOP = 82; // where the ↗ sits in it (level with the sticker's middle)
+// the ↗, in the band's own coordinates: measured from a story with the
+// link sticker centred, 「READ THE ARTICLE ↗」 in its default size
+const ARROW = { x: 868, y: 65, size: 82 }; // the box; the stroke spans 20/26 of it (the capitals' 69px)
 const READ_TOP = 18; // 「記事を読む」 above it
 
 const anon = { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` };
@@ -183,18 +185,20 @@ function layout({ name, title, subtitle, date, image, paras, fonts }) {
     h('div', { display: 'flex', borderTop: `2px solid ${C.sub}` }, []),
     h(
       'div',
-      { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', height: FOOT, margin: `0 -${X}px`, padding: `${READ_TOP}px ${X}px 0`, background: '#fff' },
+      { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', position: 'relative', height: FOOT, margin: `0 -${X}px`, padding: `${READ_TOP}px ${X}px 0`, background: '#fff' },
       // 「記事を読む」, small, just under the rule over the ↗
       h('div', { display: 'flex', fontFamily: fonts.jaBody, fontSize: 26, lineHeight: 1.5, color: C.sub }, '記事を読む'),
+      // ↗ where the sticker's own arrow would be (a little to its right), as
+      // tall as the sticker's capitals and about as heavy; the sticker is
+      // set with its text alone (「READ THE ARTICLE」) to its left
       {
         type: 'svg',
         props: {
-          // the arrow's stroke ends 16px inside its box: out to the margin
-          style: { marginTop: ARROW_TOP - READ_TOP - 39, marginRight: -15 },
-          width: 60,
-          height: 60,
-          viewBox: '0 0 24 24',
-          children: { type: 'path', props: { d: 'M6.5 17.5 17.5 6.5 M8.5 6.5 H17.5 V15.5', stroke: C.text, strokeWidth: 1.5, fill: 'none', strokeLinecap: 'square' } },
+          style: { position: 'absolute', left: ARROW.x, top: ARROW.y, width: ARROW.size, height: ARROW.size },
+          width: ARROW.size,
+          height: ARROW.size,
+          viewBox: '-1 -1 26 26',
+          children: { type: 'path', props: { d: 'M2 22 L22 2 M7 2 H22 V17', stroke: '#000', strokeWidth: 2.2, fill: 'none' } },
         },
       },
     ),
