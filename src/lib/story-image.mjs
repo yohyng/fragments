@@ -133,9 +133,11 @@ const h = (type, style, ...children) => {
 function layout({ name, title, subtitle, date, image, paras, fonts }) {
   const imgW = W - X * 2;
   let imgH = 0;
-  // its own shape, up to 560px tall (a tall one, e.g. a book cover, whole
-  // and centred, as the site shows it)
-  if (image) imgH = Math.round(Math.min(560, (imgW * image.h) / image.w));
+  // its own shape, up to 720px tall (a tall one, e.g. a book cover, whole
+  // and centred, as the site shows it); smaller when the title is long, so
+  // the text below keeps its five lines
+  if (image) imgH = Math.round(Math.min(720, (imgW * image.h) / image.w));
+  const line = 38 * 1.9;
   return h(
     'div',
     { width: W, height: H, display: 'flex', flexDirection: 'column', background: C.bg, padding: `200px ${X}px 0`, color: C.text },
@@ -146,16 +148,21 @@ function layout({ name, title, subtitle, date, image, paras, fonts }) {
     subtitle ? h('div', { display: 'flex', marginTop: 14, fontFamily: fonts.jaHeading, fontSize: 36, lineHeight: 1.6, color: C.sub }, subtitle) : null,
     h('div', { display: 'flex', marginTop: 28, paddingBottom: 30, borderBottom: `2px solid ${C.divider}`, fontFamily: fonts.latinBody, fontSize: 30, color: C.sub, letterSpacing: 1 }, date),
     // the first image
-    image ? { type: 'img', props: { src: image.src, width: imgW, height: imgH, style: { flexShrink: 0, marginTop: 64, width: imgW, height: imgH, objectFit: 'contain' } } } : null,
+    image ? { type: 'img', props: { src: image.src, width: imgW, height: imgH, style: { flexShrink: 1, minHeight: 200, marginTop: 64, width: imgW, height: imgH, objectFit: 'contain' } } } : null,
     // the opening, fading out
     h(
       'div',
-      { display: 'flex', flexDirection: 'column', flexGrow: 1, flexShrink: 1, minHeight: 0, overflow: 'hidden', position: 'relative', marginTop: 60 },
+      // with an image: five lines; without: down to the foot
+      image
+        ? { display: 'flex', flexDirection: 'column', height: Math.round(line * 5), overflow: 'hidden', position: 'relative', margin: '56px 0 32px' }
+        : { display: 'flex', flexDirection: 'column', flexGrow: 1, flexShrink: 1, minHeight: 0, overflow: 'hidden', position: 'relative', margin: '60px 0 32px' },
       paras.map((t, i) =>
-        h('div', { display: 'flex', marginTop: i ? 40 : 0, fontFamily: fonts.jaBody, fontSize: 38, lineHeight: 1.9, letterSpacing: 1, textAlign: 'justify' }, `　${t}`),
+        h('div', { display: 'flex', marginTop: i ? 40 : 0, fontFamily: fonts.jaBody, fontSize: 38, lineHeight: 1.9, textAlign: 'justify' }, `　${t}`),
       ),
-      h('div', { display: 'flex', position: 'absolute', left: 0, right: 0, bottom: 0, height: 260, backgroundImage: `linear-gradient(to bottom, rgba(243,242,242,0), ${C.bg})` }, []),
+      h('div', { display: 'flex', position: 'absolute', left: 0, right: 0, bottom: 0, height: image ? Math.round(line * 1.6) : 260, backgroundImage: `linear-gradient(to bottom, rgba(243,242,242,0), ${C.bg})` }, []),
     ),
+    // what the image and five lines leave goes above the foot
+    image ? h('div', { display: 'flex', flexGrow: 1 }, []) : null,
     // foot: the address, above the story's reply bar
     h(
       'div',
