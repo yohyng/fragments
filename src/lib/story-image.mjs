@@ -150,7 +150,7 @@ function layout({ name, title, subtitle, date, image, paras, fonts }) {
       h('div', { display: 'flex', fontFamily: fonts.latinHeading, fontSize: 76, lineHeight: 1.2 }, name),
       h(
         'div',
-        { display: 'flex', marginBottom: 14, padding: '7px 16px 6px 19px', background: C.accent, color: '#fff', fontFamily: fonts.latinBody, fontSize: 26, lineHeight: 1.2, letterSpacing: 5 },
+        { display: 'flex', marginBottom: 12, padding: '10px 22px 9px 27px', background: C.accent, color: '#fff', fontFamily: fonts.latinBody, fontSize: 38, lineHeight: 1.2, letterSpacing: 7 },
         'NEW',
       ),
     ),
