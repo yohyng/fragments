@@ -77,6 +77,10 @@ import '../../styles/tokens.css';
       <div class="edit-head">
         <button type="button" class="link" data-back>← 記事の一覧</button>
         <span class="spacer"></span>
+        <span class="story" data-story hidden>
+          <a class="link" data-story-view target="_blank" rel="noopener">ストーリー画像 ↗</a>
+          <button type="button" class="link" data-story-send>メールと LINE に送る</button>
+        </span>
         <a class="link" data-view-on-site target="_blank" rel="noopener" hidden>サイトで見る ↗</a>
       </div>
       <div class="edit">
@@ -294,6 +298,8 @@ import '../../styles/tokens.css';
   .msg { min-height: 1.6em; margin: 0; font-family: var(--font-mincho); font-size: 12px; color: var(--color-neutral-700); }
   .msg.error { color: #b3261e; }
 
+  .story { display: inline-flex; gap: 14px; margin-right: 18px; }
+  .story[hidden] { display: none; }
   .mfa-enroll { display: flex; flex-direction: column; gap: 12px; }
   .mfa-enroll img { align-self: center; background: #fff; padding: 8px; }
   .mfa-enroll code { font-size: 12px; word-break: break-all; user-select: all; }

@@ -323,6 +323,7 @@ async function openEditor(id: number | null) {
   const onSite = $<HTMLAnchorElement>('[data-view-on-site]');
   onSite.hidden = current.id === undefined;
   if (current.id !== undefined) onSite.href = `/posts/${current.id}/`;
+  syncStory();
 
   if (!editor) {
     editor = createEditor({
@@ -534,6 +535,37 @@ async function addCard() {
 
 // ── save / delete ──────────────────────────────────────────────────────────
 /** Ask Vercel to rebuild the site. null when it started, else why not (for the message). */
+// ── the story image (api/story, api/story-send) ──
+function syncStory() {
+  const saved = current?.id !== undefined;
+  $('[data-story]').hidden = !saved;
+  if (saved) $<HTMLAnchorElement>('[data-story-view]').href = `/api/story?id=${current!.id}`;
+}
+/** Sends the story image; returns a line on how it went, or '' when nothing is set up. */
+async function sendStory(id: number): Promise<string> {
+  try {
+    const res = await fetch('/api/story-send', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ id }),
+    });
+    const r = await res.json().catch(() => ({}));
+    if (!res.ok) return `ストーリー画像を送れませんでした: ${r.error ?? res.status}`;
+    const done = [r.mail === 'sent' && 'メール', r.line === 'sent' && 'LINE'].filter(Boolean).join('と');
+    const errs = [r.mail, r.line].filter((x) => x && x !== 'sent' && x !== 'skipped');
+    return [done && `ストーリー画像を${done}に送りました。`, ...errs].filter(Boolean).join(' ');
+  } catch {
+    return 'ストーリー画像を送れませんでした（窓口につながりません）';
+  }
+}
+$('[data-story-send]').addEventListener('click', async () => {
+  if (current?.id === undefined) return;
+  const out = $('[data-save-msg]');
+  msg(out, 'ストーリー画像を送っています…');
+  const r = await sendStory(current.id);
+  msg(out, r || 'メールも LINE も設定されていないので、送れませんでした（Vercel の環境変数を確かめてください）。', !r || /送れません/.test(r));
+});
+
 async function rebuild(): Promise<string | null> {
   try {
     const res = await fetch('/api/rebuild', { method: 'POST', headers: { Authorization: `Bearer ${session?.access_token}` } });
@@ -572,6 +604,7 @@ $('[data-save]').addEventListener('click', async () => {
   msg(out, '保存しています…');
   if (!(await ensureSignedIn())) return void (button.disabled = false);
   const wasVisible = current.status === 'published' || current.status === 'scheduled';
+  const wasPublished = current.id !== undefined && current.status === 'published';
   const res = current.id === undefined
     ? await sb.from('articles').insert(row).select('id').single()
     : await sb.from('articles').update(row).eq('id', current.id).select('id').single();
@@ -590,7 +623,13 @@ $('[data-save]').addEventListener('click', async () => {
     msg(out, '保存しました。サイトに反映しています…');
     const why = await rebuild();
     msg(out, why ? `保存しました。ただ、サイトに反映できませんでした: ${why}。` : '保存しました。1〜2分でサイトに反映されます。', !!why);
+    // just published: the story image goes out by mail and LINE
+    if (status === 'published' && !wasPublished && !why) {
+      const sent = await sendStory(current.id!);
+      if (sent) msg(out, `保存しました。1〜2分でサイトに反映されます。${sent}`);
+    }
   } else msg(out, '保存しました（下書き・非公開なので、サイトには出ません）。');
+  syncStory();
   if (isNew) history.replaceState(null, '', `#/${current.id}`);
   $('[data-delete]').hidden = false;
   const onSite = $<HTMLAnchorElement>('[data-view-on-site]');
