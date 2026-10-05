@@ -20,6 +20,7 @@ const C = { accent: '#0000ff', bg: '#ffffff', text: '#201f1d', sub: '#605d5d', l
 const SITE = 'fragments-of.space';
 const FOOT = 310; // the white band under the bottom rule, for the link sticker
 const ARROW_TOP = 82; // where the ↗ sits in it (level with the sticker's middle)
+const READ_TOP = 18; // 「記事を読む」 above it
 
 const anon = { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` };
 
@@ -182,10 +183,14 @@ function layout({ name, title, subtitle, date, image, paras, fonts }) {
     h('div', { display: 'flex', borderTop: `2px solid ${C.sub}` }, []),
     h(
       'div',
-      { display: 'flex', justifyContent: 'flex-end', height: FOOT, margin: `0 -${X}px`, padding: `${ARROW_TOP}px ${X}px 0`, background: '#fff' },
+      { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', height: FOOT, margin: `0 -${X}px`, padding: `${READ_TOP}px ${X}px 0`, background: '#fff' },
+      // 「記事を読む」, small, just under the rule over the ↗
+      h('div', { display: 'flex', fontFamily: fonts.jaBody, fontSize: 26, lineHeight: 1.5, color: C.sub }, '記事を読む'),
       {
         type: 'svg',
         props: {
+          // the arrow's stroke ends 16px inside its box: out to the margin
+          style: { marginTop: ARROW_TOP - READ_TOP - 39, marginRight: -15 },
           width: 60,
           height: 60,
           viewBox: '0 0 24 24',
@@ -211,7 +216,7 @@ async function renderStory(a, s) {
   const title = String(a.title ?? '');
   const subtitle = String(a.subtitle ?? '');
   const date = ymd(a.date);
-  const text = [name, title, subtitle, date, SITE, '→', '　', ...paras].join('');
+  const text = [name, title, subtitle, date, '記事を読む', '　', ...paras].join('');
   const fam = {
     latinHeading: s.fontLatinHeading || 'Cormorant Garamond',
     latinBody: s.fontLatinBody || 'Lora',
