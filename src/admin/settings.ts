@@ -620,8 +620,28 @@ function refresh(changed?: Key) {
   const s = state;
   const text = (sel: string, t: string) => doc.querySelectorAll(sel).forEach((n) => (n.textContent = t));
   text('.index .site, .rule .site, .welcome .logo', s.name);
-  text('.intro-ja, .catch-ja', s.catchJa);
-  text('.intro-en, .catch-en', s.catchEn);
+  text('.catch-ja', s.catchJa);
+  text('.catch-en', s.catchEn);
+  // the index's catch copy line by line, as SiteIndex.astro sets it
+  const lines = (sel: string, t: string) =>
+    doc.querySelectorAll(sel).forEach((n) =>
+      n.replaceChildren(
+        ...t
+          .split('\n')
+          .map((l) => l.trim())
+          .filter(Boolean)
+          .map((l) => Object.assign(doc.createElement('span'), { className: 'ln', textContent: l })),
+      ),
+    );
+  lines('.intro-ja', s.catchJa);
+  lines('.intro-en', s.catchEn);
+  // a typed line under 90% of the column stays flush left (as the site's script)
+  doc.querySelectorAll<HTMLElement>('.intro-ja .ln, .intro-en .ln').forEach((ln) => {
+    ln.classList.add('is-short');
+    const r = doc.createRange();
+    r.selectNodeContents(ln);
+    ln.classList.toggle('is-short', !ln.clientWidth || r.getBoundingClientRect().width < ln.clientWidth * 0.9);
+  });
   text('.desc', s.about);
   text('#welcome-title', s.welcomeTitle);
   // the leads as Welcome.astro sets them: paragraphs at blank lines, <br> within

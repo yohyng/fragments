@@ -12,13 +12,15 @@ interface Props {
 const { posts, current } = Astro.props;
 const LIMIT = settings.pageSize;
 const onAbout = Astro.url.pathname.startsWith('/about');
+// the catch copy line by line, as typed in the settings (see the styles)
+const lines = (t: string) => t.split('\n').map((l) => l.trim()).filter(Boolean);
 ---
 
 <nav class="index" data-scroll data-noscrollbar data-index aria-label="記事索引">
   <a class="site" href="/">{site.name}</a>
   <div class="intro">
-    <span class="intro-ja">{site.catchJa}</span>
-    <span class="intro-en" lang="en">{site.catchEn}</span>
+    <span class="intro-ja">{lines(site.catchJa).map((l) => <span class="ln">{l}</span>)}</span>
+    <span class="intro-en" lang="en">{lines(site.catchEn).map((l) => <span class="ln">{l}</span>)}</span>
     <div class="cats">
       {
         ['all', ...categories].map((c) => (
@@ -80,6 +82,18 @@ const onAbout = Astro.url.pathname.startsWith('/about');
   };
 
   const nav = document.currentScript.previousElementSibling;
+  // catch copy: a typed line under 90% of the column stays flush left
+  const markShort = () =>
+    nav?.querySelectorAll('.intro-ja .ln, .intro-en .ln').forEach((ln) => {
+      ln.classList.add('is-short'); // measured flush left
+      const r = document.createRange();
+      r.selectNodeContents(ln);
+      const w = r.getBoundingClientRect().width;
+      ln.classList.toggle('is-short', !ln.clientWidth || w < ln.clientWidth * 0.9);
+    });
+  markShort();
+  document.fonts?.ready.then(markShort);
+  addEventListener('resize', markShort);
   if (nav) {
     const cats = [...nav.querySelectorAll('.cat')];
     const items = [...nav.querySelectorAll('.item')];
@@ -243,12 +257,27 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     line-height: 1.75;
     color: var(--color-neutral-800);
   }
-  /* the catch copy justified, the last line flush left (English hyphenated) */
+  /* the catch copy justified, the last line flush left (English hyphenated).
+     Each line typed in the settings is its own block: a line ending in a
+     typed break is justified too, only the copy's last line is flush left —
+     and a line much shorter than the column (.is-short, set by the script),
+     which justifying would stretch apart (:global — the admin's preview
+     makes these lines itself) */
   .intro-ja,
   .intro-en {
     display: block;
-    white-space: pre-line; /* line breaks typed in the settings */
     text-align: justify;
+    text-align-last: left;
+  }
+  .intro-ja :global(.ln),
+  .intro-en :global(.ln) {
+    display: block;
+    text-align-last: justify;
+  }
+  .intro-ja :global(.ln:last-child),
+  .intro-en :global(.ln:last-child),
+  .intro-ja :global(.ln.is-short),
+  .intro-en :global(.ln.is-short) {
     text-align-last: left;
   }
   .intro-en { hyphens: auto; -webkit-hyphens: auto; position: relative; }
