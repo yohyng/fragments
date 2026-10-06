@@ -358,7 +358,7 @@ const { title, subtitle, date } = Astro.props;
       );
     }
     .subtitle {
-      font-size: 19px;
+      font-size: calc(var(--s-sub-pc, 19) * 1px);
     }
     .date {
       font-size: 13px;
@@ -611,10 +611,27 @@ const { title, subtitle, date } = Astro.props;
      so its half-leading is taken off and the catch copy's added. ── */
   @media (min-width: 1160px) {
     .head {
-      padding-top: calc(var(--s-ix-a, 56) * 1px + var(--s-catch-ja, 13) * 0.375px);
+      /* (表示設定 → 記事の見出し: ヘッダーの線からタイトルまで, from this) */
+      padding-top: calc(var(--s-ix-a, 56) * 1px + var(--s-catch-ja, 13) * 0.375px + var(--s-title-top, 0) * 1px);
+      /* the gaps below are each set; the body follows the date's rule at a
+         set distance (the script) */
+      gap: 0;
+      min-height: 0;
     }
     h1 {
       margin-top: -0.2em;
+    }
+    .subtitle {
+      margin-top: calc(var(--s-sub-gap, 4) * 1px);
+    }
+    .date {
+      margin-top: calc(var(--s-date-gap, 14) * 1px);
+    }
+  }
+  /* the subtitle 2px smaller than set on narrower PCs (as before: 17 / 19) */
+  @media (min-width: 1160px) and (max-width: 1399px) {
+    .subtitle {
+      font-size: calc(var(--s-sub-pc, 19) * 1px - 2px);
     }
   }
 </style>
@@ -705,8 +722,10 @@ const { title, subtitle, date } = Astro.props;
     foot.style.width = n.width + 'px';
     foot.style.top = sub.getBoundingClientRect().top - c.top + col.scrollTop + 'px';
   }
-  // The date's rule is drawn out of the flow: make sure the body starts
-  // below it (32px), whatever its distance or alignment.
+  // The date's rule is drawn out of the flow: the body starts below it — on
+  // PC (beside the index) at the set distance (表示設定 → 日付の下の線から
+  // 本文まで; from the date itself when there is no rule), elsewhere at
+  // least 32px below, whatever its distance or alignment.
   function clearDateRule() {
     const head = document.querySelector<HTMLElement>('main.column .head');
     const date = head?.querySelector<HTMLElement>('.date');
@@ -714,14 +733,17 @@ const { title, subtitle, date } = Astro.props;
     if (!head || !date || !body) return;
     head.style.marginBottom = '';
     const rule = getComputedStyle(date, '::after');
-    if (!(parseFloat(rule.width) > 0)) return;
+    const hasRule = parseFloat(rule.width) > 0;
+    const exact = matchMedia('(min-width: 1160px)').matches;
+    if (!hasRule && !exact) return;
+    const gap = exact ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s-rule-body')) || 56 : 32;
     const first = (body.firstElementChild as HTMLElement | null) ?? body;
     // (a margin: the head's min-height would swallow extra padding; margins
     // can collapse with the body's first one, so measure again and repeat)
     for (let i = 0; i < 6; i++) {
-      const ruleY = date.getBoundingClientRect().top + parseFloat(rule.top);
-      const need = ruleY + 32 - first.getBoundingClientRect().top;
-      if (need <= 0.5) break;
+      const ruleY = hasRule ? date.getBoundingClientRect().top + parseFloat(rule.top) : date.getBoundingClientRect().bottom;
+      const need = ruleY + gap - first.getBoundingClientRect().top;
+      if (exact ? Math.abs(need) <= 0.5 : need <= 0.5) break;
       head.style.marginBottom = parseFloat(getComputedStyle(head).marginBottom) + need + 'px';
     }
   }

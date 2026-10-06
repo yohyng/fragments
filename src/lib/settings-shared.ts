@@ -42,6 +42,14 @@ export interface Settings {
   indent: boolean;
   justify: boolean;
   titleSizePc: number;
+  /** an article's head on PC (beside the index), px: the title below where
+   *  it lines up with the index's catch copy (0), title → subtitle, the
+   *  subtitle's size, subtitle (or title) → date, and the date's rule → body */
+  titleTopPc: number;
+  subtitleGapPc: number;
+  subtitleSizePc: number;
+  dateGapPc: number;
+  ruleBodyGapPc: number;
   noteSize: number;
   /** the thin rule under an article's date: length (0 = none) and distance below it, px */
   dateRuleLength: number;
@@ -142,6 +150,11 @@ export const defaults: Settings = {
   indent: true,
   justify: true,
   titleSizePc: 36,
+  titleTopPc: 0,
+  subtitleGapPc: 4,
+  subtitleSizePc: 19,
+  dateGapPc: 14,
+  ruleBodyGapPc: 56,
   noteSize: 14,
   dateRuleLength: 900,
   dateRuleGap: 16,
@@ -360,6 +373,11 @@ export function settingsCss(s: Settings): string {
     ['measure', '--s-measure'],
     ['colGap', '--s-col-gap'],
     ['titleSizePc', '--s-title-pc'],
+    ['titleTopPc', '--s-title-top'],
+    ['subtitleGapPc', '--s-sub-gap'],
+    ['subtitleSizePc', '--s-sub-pc'],
+    ['dateGapPc', '--s-date-gap'],
+    ['ruleBodyGapPc', '--s-rule-body'],
     ['noteSize', '--s-note'],
     ['dateRuleLength', '--s-date-rule'],
     ['dateRuleGap', '--s-date-rule-gap'],
