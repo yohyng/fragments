@@ -57,7 +57,7 @@
 
 .el-book {
   display: grid;
-  grid-template-columns: 72px minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr);
   column-gap: 16px;
   margin: 2em 0;
   padding: 14px;
@@ -71,11 +71,19 @@
   color: var(--color-text);
   border-color: var(--color-accent);
 }
+/* the whole image, never cut: a cover (portrait) is 104px tall, about 72px
+   wide as before; a page's landscape image is up to 140px wide instead */
 .el-book .el-cover {
   display: block;
+  width: auto;
+  height: auto;
+  max-width: 140px;
+  max-height: 104px;
+  align-self: start;
+}
+.el-book .el-placeholder {
   width: 72px;
   height: 104px;
-  object-fit: cover;
 }
 .el-book .el-placeholder {
   background: var(--color-neutral-200);
