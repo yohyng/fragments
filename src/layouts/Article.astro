@@ -143,7 +143,9 @@ const { title, subtitle, date } = Astro.props;
     content: '';
     position: absolute;
     left: 0;
-    top: var(--date-rule-top, calc(100% + var(--s-date-rule-gap, 16) * 1px)); /* set by the script when aligned with the index */
+    /* beside the index set by the script (level with the index's rule);
+       elsewhere --rule-gap below the date, per layout */
+    top: var(--date-rule-top, calc(100% + var(--rule-gap, 16) * 1px));
     width: min(100%, calc(var(--s-date-rule, 900) * 1px));
     height: 1px;
     background: var(--color-divider);
@@ -361,7 +363,7 @@ const { title, subtitle, date } = Astro.props;
       font-size: calc(var(--s-sub-pc, 19) * 1px);
     }
     .date {
-      font-size: 13px;
+      font-size: calc(var(--s-date-pc, 13) * 1px);
     }
     .body :global(.sidenote) {
       font-size: calc(var(--s-note, 14) * 1px);
@@ -451,21 +453,27 @@ const { title, subtitle, date } = Astro.props;
     .site:hover {
       color: var(--color-text);
     }
+    /* the head's sizes and gaps: 表示設定 → 記事本文 → 記事の見出し（タブレット）
+       (the body follows the date's rule at a set distance: the script) */
     .head {
       min-height: 0;
-      padding: 56px 0 40px;
+      gap: 0;
+      padding: calc(var(--s-title-top-tab, 56) * 1px) 0 0;
       max-width: min(calc(34 * var(--tab-size)), 100% - var(--tab-note) - 40px); /* = the body */
     }
     h1 {
-      font-size: 28px;
+      font-size: calc(var(--s-title-tab, 28) * 1px);
       line-height: 1.45;
       letter-spacing: -0.015em;
     }
     .subtitle {
-      font-size: 15px;
+      font-size: calc(var(--s-sub-tab, 15) * 1px);
+      margin-top: calc(var(--s-sub-gap-tab, 4) * 1px);
     }
     .date {
-      margin-top: 8px;
+      font-size: calc(var(--s-date-tab, 12) * 1px);
+      margin-top: calc(var(--s-date-gap-tab, 12) * 1px);
+      --rule-gap: var(--s-date-rule-gap-tab, 16);
     }
     .body {
       /* up to 34em, giving way so the notes still fit */
@@ -490,12 +498,22 @@ const { title, subtitle, date } = Astro.props;
     .site {
       font-size: calc(var(--s-site-name-sp, var(--s-site-name, 30) * 26 / 30) * 1px); /* as on the top page (26px by default) */
     }
+    /* 表示設定 → 記事本文 → 記事の見出し（スマホ） */
     .head {
-      padding: 40px 0 36px;
+      padding-top: calc(var(--s-title-top-sp, 40) * 1px);
       max-width: none;
     }
     h1 {
-      font-size: 24px;
+      font-size: calc(var(--s-title-sp, 24) * 1px);
+    }
+    .subtitle {
+      font-size: calc(var(--s-sub-sp, 15) * 1px);
+      margin-top: calc(var(--s-sub-gap-sp, 4) * 1px);
+    }
+    .date {
+      font-size: calc(var(--s-date-sp, 12) * 1px);
+      margin-top: calc(var(--s-date-gap-sp, 12) * 1px);
+      --rule-gap: var(--s-date-rule-gap-sp, 16);
     }
     .body {
       max-width: none;
@@ -611,9 +629,10 @@ const { title, subtitle, date } = Astro.props;
      so its half-leading is taken off and the catch copy's added. ── */
   @media (min-width: 1160px) {
     .head {
-      /* (表示設定 → 記事の見出し: ヘッダーの線からタイトルまで, from this) */
+      /* (表示設定 → 記事の見出し（PC）: ヘッダーの線からタイトルまで, from this) */
       padding-top: calc(var(--s-ix-a, 56) * 1px + var(--s-catch-ja, 13) * (var(--s-catch-ja-lh, 1.75) - 1) / 2 * 1px + var(--s-title-top, 0) * 1px);
-      /* the gaps below are each set; the body follows the date's rule at a
+      /* the gaps below are each set; the date's rule is fixed level with the
+         index's, the date set above it, and the body follows the rule at a
          set distance (the script) */
       gap: 0;
       min-height: 0;
@@ -625,23 +644,28 @@ const { title, subtitle, date } = Astro.props;
       margin-top: calc(var(--s-sub-gap, 4) * 1px);
     }
     .date {
-      margin-top: calc(var(--s-date-gap, 14) * 1px);
+      margin-top: 8px; /* at least; the script moves it down to the rule */
     }
   }
-  /* the subtitle 2px smaller than set on narrower PCs (as before: 17 / 19) */
+  /* the subtitle 2px and the date 1px smaller than set on narrower PCs
+     (as before: 17 / 19, 12 / 13) */
   @media (min-width: 1160px) and (max-width: 1399px) {
     .subtitle {
       font-size: calc(var(--s-sub-pc, 19) * 1px - 2px);
+    }
+    .date {
+      font-size: calc(var(--s-date-pc, 13) * 1px - 1px);
     }
   }
 </style>
 
 <script>
-  // Beside the index (≥1160px; 表示設定 → 記事本文 → そろえる): the date's
-  // text bottom level with the index's English catch copy, and the rule
-  // under the date level with the rule under the catch copy. Positions are
-  // taken from each column's header rule, scroll left out. A long title that
-  // already brings the date lower keeps it there.
+  // Beside the index (≥1160px): the rule under the date is fixed level with
+  // the rule under the index's catch copy, and the date stands above it, its
+  // bottom 表示設定 → 日付の下端から線まで above. Positions are taken from
+  // each column's header rule, scroll left out. A long title that brings the
+  // date lower keeps it there (at least 8px below), and the rule goes down
+  // with it.
   function alignHead() {
     const col = document.querySelector<HTMLElement>('main.column');
     const head = col?.querySelector<HTMLElement>('.head');
@@ -653,14 +677,7 @@ const { title, subtitle, date } = Astro.props;
     if (!col || !head || !date || !rule || !index || !en || !site) return;
     date.style.marginTop = '';
     date.style.removeProperty('--date-rule-top');
-    const on = getComputedStyle(document.documentElement).getPropertyValue('--s-date-align').trim() !== '0';
-    if (!on || !matchMedia('(min-width: 1160px)').matches || !en.offsetParent) return;
-    const textBottom = (el: HTMLElement) => {
-      const r = document.createRange();
-      r.selectNodeContents(el);
-      const rects = r.getClientRects();
-      return rects[rects.length - 1]?.bottom ?? el.getBoundingClientRect().bottom;
-    };
+    if (!matchMedia('(min-width: 1160px)').matches || !en.offsetParent) return;
     // y in the index, from the bottom of its header rule
     const ixTop = index.getBoundingClientRect().top - index.scrollTop;
     const ixRule = site.getBoundingClientRect().bottom - index.getBoundingClientRect().top;
@@ -670,12 +687,15 @@ const { title, subtitle, date } = Astro.props;
     const colRule = rule.getBoundingClientRect().bottom - col.getBoundingClientRect().top;
     const inCol = (y: number) => y - colTop - colRule;
 
-    const shift = inIndex(textBottom(en)) - inCol(textBottom(date));
-    if (shift > 0) date.style.marginTop = parseFloat(getComputedStyle(date).marginTop) + shift + 'px';
+    const v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s-date-rule-gap-pc'));
+    const gap = Number.isFinite(v) ? v : 14;
     // the index's rule: the catch copy's ::after, `top` below the copy's box
-    const enTop = en.getBoundingClientRect().top;
-    const ixRuleY = inIndex(enTop + parseFloat(getComputedStyle(en, '::after').top));
-    date.style.setProperty('--date-rule-top', ixRuleY - inCol(date.getBoundingClientRect().top) + 'px');
+    const ixRuleY = inIndex(en.getBoundingClientRect().top + parseFloat(getComputedStyle(en, '::after').top));
+    const margin = parseFloat(getComputedStyle(date).marginTop);
+    const shift = ixRuleY - gap - inCol(date.getBoundingClientRect().bottom);
+    if (shift > 0) date.style.marginTop = margin + shift + 'px';
+    const ruleY = Math.max(ixRuleY, inCol(date.getBoundingClientRect().bottom) + gap);
+    date.style.setProperty('--date-rule-top', ruleY - inCol(date.getBoundingClientRect().top) + 'px');
   }
 
   // Over the notes column (where the notes are beside the body): a light
@@ -722,10 +742,9 @@ const { title, subtitle, date } = Astro.props;
     foot.style.width = n.width + 'px';
     foot.style.top = sub.getBoundingClientRect().top - c.top + col.scrollTop + 'px';
   }
-  // The date's rule is drawn out of the flow: the body starts below it — on
-  // PC (beside the index) at the set distance (表示設定 → 日付の下の線から
-  // 本文まで; from the date itself when there is no rule), elsewhere at
-  // least 32px below, whatever its distance or alignment.
+  // The date's rule is drawn out of the flow: the body starts below it at the
+  // distance set for each layout (表示設定 → 日付の下の線から本文まで; from
+  // the date itself when there is no rule).
   function clearDateRule() {
     const head = document.querySelector<HTMLElement>('main.column .head');
     const date = head?.querySelector<HTMLElement>('.date');
@@ -734,16 +753,20 @@ const { title, subtitle, date } = Astro.props;
     head.style.marginBottom = '';
     const rule = getComputedStyle(date, '::after');
     const hasRule = parseFloat(rule.width) > 0;
-    const exact = matchMedia('(min-width: 1160px)').matches;
-    if (!hasRule && !exact) return;
-    const gap = exact ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s-rule-body')) || 56 : 32;
+    const [name, fallback] = matchMedia('(min-width: 1160px)').matches
+      ? ['--s-rule-body', 56]
+      : matchMedia('(min-width: 760px)').matches
+        ? ['--s-rule-body-tab', 44]
+        : ['--s-rule-body-sp', 40];
+    const v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name));
+    const gap = Number.isFinite(v) ? v : fallback;
     const first = (body.firstElementChild as HTMLElement | null) ?? body;
     // (a margin: the head's min-height would swallow extra padding; margins
     // can collapse with the body's first one, so measure again and repeat)
     for (let i = 0; i < 6; i++) {
       const ruleY = hasRule ? date.getBoundingClientRect().top + parseFloat(rule.top) : date.getBoundingClientRect().bottom;
       const need = ruleY + gap - first.getBoundingClientRect().top;
-      if (exact ? Math.abs(need) <= 0.5 : need <= 0.5) break;
+      if (Math.abs(need) <= 0.5) break;
       head.style.marginBottom = parseFloat(getComputedStyle(head).marginBottom) + need + 'px';
     }
   }

@@ -78,16 +78,32 @@ const tabs: Tab[] = [
       { key: 'colGap', label: '段のあいだの余白（記事一覧・本文・注）', type: 'range', min: 24, max: 160, step: 2, unit: 'px', hint: '記事一覧と本文、本文と注のあいだが、PC（画面幅 1160px 以上）でこの幅にそろいます。' },
       { key: 'indent', label: '段落の頭を1字下げる', type: 'check' },
       { key: 'justify', label: '両端揃え', type: 'check' },
-      // the article's head on PC, top to bottom
+      // the article's head on PC, top to bottom: the band from the header rule
+      // to the light rule under the date is fixed (level with the index's)
       { key: 'titleTopPc', label: '記事の見出し（PC）：ヘッダーの線からタイトルまで', type: 'range', min: -40, max: 160, step: 1, unit: 'px', hint: '0 で、タイトルの上端が記事一覧のキャッチコピー（日本語）の上端にそろいます。そこからの増減です。' },
       { key: 'titleSizePc', label: '記事の見出し（PC）：タイトルの文字サイズ', type: 'range', min: 26, max: 44, step: 1, unit: 'px' },
       { key: 'subtitleGapPc', label: '記事の見出し（PC）：タイトルからサブタイトルまで', type: 'range', min: 0, max: 60, step: 1, unit: 'px' },
       { key: 'subtitleSizePc', label: '記事の見出し（PC）：サブタイトルの文字サイズ', type: 'range', min: 13, max: 28, step: 0.5, unit: 'px', hint: '画面幅 1400px 以上での大きさです。それより狭い PC では 2px 小さくなります。' },
-      { key: 'dateGapPc', label: '記事の見出し（PC）：サブタイトル（なければタイトル）から日付まで', type: 'range', min: 0, max: 80, step: 1, unit: 'px', hint: '下の「そろえる」が入っていると、日付が記事一覧の英文より上に来るときは、英文の高さまで下がります。' },
-      { key: 'dateAlign', label: '記事一覧と並ぶとき、日付と線の高さを記事一覧にそろえる（日付の下端を英文のキャッチコピーの下端に、線をキャッチコピーの下の線に）', type: 'check' },
-      { key: 'dateRuleGap', label: '日付の下の区切り線：日付からの距離', type: 'range', min: 0, max: 120, step: 1, unit: 'px', hint: '上の「そろえる」が切れているとき、またはタブレット・スマホでの距離です。' },
-      { key: 'dateRuleLength', label: '日付の下の区切り線：長さ', type: 'range', min: 0, max: 900, step: 4, unit: 'px', hint: '左揃えの細く薄い線です。0 にすると線なしになります。タイトルの幅より長くすると、その幅で止まります。' },
+      { key: 'dateSizePc', label: '記事の見出し（PC）：日付の文字サイズ', type: 'range', min: 10, max: 18, step: 0.5, unit: 'px', hint: '画面幅 1400px 以上での大きさです。それより狭い PC では 1px 小さくなります。' },
+      { key: 'dateRuleGapPc', label: '記事の見出し（PC）：日付の下端から線まで', type: 'range', min: 0, max: 60, step: 1, unit: 'px', hint: '日付の下の薄い線は、記事一覧のキャッチコピーの下の線と同じ高さに固定です。日付はその線からこの距離だけ上に置かれます（タイトルが長くて日付が下がるときは、線も一緒に下がります）。' },
       { key: 'ruleBodyGapPc', label: '記事の見出し（PC）：日付の下の線から本文まで', type: 'range', min: 8, max: 200, step: 1, unit: 'px', hint: '線がないときは、日付から本文までの距離です。' },
+      { key: 'titleTopTab', label: '記事の見出し（タブレット）：ヘッダーの線からタイトルまで', type: 'range', min: 0, max: 160, step: 1, unit: 'px' },
+      { key: 'titleSizeTab', label: '記事の見出し（タブレット）：タイトルの文字サイズ', type: 'range', min: 18, max: 40, step: 1, unit: 'px' },
+      { key: 'subtitleGapTab', label: '記事の見出し（タブレット）：タイトルからサブタイトルまで', type: 'range', min: 0, max: 60, step: 1, unit: 'px' },
+      { key: 'subtitleSizeTab', label: '記事の見出し（タブレット）：サブタイトルの文字サイズ', type: 'range', min: 11, max: 24, step: 0.5, unit: 'px' },
+      { key: 'dateGapTab', label: '記事の見出し（タブレット）：サブタイトル（なければタイトル）から日付まで', type: 'range', min: 0, max: 80, step: 1, unit: 'px' },
+      { key: 'dateSizeTab', label: '記事の見出し（タブレット）：日付の文字サイズ', type: 'range', min: 10, max: 18, step: 0.5, unit: 'px' },
+      { key: 'dateRuleGapTab', label: '記事の見出し（タブレット）：日付の下端から線まで', type: 'range', min: 0, max: 120, step: 1, unit: 'px' },
+      { key: 'ruleBodyGapTab', label: '記事の見出し（タブレット）：日付の下の線から本文まで', type: 'range', min: 8, max: 200, step: 1, unit: 'px', hint: '線がないときは、日付から本文までの距離です。' },
+      { key: 'titleTopSp', label: '記事の見出し（スマホ）：ヘッダーの線からタイトルまで', type: 'range', min: 0, max: 160, step: 1, unit: 'px' },
+      { key: 'titleSizeSp', label: '記事の見出し（スマホ）：タイトルの文字サイズ', type: 'range', min: 18, max: 40, step: 1, unit: 'px' },
+      { key: 'subtitleGapSp', label: '記事の見出し（スマホ）：タイトルからサブタイトルまで', type: 'range', min: 0, max: 60, step: 1, unit: 'px' },
+      { key: 'subtitleSizeSp', label: '記事の見出し（スマホ）：サブタイトルの文字サイズ', type: 'range', min: 11, max: 24, step: 0.5, unit: 'px' },
+      { key: 'dateGapSp', label: '記事の見出し（スマホ）：サブタイトル（なければタイトル）から日付まで', type: 'range', min: 0, max: 80, step: 1, unit: 'px' },
+      { key: 'dateSizeSp', label: '記事の見出し（スマホ）：日付の文字サイズ', type: 'range', min: 10, max: 18, step: 0.5, unit: 'px' },
+      { key: 'dateRuleGapSp', label: '記事の見出し（スマホ）：日付の下端から線まで', type: 'range', min: 0, max: 120, step: 1, unit: 'px' },
+      { key: 'ruleBodyGapSp', label: '記事の見出し（スマホ）：日付の下の線から本文まで', type: 'range', min: 8, max: 200, step: 1, unit: 'px', hint: '線がないときは、日付から本文までの距離です。' },
+      { key: 'dateRuleLength', label: '日付の下の区切り線：長さ（PC・タブレット・スマホ共通）', type: 'range', min: 0, max: 900, step: 4, unit: 'px', hint: '左揃えの細く薄い線です。0 にすると線なしになります。タイトルの幅より長くすると、その幅で止まります。' },
       { key: 'noteSize', label: '注の文字サイズ（PC）', type: 'range', min: 12, max: 16, step: 0.5, unit: 'px' },
     ],
   },
@@ -663,5 +679,7 @@ function refresh(changed?: Key) {
   if (changed === 'catchJa' || changed === 'catchEn' || !changed)
     document.querySelectorAll<HTMLTextAreaElement>('[data-set-fields] textarea').forEach((t) => {
       if (t.placeholder.includes('メールでお届け')) t.placeholder = `${s.catchJa.replace(/\s*\/$/, '')}。\n新しい記事を、メールでお届けします。`;
-    });
+    });  // the page's scripts that place things by measuring (the article's head,
+  // the catch copy's short lines) run again on resize
+  frame().contentWindow?.dispatchEvent(new Event('resize'));
 }

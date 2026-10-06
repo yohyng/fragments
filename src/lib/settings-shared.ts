@@ -44,18 +44,37 @@ export interface Settings {
   titleSizePc: number;
   /** an article's head on PC (beside the index), px: the title below where
    *  it lines up with the index's catch copy (0), title → subtitle, the
-   *  subtitle's size, subtitle (or title) → date, and the date's rule → body */
+   *  subtitle's and date's sizes, the date's bottom above its rule (which is
+   *  fixed level with the index's), and the rule → body */
   titleTopPc: number;
   subtitleGapPc: number;
   subtitleSizePc: number;
-  dateGapPc: number;
+  dateSizePc: number;
+  dateRuleGapPc: number;
   ruleBodyGapPc: number;
+  /** the same on tablets (Tab) and phones (Sp), where the index is not
+   *  beside the body: header rule → title, title size, title → subtitle,
+   *  subtitle size, subtitle (or title) → date, date size, date → its rule,
+   *  rule → body */
+  titleTopTab: number;
+  titleSizeTab: number;
+  subtitleGapTab: number;
+  subtitleSizeTab: number;
+  dateGapTab: number;
+  dateSizeTab: number;
+  dateRuleGapTab: number;
+  ruleBodyGapTab: number;
+  titleTopSp: number;
+  titleSizeSp: number;
+  subtitleGapSp: number;
+  subtitleSizeSp: number;
+  dateGapSp: number;
+  dateSizeSp: number;
+  dateRuleGapSp: number;
+  ruleBodyGapSp: number;
   noteSize: number;
-  /** the thin rule under an article's date: length (0 = none) and distance below it, px */
+  /** the thin rule under an article's date: length (0 = none), px */
   dateRuleLength: number;
-  dateRuleGap: number;
-  /** beside the index: the date level with the English catch copy, its rule with the index's */
-  dateAlign: boolean;
   // 記事一覧
   siteNameSize: number;
   catchJaSize: number;
@@ -156,12 +175,27 @@ export const defaults: Settings = {
   titleTopPc: 0,
   subtitleGapPc: 4,
   subtitleSizePc: 19,
-  dateGapPc: 14,
+  dateSizePc: 13,
+  dateRuleGapPc: 14,
   ruleBodyGapPc: 56,
+  titleTopTab: 56,
+  titleSizeTab: 28,
+  subtitleGapTab: 4,
+  subtitleSizeTab: 15,
+  dateGapTab: 12,
+  dateSizeTab: 12,
+  dateRuleGapTab: 16,
+  ruleBodyGapTab: 44,
+  titleTopSp: 40,
+  titleSizeSp: 24,
+  subtitleGapSp: 4,
+  subtitleSizeSp: 15,
+  dateGapSp: 12,
+  dateSizeSp: 12,
+  dateRuleGapSp: 16,
+  ruleBodyGapSp: 40,
   noteSize: 14,
   dateRuleLength: 900,
-  dateRuleGap: 16,
-  dateAlign: true,
   siteNameSize: 30,
   catchJaSize: 13,
   catchEnSize: 13,
@@ -381,11 +415,27 @@ export function settingsCss(s: Settings): string {
     ['titleTopPc', '--s-title-top'],
     ['subtitleGapPc', '--s-sub-gap'],
     ['subtitleSizePc', '--s-sub-pc'],
-    ['dateGapPc', '--s-date-gap'],
+    ['dateSizePc', '--s-date-pc'],
+    ['dateRuleGapPc', '--s-date-rule-gap-pc'],
     ['ruleBodyGapPc', '--s-rule-body'],
+    ['titleTopTab', '--s-title-top-tab'],
+    ['titleSizeTab', '--s-title-tab'],
+    ['subtitleGapTab', '--s-sub-gap-tab'],
+    ['subtitleSizeTab', '--s-sub-tab'],
+    ['dateGapTab', '--s-date-gap-tab'],
+    ['dateSizeTab', '--s-date-tab'],
+    ['dateRuleGapTab', '--s-date-rule-gap-tab'],
+    ['ruleBodyGapTab', '--s-rule-body-tab'],
+    ['titleTopSp', '--s-title-top-sp'],
+    ['titleSizeSp', '--s-title-sp'],
+    ['subtitleGapSp', '--s-sub-gap-sp'],
+    ['subtitleSizeSp', '--s-sub-sp'],
+    ['dateGapSp', '--s-date-gap-sp'],
+    ['dateSizeSp', '--s-date-sp'],
+    ['dateRuleGapSp', '--s-date-rule-gap-sp'],
+    ['ruleBodyGapSp', '--s-rule-body-sp'],
     ['noteSize', '--s-note'],
     ['dateRuleLength', '--s-date-rule'],
-    ['dateRuleGap', '--s-date-rule-gap'],
     ['siteNameSize', '--s-site-name'],
     ['ixHeadGap', '--s-ix-a'],
     ['ixCatchGap', '--s-ix-b'],
@@ -434,7 +484,6 @@ export function settingsCss(s: Settings): string {
     v['--s-ix-c-pc'] = `${s.ixCatsGap - 14 - s.ixCatchGap}px`; // less the categories' padding and the catch gap
     v['--s-ix-c-minh'] = '0px';
   }
-  if (!s.dateAlign) v['--s-date-align'] = '0';
   if (!s.indent) v['--s-indent'] = '0';
   if (!s.justify) v['--s-align'] = 'left';
   const body = Object.entries(v)
