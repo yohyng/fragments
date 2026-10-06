@@ -12,8 +12,12 @@ export const site = {
   url: 'https://fragments-of.space',
   lang: 'ja',
   locale: 'ja_JP',
+  /** as typed, line breaks kept (shown where the copy is set) */
   catchJa: settings.catchJa,
   catchEn: settings.catchEn,
+  /** on one line, for descriptions and plain text */
+  catchJaLine: settings.catchJa.replace(/\s*\n\s*/g, ''),
+  catchEnLine: settings.catchEn.replace(/\s*\n\s*/g, ' '),
   /** meta description of the site */
   description: settings.description,
   about: settings.about,

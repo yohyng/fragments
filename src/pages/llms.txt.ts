@@ -11,7 +11,7 @@ export const GET: APIRoute = async ({ site: astroSite }) => {
   const lines = [
     `# ${site.name}`,
     '',
-    `> ${site.catchJa.replace(/\s*\/$/, '')} — ${site.catchEn}`,
+    `> ${site.catchJaLine.replace(/\s*\/$/, '')} — ${site.catchEnLine}`,
     '',
     `${site.name} は、建築・空間・デザインをめぐる長文（批評・エッセイ・論考）を中心とした個人メディアです。著者：${site.author.name}。言語：日本語。`,
     '記事ページは本文・注（出典の書誌情報つき）を含めてすべて静的な HTML です。',

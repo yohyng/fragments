@@ -49,8 +49,8 @@ const tabs: Tab[] = [
     page: 'top',
     fields: [
       { key: 'name', label: 'サイト名', type: 'text' },
-      { key: 'catchJa', label: 'キャッチコピー（日本語）', type: 'text' },
-      { key: 'catchEn', label: 'キャッチコピー（英語）', type: 'textarea', rows: 2 },
+      { key: 'catchJa', label: 'キャッチコピー（日本語）', type: 'textarea', rows: 2, hint: '改行すると、サイトでもそこで改行されます。' },
+      { key: 'catchEn', label: 'キャッチコピー（英語）', type: 'textarea', rows: 2, hint: '改行すると、サイトでもそこで改行されます。' },
       { key: 'description', label: 'サイトの説明（検索結果や SNS で使われます）', type: 'textarea', rows: 3, later: true },
       { key: 'bg', label: '背景色', type: 'color' },
       { key: 'text', label: '文字色', type: 'color' },

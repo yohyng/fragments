@@ -5,7 +5,7 @@ import Page from '../layouts/Page.astro';
 import { site } from '../lib/site';
 ---
 
-<Page title="about — fragments" description={`${site.name}について。${site.catchJa} ${site.catchEn}`}>
+<Page title="about — fragments" description={`${site.name}について。${site.catchJaLine} ${site.catchEnLine}`}>
   <main class="column" data-scroll data-noscrollbar>
     <div class="rule"><a class="site" href="/">fragments</a></div>
     <div class="grid">
@@ -108,12 +108,14 @@ import { site } from '../lib/site';
     line-height: 1.9;
   }
   .catch-ja {
+    white-space: pre-line; /* line breaks typed in the settings */
     margin: 0;
     font-family: var(--font-mincho-heading);
     font-size: 18px;
     line-height: 1.7;
   }
   .catch-en {
+    white-space: pre-line;
     margin: 0;
     font-family: var(--font-body);
     font-style: italic;
