@@ -264,8 +264,8 @@ const onAbout = Astro.url.pathname.startsWith('/about');
     height: 1px;
     background: var(--color-divider);
   }
-  .intro-ja { font-family: var(--font-mincho); font-size: calc(var(--s-catch-ja, 13) * 1px); }
-  .intro-en { font-family: var(--font-body); font-style: italic; font-size: calc(var(--s-catch-en, 13) * 1px); }
+  .intro-ja { font-family: var(--font-mincho); font-size: calc(var(--s-catch-ja, 13) * 1px); line-height: var(--s-catch-ja-lh, 1.75); }
+  .intro-en { font-family: var(--font-body); font-style: italic; font-size: calc(var(--s-catch-en, 13) * 1px); line-height: var(--s-catch-en-lh, 1.75); }
   .cats {
     display: flex;
     flex-wrap: wrap;

@@ -60,6 +60,9 @@ export interface Settings {
   siteNameSize: number;
   catchJaSize: number;
   catchEnSize: number;
+  /** line height of the catch copy (where it breaks over lines) */
+  catchJaLh: number;
+  catchEnLh: number;
   /** the index on phones (≤759px); as they are, they follow the PC sizes */
   siteNameSizeSp: number;
   catchJaSizeSp: number;
@@ -162,6 +165,8 @@ export const defaults: Settings = {
   siteNameSize: 30,
   catchJaSize: 13,
   catchEnSize: 13,
+  catchJaLh: 1.75,
+  catchEnLh: 1.75,
   siteNameSizeSp: 26,
   catchJaSizeSp: 13,
   catchEnSizeSp: 13,
@@ -415,6 +420,8 @@ export function settingsCss(s: Settings): string {
     ['welcomeLeadParaGap', '--s-wl-para'],
     ['catchJaSize', '--s-catch-ja'],
     ['catchEnSize', '--s-catch-en'],
+    ['catchJaLh', '--s-catch-ja-lh'],
+    ['catchEnLh', '--s-catch-en-lh'],
     ['siteNameSizeSp', '--s-site-name-sp'],
     ['catchJaSizeSp', '--s-catch-ja-sp'],
     ['catchEnSizeSp', '--s-catch-en-sp'],

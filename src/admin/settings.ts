@@ -99,6 +99,8 @@ const tabs: Tab[] = [
       { key: 'siteNameSize', label: 'サイト名の文字サイズ', type: 'range', min: 20, max: 48, step: 1, unit: 'px', hint: 'PC での大きさです。タブレット・スマホでは同じ比率で少し小さくなります（記事ページ上部のサイト名も）。' },
       { key: 'catchJaSize', label: 'キャッチコピー（日本語）の文字サイズ', type: 'range', min: 11, max: 20, step: 0.5, unit: 'px' },
       { key: 'catchEnSize', label: 'キャッチコピー（英語）の文字サイズ', type: 'range', min: 11, max: 20, step: 0.5, unit: 'px' },
+      { key: 'catchJaLh', label: 'キャッチコピー（日本語）の行間', type: 'range', min: 1.2, max: 2.6, step: 0.05, unit: '', hint: '文字の大きさに対する行の高さです（1.75 が標準）。改行したときや折り返したときの行の間隔になります。' },
+      { key: 'catchEnLh', label: 'キャッチコピー（英語）の行間', type: 'range', min: 1.2, max: 2.6, step: 0.05, unit: '' },
       { key: 'fontIndex', label: '記事一覧（記事タイトル）のフォント', type: 'font-ja', sameAs: '本文と同じ' },
       { key: 'indexSize', label: '記事一覧の文字サイズ', type: 'range', min: 12, max: 17, step: 0.5, unit: 'px', hint: 'PC・タブレットの大きさです（スマホは下のスマホ用の設定、触らなければ同じ大きさ）。' },
       { key: 'ixHeadGap', label: '間隔：ヘッダー（サイト名の線）とキャッチコピー', type: 'range', min: 0, max: 160, step: 2, unit: 'px', hint: 'PC・タブレットの値です。' },

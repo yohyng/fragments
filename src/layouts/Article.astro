@@ -612,7 +612,7 @@ const { title, subtitle, date } = Astro.props;
   @media (min-width: 1160px) {
     .head {
       /* (表示設定 → 記事の見出し: ヘッダーの線からタイトルまで, from this) */
-      padding-top: calc(var(--s-ix-a, 56) * 1px + var(--s-catch-ja, 13) * 0.375px + var(--s-title-top, 0) * 1px);
+      padding-top: calc(var(--s-ix-a, 56) * 1px + var(--s-catch-ja, 13) * (var(--s-catch-ja-lh, 1.75) - 1) / 2 * 1px + var(--s-title-top, 0) * 1px);
       /* the gaps below are each set; the body follows the date's rule at a
          set distance (the script) */
       gap: 0;
