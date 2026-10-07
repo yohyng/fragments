@@ -32,7 +32,7 @@ const shares: { label: string; icon: string; href: string }[] = [
 
 <div class="end">
 <aside class="sub" aria-label="購読とシェア">
-  <Subscribe compact />
+  <Subscribe fit />
   <nav class="share" aria-label="この記事をシェア" data-share={url} data-share-text={text}>
     <ul>
       {
@@ -114,9 +114,14 @@ const shares: { label: string; icon: string; href: string }[] = [
     padding: 0;
     list-style: none;
   }
+  /* the subscribe box takes what the share buttons leave (only a button
+     to the subscribe screen when that is too narrow: Subscribe.astro) */
   .sub > :global(.subscribe) {
-    flex: 1 1 300px;
+    flex: 1 1 0;
     min-width: 0;
+  }
+  .share {
+    flex: none;
   }
   /* icon buttons: a thin frame, the accent on hover */
   .share a,
@@ -161,7 +166,6 @@ const shares: { label: string; icon: string; href: string }[] = [
   /* the subscribe form and the share buttons in one row under one rule */
   .sub {
     display: flex;
-    flex-wrap: wrap;
     align-items: flex-start; /* the icons level with the field, above the policy line */
     gap: 12px 16px;
     margin-top: 96px;

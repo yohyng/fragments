@@ -40,7 +40,7 @@ const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn, true);
           No thanks <span aria-hidden="true">→</span>
         </button>
       ) : (
-        <a class="skip" href="/">
+        <a class="skip" href="/" data-skip-page>
           {settings.welcomeReadJa}
           {settings.welcomeReadEn && <span class="skip-en">{settings.welcomeReadEn}</span>}
           <span aria-hidden="true">→</span>
@@ -208,6 +208,11 @@ const leadEn = leadParagraphs(settings.welcomeLeadEn || site.catchEn, true);
 </style>
 
 <script>
+  // Page: back to where the reader came from (?from=/posts/…/), else the top
+  const from = new URLSearchParams(location.search).get('from') ?? '';
+  const back = document.querySelector<HTMLAnchorElement>('[data-skip-page]');
+  if (back && /^\/[^/\\]/.test(from)) back.href = from;
+
   // Overlay: "No thanks", Escape, or a finished subscription close it for
   // good (remembered in localStorage).
   const box = document.querySelector<HTMLElement>('[data-welcome="overlay"]');
