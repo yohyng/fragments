@@ -1,9 +1,16 @@
 ---
 // Subscribe box: one 1px accent frame holding the email field and the button.
 // After sending it is replaced by the 「✓ Subscribed」 band and a note.
+// compact (the article's end): on phones only the button shows, beside the
+// share buttons; pressing it stretches the bar out over them with the email
+// field, and a press outside it (or Esc) folds it back.
+interface Props {
+  compact?: boolean;
+}
+const { compact = false } = Astro.props;
 ---
 
-<div class="subscribe" data-subscribe>
+<div class:list={['subscribe', { 'is-compact': compact }]} data-subscribe>
   <form class="field" novalidate>
     <input
       type="email"
@@ -140,6 +147,45 @@
     input::placeholder {
       font-size: 10.5px;
     }
+    /* compact: the box keeps the button's width in the row; the bar grows
+       out of it to the row's width (--open-w, set by the script), over
+       what is beside it */
+    .subscribe.is-compact.is-compact {
+      position: relative;
+      z-index: 3;
+      flex: none;
+      width: var(--closed-w, 92px);
+    }
+    .is-compact .field {
+      position: relative;
+      box-sizing: border-box;
+      width: var(--closed-w, 92px);
+      background: var(--color-bg);
+      overflow: hidden;
+      transition: width 0.28s ease;
+    }
+    .is-compact.is-open .field {
+      width: var(--open-w, 100%);
+    }
+    .is-compact input {
+      transition: opacity 0.2s ease 0.08s;
+    }
+    .is-compact:not(.is-open) input {
+      padding: 0;
+      opacity: 0;
+      transition: none;
+    }
+    .is-compact .policy,
+    .is-compact .note {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: var(--open-w, 100%);
+    }
+    .is-compact:not(.is-open) .policy,
+    .is-compact:not(.is-open) .note {
+      visibility: hidden;
+    }
   }
 </style>
 
@@ -164,7 +210,40 @@
     const note = box.querySelector<HTMLElement>('[data-note]')!;
     let sending = false;
 
+    // compact (phones): the button opens the bar first; outside or Esc closes it
+    const compact = () => box.classList.contains('is-compact') && matchMedia('(max-width: 759px)').matches;
+    const measure = () => {
+      if (!box.classList.contains('is-compact')) return;
+      box.style.setProperty('--closed-w', button.offsetWidth + 2 + 'px');
+      box.style.setProperty('--open-w', (box.parentElement?.clientWidth ?? 0) + 'px');
+    };
+    const setOpen = (open: boolean) => {
+      measure();
+      box.classList.toggle('is-open', open);
+      if (open) input.focus({ preventScroll: true });
+    };
+    measure();
+    document.fonts?.ready.then(measure);
+    addEventListener('resize', measure);
+    button.addEventListener('click', (e) => {
+      if (compact() && !box.classList.contains('is-open')) {
+        e.preventDefault();
+        setOpen(true);
+      }
+    });
+    document.addEventListener('pointerdown', (e) => {
+      if (box.classList.contains('is-open') && !box.contains(e.target as Node)) setOpen(false);
+    });
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && box.classList.contains('is-open')) {
+        setOpen(false);
+        button.focus();
+      }
+    });
+
     const showDone = (text: string) => {
+      // the band and its note take the whole row
+      box.classList.remove('is-compact', 'is-open');
       done.querySelector('.msg')!.textContent = text;
       form.hidden = true;
       note.hidden = true;
