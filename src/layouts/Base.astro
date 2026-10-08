@@ -145,6 +145,78 @@ const { title } = Astro.props;
         },
         { passive: false },
       );
+      // Pull to refresh: the page never scrolls, so the browser's own never
+      // fires. A column pulled down at its top shows ↻ coming down from the
+      // top edge; let go past the mark, and the page reloads.
+      (() => {
+        const MARK = 64; // px of pull (after damping) to reload
+        let col = null;
+        let startY = 0;
+        let pull = 0;
+        let el = null;
+        const ui = () => {
+          if (el) return el;
+          el = document.createElement('div');
+          el.className = 'ptr';
+          el.setAttribute('aria-hidden', 'true');
+          el.innerHTML =
+            '<svg viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3" /><path d="M19.5 4.5v4h-4" /></svg>';
+          document.body.append(el);
+          return el;
+        };
+        const draw = () => {
+          const n = ui();
+          const p = Math.min(pull / MARK, 1);
+          n.style.transition = 'none';
+          n.style.opacity = String(Math.min(1, pull / 24));
+          n.style.transform = 'translate(-50%, ' + (Math.min(pull, MARK * 1.4) - 44) + 'px) rotate(' + p * 270 + 'deg)';
+          n.classList.toggle('is-ready', pull >= MARK);
+        };
+        const reset = () => {
+          if (!el) return;
+          el.style.transition = '';
+          el.style.opacity = '0';
+          el.style.transform = 'translate(-50%, -44px)';
+          el.classList.remove('is-ready');
+        };
+        document.addEventListener(
+          'touchstart',
+          (e) => {
+            pull = 0;
+            const c = e.touches.length === 1 && e.target instanceof Element ? e.target.closest('[data-scroll]') : null;
+            col = c && c.scrollTop <= 0 && !document.documentElement.dataset.welcome ? c : null;
+            startY = e.touches[0].clientY;
+          },
+          { passive: true },
+        );
+        document.addEventListener(
+          'touchmove',
+          (e) => {
+            if (!col) return;
+            if (e.touches.length > 1 || col.scrollTop > 0) {
+              col = null;
+              pull = 0;
+              return reset();
+            }
+            pull = Math.max(0, (e.touches[0].clientY - startY) * 0.5);
+            draw();
+          },
+          { passive: true },
+        );
+        const end = () => {
+          if (!col) return;
+          col = null;
+          if (pull >= MARK && el) {
+            el.style.transition = '';
+            el.style.transform = 'translate(-50%, ' + (MARK - 44) + 'px)';
+            el.classList.add('is-loading');
+            location.reload();
+          } else reset();
+          pull = 0;
+        };
+        document.addEventListener('touchend', end, { passive: true });
+        document.addEventListener('touchcancel', () => ((pull = 0), end()), { passive: true });
+      })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

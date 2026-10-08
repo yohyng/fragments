@@ -41,6 +41,46 @@ a:hover { color: var(--color-accent-600); }
 [data-scroll] { overscroll-behavior: contain; }
 [data-noscrollbar] { scrollbar-width: none; }
 
+/* pull to refresh (Base.astro): ↻ in a small round tab, down from the top */
+.ptr {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  z-index: 50;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-divider);
+  border-radius: 50%;
+  background: var(--color-bg);
+  color: var(--color-neutral-700);
+  opacity: 0;
+  transform: translate(-50%, -44px);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  pointer-events: none;
+}
+.ptr svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ptr.is-ready {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+.ptr.is-loading svg {
+  animation: ptr-spin 0.8s linear infinite;
+}
+@keyframes ptr-spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Until the web fonts are in (see Base.astro), nothing shows; then a short
    fade. Without JavaScript the class is never set. */
 body { transition: opacity 0.2s ease; }
