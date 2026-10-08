@@ -150,10 +150,11 @@ const { fit = false } = Astro.props;
     justify-content: center;
     width: fit-content; /* at the left; the share buttons stay at the right */
     height: 36px; /* as the field with its frame */
-    padding: 0 18px;
+    padding: 0 calc(18px - 0.08em) 0 18px; /* less the spacing after the last letter */
     box-sizing: border-box;
     font-family: var(--font-body);
     font-size: 13px;
+    letter-spacing: 0.08em;
     /* quieter than the form's button: an accent frame and accent text */
     color: var(--color-accent);
     background: none;
