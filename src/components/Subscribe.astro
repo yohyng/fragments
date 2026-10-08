@@ -154,12 +154,15 @@ const { fit = false } = Astro.props;
     box-sizing: border-box;
     font-family: var(--font-body);
     font-size: 13px;
-    color: #fff;
-    background: var(--color-accent);
+    /* quieter than the form's button: an accent frame and accent text */
+    color: var(--color-accent);
+    background: none;
+    border: 1.5px solid var(--color-accent);
     text-decoration: none;
   }
   .go:hover {
-    background: var(--color-accent-600);
+    color: var(--color-accent-600);
+    border-color: var(--color-accent-600);
   }
   @container (max-width: 239px) {
     .go {
