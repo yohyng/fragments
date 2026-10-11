@@ -169,6 +169,11 @@ import '../../styles/tokens.css';
               <span class="mail-label">添える記事 <span class="hint">（前回の配信より後の記事に、はじめから印がついています）</span></span>
               <div data-mail-arts></div>
             </div>
+            <div class="mail-mode">
+              <span class="mail-label">記事の載せ方</span>
+              <label class="mail-art"><input type="radio" name="mail-mode" value="excerpt" data-mail-mode checked /><span>冒頭だけ（「続きを読む」でサイトへ）</span></label>
+              <label class="mail-art"><input type="radio" name="mail-mode" value="full" data-mail-mode /><span>全文（注・画像も含めて、メールで最後まで読める）</span></label>
+            </div>
             <label>結びの文<textarea data-mail-f="outro" rows="3" placeholder="（なくても構いません）"></textarea></label>
             <label>テスト送信先<input type="text" data-mail-to placeholder="空欄ならログイン中のアドレス" /></label>
             <p class="hint mail-to-hint" data-mail-to-hint>カンマで区切って 3 件まで。入れたアドレスは、管理者だけが読める場所に保存されます。</p>
@@ -443,6 +448,7 @@ import '../../styles/tokens.css';
   .mail-arts [data-mail-arts] { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; max-height: 260px; overflow: auto; }
   .mail-art { flex-direction: row; align-items: baseline; gap: 8px; font-size: 13px; color: var(--color-text); cursor: pointer; }
   .mail-art input { flex: none; }
+  .mail-mode { display: flex; flex-direction: column; gap: 4px; }
   .mail-art .date { font-family: var(--font-body); font-size: 11px; color: var(--color-neutral-700); white-space: nowrap; font-variant-numeric: tabular-nums; }
   .mail-to-hint { margin-top: -8px; }
   .mail-actions { display: flex; gap: 10px; }

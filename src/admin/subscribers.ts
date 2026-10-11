@@ -4,6 +4,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import setupSql from '../../supabase/fragments_subscribers.sql?raw';
 import { renderNewsletter } from '../lib/newsletter-mail.mjs';
+import { fullArticle } from './mail-article';
 
 type Row = { id: string; email: string; status: 'pending' | 'active' | 'unsubscribed'; created_at: string; confirmed_at: string | null };
 const LABEL: Record<Row['status'], string> = { active: '登録中', pending: '確認待ち', unsubscribed: '配信停止' };
@@ -77,7 +78,7 @@ export async function openSubscribers() {
 }
 
 // ── メールを送る ──────────────────────────────────────────────────────────
-type Art = { id: number; title: string; subtitle: string; date: string; url: string; excerpt: string };
+type Art = { id: number; title: string; subtitle: string; date: string; url: string; excerpt: string; content: string };
 const SITE = (import.meta.env.SITE || 'https://fragments-of.space').replace(/\/$/, '');
 const DRAFT = 'fragments-mail-draft';
 let arts: Art[] = [];
@@ -98,19 +99,28 @@ function excerpt(html: string, n = 110) {
   const t = (doc.body.textContent ?? '').replace(/\s+/g, ' ').trim();
   return t.length > n ? t.slice(0, n).trimEnd() + '…' : t;
 }
+
+const mode = () => ($<HTMLInputElement>('[data-mail-mode][value="full"]').checked ? 'full' : 'excerpt');
 const chosen = () => arts.filter((a) => $<HTMLInputElement>(`[data-mail-art="${a.id}"]`)?.checked);
 const payload = () => ({
   subject: f('subject').value.trim(),
   intro: f('intro').value,
   outro: f('outro').value,
-  articles: chosen().map(({ title, subtitle, date, url, excerpt }) => ({ title, subtitle, date, url, excerpt })),
+  articles: chosen().map(({ title, subtitle, date, url, excerpt, content }) => ({
+    title,
+    subtitle,
+    date,
+    url,
+    excerpt,
+    ...(mode() === 'full' && fullArticle(content, SITE)),
+  })),
 });
 
 function preview() {
   const p = payload();
   $<HTMLIFrameElement>('[data-mail-preview]').srcdoc = renderNewsletter({ ...p, subject: p.subject || '（件名）', unsubscribe: `${SITE}/subscribe/`, site: SITE }).html;
   try {
-    localStorage.setItem(DRAFT, JSON.stringify({ subject: f('subject').value, intro: f('intro').value, outro: f('outro').value }));
+    localStorage.setItem(DRAFT, JSON.stringify({ subject: f('subject').value, intro: f('intro').value, outro: f('outro').value, mode: mode() }));
   } catch {}
   $('[data-mail-send]').textContent = activeCount ? `配信する（${activeCount}人）` : '配信する';
 }
@@ -119,6 +129,7 @@ function initMail() {
   try {
     const d = JSON.parse(localStorage.getItem(DRAFT) || '{}');
     for (const k of ['subject', 'intro', 'outro']) if (typeof d[k] === 'string') f(k).value = d[k];
+    if (d.mode === 'full') $<HTMLInputElement>('[data-mail-mode][value="full"]').checked = true;
   } catch {}
   $('[data-mail]').addEventListener('input', (e) => {
     if ((e.target as HTMLElement).matches('[data-mail-to]')) return;
@@ -136,7 +147,7 @@ async function openMail() {
     sb.from('articles').select('id,date,title,subtitle,content,status').eq('status', 'published').order('date', { ascending: false }).order('id', { ascending: false }).limit(15),
     sb.from('fragments_mailings').select('subject,recipients,sent_at').order('sent_at', { ascending: false }).limit(10),
   ]);
-  arts = ((a.data ?? []) as any[]).map((r) => ({ id: r.id, title: r.title ?? '', subtitle: r.subtitle ?? '', date: ymd(r.date ?? ''), url: `${SITE}/posts/${r.id}/`, excerpt: excerpt(r.content) }));
+  arts = ((a.data ?? []) as any[]).map((r) => ({ id: r.id, title: r.title ?? '', subtitle: r.subtitle ?? '', date: ymd(r.date ?? ''), url: `${SITE}/posts/${r.id}/`, excerpt: excerpt(r.content), content: r.content ?? '' }));
   const last = (h.data?.[0] as any)?.sent_at as string | undefined;
   const since = last ? ymd(new Date(last).toLocaleDateString('sv-SE')) : ymd(new Date(Date.now() - 7 * 864e5).toLocaleDateString('sv-SE'));
   $('[data-mail-arts]').replaceChildren(

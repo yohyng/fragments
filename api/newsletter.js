@@ -1,6 +1,7 @@
 // POST from the admin (購読者 → メールを送る), with the signed-in user's
 // Supabase token: sends the newsletter 「fragments folio」.
-//   { subject, intro, outro, articles: [{ title, subtitle, date, url, excerpt }], test }
+//   { subject, intro, outro, articles: [{ title, subtitle, date, url, excerpt, blocks?, notes? }], test }
+// (blocks / notes: the whole article in the mail; see src/lib/newsletter-mail.mjs)
 // test: true → only to the saved test addresses (fragments_admin_prefs), or
 // the signed-in user, to check it. Otherwise to every
 // active subscriber, each with their own unsubscribe link, and recorded in
@@ -8,7 +9,7 @@
 // SUPABASE_SERVICE_ROLE_KEY.
 
 import { listActive, mailReady, recordMailing, requireAdmin, sendBatch, siteUrl, testRecipients, unsubscribeUrl } from '../src/lib/newsletter.mjs';
-import { renderNewsletter } from '../src/lib/newsletter-mail.mjs';
+import { cleanArticle, renderNewsletter } from '../src/lib/newsletter-mail.mjs';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -30,6 +31,7 @@ export default async function handler(req, res) {
     date: String(a.date ?? ''),
     url: String(a.url ?? ''),
     excerpt: String(a.excerpt ?? ''),
+    ...(Array.isArray(a.blocks) && cleanArticle(a)), // full: the whole article
   }));
   if (!subject) return res.status(400).json({ error: '件名を入れてください' });
   if (!intro.trim() && !articles.length) return res.status(400).json({ error: '本文か記事を入れてください' });
