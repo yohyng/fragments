@@ -10,6 +10,10 @@ html, body {
   overscroll-behavior: none;
 }
 
+/* no blue flash over what is tapped (Android Chrome's default): links and
+   buttons show their own hover / focus styles instead */
+html { -webkit-tap-highlight-color: transparent; }
+
 body {
   margin: 0;
   background: var(--color-bg);
