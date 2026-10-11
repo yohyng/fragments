@@ -46,7 +46,7 @@ ${a.excerpt ? `<div style="font-family:${SERIF};font-size:13.5px;line-height:1.8
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px">
 <tr><td style="padding-bottom:6px;border-bottom:1px solid ${C.text}">
 <a href="${esc(site)}" style="font-family:'Cormorant Garamond',Georgia,serif;font-size:30px;line-height:1.2;color:${C.text};text-decoration:none">fragments</a>
-<span style="font-family:${LATIN};font-style:italic;font-size:13px;color:${C.sub};margin-left:10px">folio</span>
+<span style="font-family:${LATIN};font-style:italic;font-size:18px;color:${C.sub};margin-left:10px">folio</span>
 </td></tr>
 <tr><td style="padding-top:32px">${paras(intro).map((t) => p(t)).join('')}</td></tr>
 ${items ? `<tr><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${items}</table></td></tr>` : ''}
